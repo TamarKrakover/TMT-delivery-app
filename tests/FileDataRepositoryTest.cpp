@@ -1,0 +1,59 @@
+#include <gtest/gtest.h>
+#include "FileDataRepository.hpp"
+#include <fstream>
+#include <vector>
+#include <string>
+
+// Test suite for FileDataRepository
+class FileDataRepositoryTest : public ::testing::Test {
+protected:
+    std::string testFileName = "test_data.txt";
+
+    // Clean up the test file before and after each test
+    void SetUp() override {
+        std::remove(testFileName.c_str());
+    }
+
+    void TearDown() override {
+        std::remove(testFileName.c_str());
+    }
+};
+
+// 1. Test saving and retrieving data
+TEST_F(FileDataRepositoryTest, SaveAndGetAllData) {
+    FileDataRepository repo(testFileName);
+    std::string userId = "user1";
+    std::vector<std::string> products = {"p1", "p2"};
+
+    repo.saveUserViews(userId, products);
+    auto data = repo.getAllData();
+
+    ASSERT_EQ(data.size(), 1);
+    EXPECT_EQ(data[userId], products);
+}
+
+// 2. Test data persistence (writing to file and loading back)
+TEST_F(FileDataRepositoryTest, PersistenceTest) {
+    {
+        FileDataRepository repo(testFileName);
+        repo.saveUserViews("u1", {"p1"});
+    } // repo goes out of scope and should have persisted to file
+
+    FileDataRepository newRepo(testFileName);
+    ASSERT_TRUE(newRepo.loadAllData());
+    
+    auto data = newRepo.getAllData();
+    ASSERT_EQ(data.size(), 1);
+    EXPECT_EQ(data["u1"].at(0), "p1");
+}
+
+// 3. Test appending products to an existing user
+TEST_F(FileDataRepositoryTest, AppendProductsTest) {
+    FileDataRepository repo(testFileName);
+    repo.saveUserViews("u1", {"p1"});
+    repo.saveUserViews("u1", {"p2"});
+
+    auto data = repo.getAllData();
+    std::vector<std::string> expected = {"p1", "p2"};
+    EXPECT_EQ(data["u1"], expected);
+}
