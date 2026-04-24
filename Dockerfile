@@ -1,24 +1,25 @@
-# Use the official GCC image which already includes C++ compilers and make
+# Use the official GCC image
 FROM gcc:latest
 
-# Install cmake and unzip (unzip is required by CMake FetchContent to extract GoogleTest)
+# Install cmake and unzip for GoogleTest extraction
 RUN apt-get update && apt-get install -y \
     cmake \
     unzip \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy the entire contents of the current directory into the container
-COPY . /usr/src/mytest
-
-# Set the working directory
+# Set the working directory for the project
 WORKDIR /usr/src/mytest
 
-# Create a build directory and set it as the active working directory
-RUN mkdir build
+# Copy the project files into the container
+COPY . .
+
+# Create build directory, configure with CMake, and compile all targets
+# This builds both 'recommendApp' and 'runTests'
+RUN mkdir build && cd build && cmake .. && make
+
+# Set the working directory to the location of the binaries
 WORKDIR /usr/src/mytest/build
 
-# Run CMake to configure the project, then compile it using make
-RUN cmake .. && make
-
-# Set the default command to run the compiled tests executable
-CMD ["./runTests"]
+# Default command: Runs the recommendation CLI application
+# To run tests instead, use: docker run --rm <image_name> ./runTests
+CMD ["./recommendApp"]
