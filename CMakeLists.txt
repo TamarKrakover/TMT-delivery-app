@@ -18,8 +18,12 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
+
+file(GLOB SRC_FILES "src/*.cpp")
 file(GLOB TEST_SOURCES "tests/*.cpp")
 
-add_executable(runTests ${TEST_SOURCES})
+add_executable(runTests ${SRC_FILES} ${TEST_SOURCES})
+
+target_include_directories(runTests PRIVATE src)
 
 target_link_libraries(runTests gtest_main)
