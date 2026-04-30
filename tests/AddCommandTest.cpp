@@ -26,22 +26,22 @@ protected:
 TEST_F(AddCommandTest, ExecuteValidAddCommand) {
     AddCommand addCmd(*repo);
     // Format: [userid, productid1, productid2, ...]
-    std::vector<std::string> args = {"user123", "p101", "p102"};
+    std::vector<std::string> args = {"1", "101", "102"};
     
     addCmd.execute(args);
     
     auto data = repo->getAllData();
-    ASSERT_EQ(data.count("user123"), 1);
-    EXPECT_EQ(data["user123"].size(), 2);
-    EXPECT_EQ(data["user123"][0], "p101");
-    EXPECT_EQ(data["user123"][1], "p102");
+    ASSERT_EQ(data.count("1"), 1);
+    EXPECT_EQ(data["1"].size(), 2);
+    EXPECT_EQ(data["1"][0], "101");
+    EXPECT_EQ(data["1"][1], "102");
 }
 
 // Test that an invalid command (missing product IDs) does not modify the repository
 TEST_F(AddCommandTest, ExecuteInvalidAddCommand) {
     AddCommand addCmd(*repo);
     // Invalid: only userId provided, no productIds
-    std::vector<std::string> args = {"user123"}; 
+    std::vector<std::string> args = {"1"}; 
     
     addCmd.execute(args);
     
