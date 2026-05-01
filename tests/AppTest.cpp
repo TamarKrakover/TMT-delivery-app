@@ -1,0 +1,105 @@
+#include <gtest/gtest.h>
+#include <vector>
+#include <string>
+#include <memory>
+#include <map>
+
+#include "App.hpp"
+#include "IInputSource.hpp"
+#include "IOutputWriter.hpp"
+#include "ICommand.hpp"
+
+// --- Mocks ---
+
+// Fake Input Source: Feeds predefined strings one by one
+class MockInputSource : public IInputSource {
+public:
+    std::vector<std::string> inputsToFeed;
+    size_t currentIndex = 0;
+
+    std::string readNextLine() override {
+        if (currentIndex < inputsToFeed.size()) {
+            return inputsToFeed[currentIndex++];
+        }
+        return ""; // Empty string terminates the App loop
+    }
+};
+
+// Fake Output Writer: Captures output for verification
+class MockOutputWriter : public IOutputWriter {
+public:
+    std::string capturedOutput = "";
+
+    void write(const std::string& message) override {
+        capturedOutput += message;
+    }
+};
+
+// Fake Command: Records if it was executed and with what arguments
+class MockCommand : public ICommand {
+public:
+    bool wasExecuted = false;
+    std::vector<std::string> receivedArgs;
+
+    void execute(const std::vector<std::string>& args) override {
+        wasExecuted = true;
+        receivedArgs = args;
+    }
+};
+
+// --- Tests ---
+
+class AppTest : public ::testing::Test {
+protected:
+    std::shared_ptr<MockInputSource> mockInput;
+    std::shared_ptr<MockOutputWriter> mockOutput;
+    std::map<std::string, std::shared_ptr<ICommand>> commandMap;
+    std::shared_ptr<MockCommand> mockAddCmd;
+    
+    void SetUp() override {
+        mockInput = std::make_shared<MockInputSource>();
+        mockOutput = std::make_shared<MockOutputWriter>();
+        
+        mockAddCmd = std::make_shared<MockCommand>();
+        commandMap["add"] = mockAddCmd;
+    }
+};
+
+// Test 1: Verify valid command parsing and execution
+TEST_F(AppTest, ParsesAndExecutesValidCommand) {
+    // We mock typing "add 1 100 101"
+    mockInput->inputsToFeed = {"add 1 100 101"};
+    
+    App app(mockInput, mockOutput, commandMap);
+    app.run(); // Will stop automatically after reading the input because readNextLine returns ""
+    
+    EXPECT_TRUE(mockAddCmd->wasExecuted);
+    // The App should pass the arguments correctly (excluding the command name itself)
+    ASSERT_EQ(mockAddCmd->receivedArgs.size(), 3);
+    EXPECT_EQ(mockAddCmd->receivedArgs[0], "1");
+    EXPECT_EQ(mockAddCmd->receivedArgs[1], "100");
+    EXPECT_EQ(mockAddCmd->receivedArgs[2], "101");
+}
+
+// Test 2: Verify unknown commands are ignored
+TEST_F(AppTest, IgnoresUnknownCommand) {
+    // We mock typing an unknown command
+    mockInput->inputsToFeed = {"delete 1 100"};
+    
+    App app(mockInput, mockOutput, commandMap);
+    app.run();
+    
+    // The AddCommand should NOT have been executed
+    EXPECT_FALSE(mockAddCmd->wasExecuted);
+}
+
+// Test 3: Verify empty input is handled correctly
+TEST_F(AppTest, HandlesEmptyInput) {
+    // Provide blank spaces, then empty string
+    mockInput->inputsToFeed = {"   ", ""};
+    
+    App app(mockInput, mockOutput, commandMap);
+    app.run();
+    
+    EXPECT_FALSE(mockAddCmd->wasExecuted);
+}

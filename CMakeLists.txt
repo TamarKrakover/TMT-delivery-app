@@ -18,7 +18,7 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 file(GLOB ALL_SRC "src/*.cpp")
-file(GLOB TEST_SOURCES "tests/*.cpp")ש
+file(GLOB TEST_SOURCES "tests/*.cpp")
 
 set(APP_LOGIC ${ALL_SRC})
 list(REMOVE_ITEM APP_LOGIC "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
