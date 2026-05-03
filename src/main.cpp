@@ -9,6 +9,7 @@
 #include "Recommender.hpp"
 #include "AddCommand.hpp"
 #include "RecommendCommand.hpp"
+#include "HelpCommand.hpp"
 
 int main() {
     auto input = std::make_shared<StandardInput>();
@@ -26,6 +27,7 @@ int main() {
     
     commands["add"] = std::make_shared<AddCommand>(*repo);
     commands["recommend"] = std::make_shared<RecommendCommand>(recommender, *output);
+    commands["help"] = std::make_shared<HelpCommand>(*output);
     // Partner will add HelpCommand here
     
     // Run the app
