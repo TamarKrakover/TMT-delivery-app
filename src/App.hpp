@@ -9,12 +9,16 @@
 #include "IInputSource.hpp"
 #include "IOutputWriter.hpp"
 #include "ICommand.hpp"
+#include "CommandParser.hpp"
+
 
 class App {
 private:
     std::shared_ptr<IInputSource> input;
     std::shared_ptr<IOutputWriter> output;
     std::map<std::string, std::shared_ptr<ICommand>> commands;
+
+    CommandParser parser;
     
     // Flag to control the run loop for testing purposes
     bool isRunning;

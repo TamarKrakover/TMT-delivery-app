@@ -15,15 +15,28 @@ void App::run() {
              break;
         }
 
-        std::istringstream iss(line);
-        std::string commandName;
-        iss >> commandName;
+        //std::istringstream iss(line);
+        //std::string commandName;
+        //iss >> commandName;
 
-        std::vector<std::string> args;
-        std::string arg;
-        while (iss >> arg) {
-            args.push_back(arg);
+        // use parser to get vector of words
+        std::vector<std::string> tokens = parser.parse(line);
+
+        // move to a valid line
+        if(tokens.empty()) {
+            continue;
         }
+
+        // the first word is the command
+        std::string commandName = tokens[0];
+
+        // the other arguments
+        std::vector<std::string> args(tokens.begin() + 1, tokens.end());
+        //std::vector<std::string> args;
+        //std::string arg;
+        //while (iss >> arg) {
+        //    args.push_back(arg);
+        //}
 
         auto it = commands.find(commandName);
         if (it != commands.end()) {
