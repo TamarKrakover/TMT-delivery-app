@@ -8,7 +8,7 @@ using namespace std;
 vector<string> CommandParser::parse(const string& input) {
     vector<string> words;
 
-    // ignoring white space
+    // ignoring white spaces
     for (char c : input) {
         if(isspace(static_cast<unsigned char>(c)) && c != ' ') {
             return words;
