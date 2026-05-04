@@ -16,7 +16,7 @@ int main() {
     auto output = std::make_shared<StandardOutput>();
 
     // Init repository and load data
-    auto repo = std::make_unique<FileDataRepository>("data.txt");
+    auto repo = std::make_unique<FileDataRepository>("../data/data.txt");
     repo->loadAllData();
 
     // Create engine
@@ -28,7 +28,6 @@ int main() {
     commands["add"] = std::make_shared<AddCommand>(*repo);
     commands["recommend"] = std::make_shared<RecommendCommand>(recommender, *output);
     commands["help"] = std::make_shared<HelpCommand>(*output);
-    // Partner will add HelpCommand here
     
     // Run the app
     App app(input, output, std::move(commands));

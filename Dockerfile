@@ -17,9 +17,11 @@ COPY . .
 # This builds both 'TMTApp' and 'runTests'
 RUN mkdir build && cd build && cmake .. && make
 
+# Declare the data directory as a mount point for external volumes
+VOLUME ["/usr/src/mytest/data"]
+
 # Set the working directory to the location of the binaries
 WORKDIR /usr/src/mytest/build
 
 # Default command: Runs the recommendation CLI application
-# To run tests instead, use: docker run --rm <image_name> ./runTests
 CMD ["./TMTApp"]
