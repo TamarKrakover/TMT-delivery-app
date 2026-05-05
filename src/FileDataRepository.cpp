@@ -11,6 +11,14 @@ void FileDataRepository::saveUserViews(const std::string& userId, const std::vec
     persistToFile();
 }
 
+std::vector<std::string> FileDataRepository::getUserViews(const std::string& userId) const {
+        auto it = userInteractions.find(userId);
+        if (it != userInteractions.end()) {
+            return it->second;
+        }
+        return {}; 
+    }
+
 // loads all user product interactions from the file into memory
 bool FileDataRepository::loadAllData() {
     std::ifstream inFile(filePath);

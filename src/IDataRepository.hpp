@@ -19,8 +19,8 @@ public:
     virtual void saveUserViews(const std::string& userId, const std::vector<std::string>& productIds) = 0;
     virtual bool loadAllData() = 0;
     
-
     virtual std::map<std::string, std::vector<std::string>> getAllData() const = 0;
+    virtual std::vector<std::string> getUserViews(const std::string& userId) const = 0;
 };
 
 #endif

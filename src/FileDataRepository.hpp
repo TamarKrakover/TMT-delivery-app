@@ -16,6 +16,8 @@ public:
     // adds new interactions to memory and persists them to the file
     void saveUserViews(const std::string& userId, const std::vector<std::string>& productIds) override;
 
+    // returns the products a specific user has already viewed
+    std::vector<std::string> getUserViews(const std::string& userId) const override;
     // loads all data from the file into the userInteractions map
     bool loadAllData() override;
     // returns the current in memory dataset
