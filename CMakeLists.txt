@@ -17,15 +17,29 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-file(GLOB ALL_SRC "src/*.cpp")
-file(GLOB TEST_SOURCES "tests/*.cpp")
+file(GLOB_RECURSE ALL_SRC "src/*.cpp")
+file(GLOB_RECURSE TEST_SOURCES "tests/*.cpp")
 
 set(APP_LOGIC ${ALL_SRC})
 list(REMOVE_ITEM APP_LOGIC "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
 
 add_executable(TMTApp src/main.cpp ${APP_LOGIC})
-target_include_directories(TMTApp PRIVATE src)
+target_include_directories(TMTApp PRIVATE 
+    src
+    src/interfaces
+    src/commands
+    src/core
+    src/io
+    src/repositories
+)
 
 add_executable(runTests ${APP_LOGIC} ${TEST_SOURCES})
-target_include_directories(runTests PRIVATE src)
+target_include_directories(runTests PRIVATE 
+    src
+    src/interfaces
+    src/commands
+    src/core
+    src/io
+    src/repositories
+)
 target_link_libraries(runTests gtest_main)
