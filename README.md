@@ -47,7 +47,7 @@ Below is a demonstration of adding user data and requesting a recommendation:
 ```
 
 ## Visual Representation
-    Design Notes:
-        Persistence: All data entered via the add command is stored in data/data.txt to ensure continuity between runs.  
+Design Notes:
+Persistence: All data entered via the add command is stored in data/data.txt to ensure continuity between runs.  
 
         Architecture: The project uses an interface-based design (ICommand, IDataRepository, etc.) to allow for easy swapping of input/output sources and storage methods in future exercises
