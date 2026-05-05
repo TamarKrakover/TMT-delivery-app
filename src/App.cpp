@@ -9,11 +9,6 @@ App::App(std::shared_ptr<IInputSource> in,
 void App::run() {
     while (isRunning) {
         std::string line = input->readNextLine();
-        
-        // If the input stream is empty/closed, stop the loop
-        if (line.empty()) {
-             break;
-        }
 
         // use parser to get vector of words
         std::vector<std::string> tokens = parser.parse(line);
