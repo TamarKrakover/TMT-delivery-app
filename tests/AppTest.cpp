@@ -21,7 +21,8 @@ public:
         if (currentIndex < inputsToFeed.size()) {
             return inputsToFeed[currentIndex++];
         }
-        return ""; // Empty string terminates the App loop
+        // Throw exception to break the infinite loop
+        throw std::runtime_error("EOF"); 
     }
 };
 
@@ -71,7 +72,9 @@ TEST_F(AppTest, ParsesAndExecutesValidCommand) {
     mockInput->inputsToFeed = {"add 1 100 101"};
     
     App app(mockInput, mockOutput, commandMap);
-    app.run(); // Will stop automatically after reading the input because readNextLine returns ""
+    
+    // Catch the exception we threw to let the test finish successfully
+    EXPECT_THROW(app.run(), std::runtime_error); 
     
     EXPECT_TRUE(mockAddCmd->wasExecuted);
     // The App should pass the arguments correctly (excluding the command name itself)
@@ -87,7 +90,9 @@ TEST_F(AppTest, IgnoresUnknownCommand) {
     mockInput->inputsToFeed = {"delete 1 100"};
     
     App app(mockInput, mockOutput, commandMap);
-    app.run();
+    
+    // Catch the exception here as well
+    EXPECT_THROW(app.run(), std::runtime_error);
     
     // The AddCommand should NOT have been executed
     EXPECT_FALSE(mockAddCmd->wasExecuted);
@@ -99,7 +104,9 @@ TEST_F(AppTest, HandlesEmptyInput) {
     mockInput->inputsToFeed = {"   ", ""};
     
     App app(mockInput, mockOutput, commandMap);
-    app.run();
+    
+    // Catch the exception here as well
+    EXPECT_THROW(app.run(), std::runtime_error);
     
     EXPECT_FALSE(mockAddCmd->wasExecuted);
 }
