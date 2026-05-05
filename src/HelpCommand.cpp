@@ -11,7 +11,7 @@ void HelpCommand::execute(const std:: vector<std::string>& args) {
 
     // the help menu
     std::string helpText = 
-        "add [userid] [productid 1] [productid2] ...\n"
+        "add [userid] [productid1] [productid2] ...\n"
         "recommend [userid] [productid]\n"
         "help\n";
 
