@@ -28,13 +28,13 @@ docker run -it --rm -v "${PWD}/data:/usr/src/mytest/data" recommender-image
 ### available commands:
 
 The application supports the following commands:  
-```bash
+
 add [userid] [productid 1] [productid 2] ...: Associates products with a user. Data is automatically saved to the data/ directory.
 
 recommend [userid] [productid]: Provides up to 10 product recommendations for the given user and product context.
 
 help: Displays the help menu
-```
+
 
 ## Application Example:
 Below is a demonstration of adding user data and requesting a recommendation:
