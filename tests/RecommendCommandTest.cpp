@@ -21,6 +21,9 @@ public:
     std::map<std::string, std::vector<std::string>> fakeData;
     void saveUserViews(const std::string& userId, const std::vector<std::string>& productIds) override {}
     std::map<std::string, std::vector<std::string>> getAllData() const override { return fakeData; }
+    std::vector<std::string> getUserViews(const std::string& userId) const override {
+        return {}; 
+    }
     bool loadAllData() override { return true; }
 };
 

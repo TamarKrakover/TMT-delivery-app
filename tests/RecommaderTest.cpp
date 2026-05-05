@@ -22,6 +22,11 @@ public:
     void saveUserViews(const std::string& userId, const std::vector<std::string>& productIds) override {
         // Not needed for Recommender tests
     }
+
+    std::vector<std::string> getUserViews(const std::string& userId) const override {
+        
+        return {};
+    }
     
     bool loadAllData() override { 
         return true; 
