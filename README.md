@@ -25,6 +25,11 @@ run command:
 ```bash
 docker run -it --rm -v "${PWD}/data:/usr/src/mytest/data" recommender-image
 ```
+test run command:
+```bash
+docker run -it --rm recommender-image ./runTests
+```
+
 ### available commands:
 
 The application supports the following commands:  
