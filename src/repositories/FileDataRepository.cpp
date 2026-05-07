@@ -7,9 +7,22 @@ FileDataRepository::FileDataRepository(std::string path) : filePath(std::move(pa
 
 // Appends new products to a user's history and instantly saves to the file
 void FileDataRepository::saveUserViews(const std::string& userId, const std::vector<std::string>& productIds) {
+
     auto& userProds = userInteractions[userId];
-    userProds.insert(userProds.end(), productIds.begin(), productIds.end());
-    persistToFile();
+    bool hasChanges = false;
+
+    for (const auto& productId : productIds) {
+        // check if the product does not exist in the user's history
+        if (std::find(userProds.begin(), userProds.end(), productId) == userProds.end()) {
+            userProds.push_back(productId);
+            hasChanges = true;
+        }
+    }
+
+    // only hit the disk if there's actually something new to write
+    if (hasChanges) {
+        persistToFile();
+    }
 }
 
 // Loads all user product interactions from the file into memory
