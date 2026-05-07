@@ -8,6 +8,52 @@
 This is a CLI-based Product Recommendation System written in C++. 
 The application allows users to input viewing histories for various users and request product recommendations. It utilizes a collaborative filtering approach: when a user expresses interest in a specific product, the system finds other users with similar tastes who also viewed that product, and recommends additional products they watched, ranked by similarity weights.
 
+Advanced-Programming/
+├── CMakeLists.txt
+├── Dockerfile
+├── README.md
+├── runScreenShot.png
+├── data/
+│   └── data.txt
+├── src/
+│   ├── main.cpp
+│   ├── commands/
+│   │   ├── AddCommand.cpp
+│   │   ├── AddCommand.hpp
+│   │   ├── HelpCommand.cpp
+│   │   ├── HelpCommand.hpp
+│   │   ├── RecommendCommand.cpp
+│   │   └── RecommendCommand.hpp
+│   ├── core/
+│   │   ├── App.cpp
+│   │   ├── App.hpp
+│   │   ├── CommandParser.cpp
+│   │   ├── CommandParser.hpp
+│   │   ├── Recommender.cpp
+│   │   └── Recommender.hpp
+│   ├── interfaces/
+│   │   ├── ICommand.hpp
+│   │   ├── IDataRepository.hpp
+│   │   ├── IInputSource.hpp
+│   │   └── IOutputWriter.hpp
+│   ├── io/
+│   │   ├── StandardInput.cpp
+│   │   ├── StandardInput.hpp
+│   │   ├── StandardOutput.cpp
+│   │   └── StandardOutput.hpp
+│   └── repositories/
+│       ├── FileDataRepository.cpp
+│       └── FileDataRepository.hpp
+└── tests/
+    ├── AddCommandTest.cpp
+    ├── AppTest.cpp
+    ├── CommandParserTest.cpp
+    ├── E2ETest.cpp
+    ├── FileDataRepositoryTest.cpp
+    ├── HelpCommandTest.cpp
+    ├── RecommaderTest.cpp
+    └── RecommendCommandTest.cpp
+
 ![Run Screenshot](runScreenShot.png)
 
 ## How to Run
