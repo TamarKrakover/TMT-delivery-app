@@ -8,6 +8,7 @@
 This is a CLI-based Product Recommendation System written in C++. 
 The application allows users to input viewing histories for various users and request product recommendations. It utilizes a collaborative filtering approach: when a user expresses interest in a specific product, the system finds other users with similar tastes who also viewed that product, and recommends additional products they watched, ranked by similarity weights.
 
+```
 Advanced-Programming/
 ├── CMakeLists.txt
 ├── Dockerfile
@@ -53,6 +54,7 @@ Advanced-Programming/
     ├── HelpCommandTest.cpp
     ├── RecommaderTest.cpp
     └── RecommendCommandTest.cpp
+```
 
 ![Run Screenshot](runScreenShot.png)
 
