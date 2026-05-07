@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <algorithm>
 #include <unordered_set>
+#include <cctype>
 
 class Recommender {
 private:
