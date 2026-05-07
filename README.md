@@ -65,15 +65,15 @@ To build the Docker image, run the following command in the root directory of th
 
 build command:
 ```bash
-docker build -t recommender-image .
+docker build -t tmt-project .
 ```
 run command:
 ```bash
-docker run -it --rm -v "${PWD}/data:/usr/src/mytest/data" recommender-image
+docker run -it --rm -v "${PWD}/data:/usr/src/mytest/data" tmt-project
 ```
 test run command:
 ```bash
-docker run -it --rm recommender-image ./runTests
+docker run -it --rm tmt-project ./runTests
 ```
 
 ### available commands:
