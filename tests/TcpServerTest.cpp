@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 #include "TcpServer.hpp"
+#include "FileDataRepository.hpp"
+#include "Recommender.hpp"
 #include <sys/socket.h>
 #include <unistd.h>
 #include <string>
@@ -12,18 +14,19 @@ TEST(TcpServerTest, HandlesClientAndExitsGracefullyOnEOF) {
     std::string commands = "help\nadd 1 200 300\n";
     send(sv[0], commands.c_str(), commands.length(), 0);
 
-    // Client closes the connection to generate an EOF after the server reads the commands
+    // Client closes the connection to generate an EOF
     close(sv[0]);
 
-    // Setup the server (port 0)
-    TcpServer server(0);
+    // Create the required dependencies for the server
+    FileDataRepository repo("test_data.txt");
+    Recommender recommender(repo);
 
-    // Run the server logic on the other end of the socket pair 
-    // The function will read the commands, run the App,  EOF, and exit
+    // Setup the server with port 0 and the required dependencies
+    TcpServer server(0, repo, recommender);
+
     EXPECT_NO_THROW({
         server.handleClient(sv[1]);
     });
 
-    // Cleanup server socket
     close(sv[1]);
 }
