@@ -24,7 +24,7 @@ TEST(HelpCommandTest, PrintsCorrectHelpText) {
     vector<string> emptyInput;  // valid input (no arguments)
 
     string rightAnswer = 
-    "add [userid] [productid 1] [productid2] ...\n"
+    "add [userid] [productid1] [productid2] ...\n"
     "recommend [userid] [productid]\n"
     "help\n";
 
