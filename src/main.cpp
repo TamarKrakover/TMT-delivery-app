@@ -3,8 +3,9 @@
 #include <string>
 
 #include "App.hpp"
-#include "StandardInput.hpp"
-#include "StandardOutput.hpp"
+//#include "StandardInput.hpp"
+//#include "StandardOutput.hpp"
+#include "TcpServer.hpp"
 #include "FileDataRepository.hpp"
 #include "Recommender.hpp"
 #include "AddCommand.hpp"
@@ -12,8 +13,8 @@
 #include "HelpCommand.hpp"
 
 int main() {
-    auto input = std::make_shared<StandardInput>();
-    auto output = std::make_shared<StandardOutput>();
+    //auto input = std::make_shared<StandardInput>();
+    //auto output = std::make_shared<StandardOutput>();
 
     // Init repository and load data
     auto repo = std::make_unique<FileDataRepository>("../data/data.txt");
@@ -30,8 +31,8 @@ int main() {
     commands["help"] = std::make_shared<HelpCommand>(*output);
     
     // Run the app
-    App app(input, output, std::move(commands));
-    app.run();
+    //App app(input, output, std::move(commands));
+    //app.run();
 
     return 0;
 }
