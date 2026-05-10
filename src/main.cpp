@@ -1,37 +1,34 @@
-#include <map>
+#include "core/TcpServer.hpp"
+#include "repositories/FileDataRepository.hpp"
+#include "core/Recommender.hpp"
+#include <iostream>
 #include <memory>
-#include <string>
-
-#include "App.hpp"
-#include "StandardInput.hpp"
-#include "StandardOutput.hpp"
-#include "FileDataRepository.hpp"
-#include "Recommender.hpp"
-#include "AddCommand.hpp"
-#include "RecommendCommand.hpp"
-#include "HelpCommand.hpp"
 
 int main() {
-    auto input = std::make_shared<StandardInput>();
-    auto output = std::make_shared<StandardOutput>();
+    // Define the port the server will listen on
+    const int port = 5555;
 
-    // Init repository and load data
-    auto repo = std::make_unique<FileDataRepository>("../data/data.txt");
-    repo->loadAllData();
+    try {
+        // Initialize repository and load data ONCE for all future clients
+        auto repo = std::make_unique<FileDataRepository>("../data/data.txt");
+        repo->loadAllData();
 
-    // Create engine
-    Recommender recommender(*repo);
+        // Create the recommendation engine ONCE using the loaded repository
+        Recommender recommender(*repo);
 
-    // Create command map
-    std::map<std::string, std::shared_ptr<ICommand>> commands;
-    
-    commands["add"] = std::make_shared<AddCommand>(*repo);
-    commands["recommend"] = std::make_shared<RecommendCommand>(recommender, *output);
-    commands["help"] = std::make_shared<HelpCommand>(*output);
-    
-    // Run the app
-    App app(input, output, std::move(commands));
-    app.run();
+        // Instantiate the server, passing the shared data resources
+        TcpServer server(port, *repo, recommender);
+
+        std::cout << "Server is starting on port " << port << "..." << std::endl;
+
+        // Launch the infinite server loop to start accepting connections
+        server.start();
+    } 
+    catch (const std::exception& e) {
+        // Catch errors during initialization (port already in use)
+        std::cerr << "Fatal error: " << e.what() << std::endl;
+        return 1;
+    }
 
     return 0;
 }
