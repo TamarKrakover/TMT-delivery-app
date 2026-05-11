@@ -11,16 +11,12 @@
 #include "ICommand.hpp"
 #include "CommandParser.hpp"
 
-
 class App {
 private:
     std::shared_ptr<IInputSource> input;
     std::shared_ptr<IOutputWriter> output;
     std::map<std::string, std::shared_ptr<ICommand>> commands;
-
     CommandParser parser;
-    
-    // Flag to control the run loop for testing purposes
     bool isRunning;
 
 public:
@@ -28,11 +24,7 @@ public:
         std::shared_ptr<IOutputWriter> out, 
         std::map<std::string, std::shared_ptr<ICommand>> cmds);
 
-    // Runs the application loop
     void run();
-    
-    // Method to break the infinite loop specifically for testing
     void stop();
 };
-
 #endif

@@ -1,5 +1,4 @@
 #include "App.hpp"
-#include <sstream>
 
 App::App(std::shared_ptr<IInputSource> in, 
          std::shared_ptr<IOutputWriter> out, 
@@ -9,28 +8,23 @@ App::App(std::shared_ptr<IInputSource> in,
 void App::run() {
     while (isRunning) {
         std::string line = input->readNextLine();
-
-        // use parser to get vector of words
-        std::vector<std::string> tokens = parser.parse(line);
-
-        // move to a valid line
-        if(tokens.empty()) {
-            continue;
+        if (line.empty()) {
+            break; // הלקוח התנתק, יוצאים מהלולאה
         }
 
-        // the first word is the command
-        std::string commandName = tokens[0];
+        std::vector<std::string> tokens = parser.parse(line);
+        if (tokens.empty()) continue;
 
-        // the other arguments
+        std::string commandName = tokens[0];
         std::vector<std::string> args(tokens.begin() + 1, tokens.end());
 
         auto it = commands.find(commandName);
         if (it != commands.end()) {
             try {
                 it->second->execute(args);
-            } catch (...) {
-               // Ignore execution errors silently as per requirement
-            }
+            } catch (...) { }
+        } else {
+            output->write("400 Bad Request");
         }
     }
 }
