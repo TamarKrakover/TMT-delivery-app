@@ -17,6 +17,7 @@ public:
 
     // Executes the delete operation
     void execute(const std::vector<std::string>& args) override;
+    std::string getHelpText() const override;
 
 private:
     IDataRepository& repo;

@@ -14,6 +14,7 @@ void DeleteCommand::execute(const std::vector<std::string>& args) {
         throw InvalidArgumentsException();
     }
 
+    
     std::string userId = args[0];
 
     // Check if user exists. If not, throw 404 (which App will catch)
@@ -40,4 +41,8 @@ void DeleteCommand::execute(const std::vector<std::string>& args) {
 
     // If everything succeeded, output the 204 response
     outputWriter.write("204 No Content\n");
+}
+
+std::string DeleteCommand::getHelpText() const {
+    return "delete <user_id> <product_id> [product_id...] - Deletes products from a user's view history";
 }

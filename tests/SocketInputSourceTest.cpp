@@ -47,8 +47,8 @@ TEST(SocketInputSourceTest, ReadsDataOverInet) {
     SocketInputSource inputSource(accepted_sock);
     std::string result = inputSource.readNextLine();
 
-    // Check if the read string matches what was sent
-    EXPECT_EQ(result, test_msg);
+    // The implementation of readNextLine strips the newline character
+    EXPECT_EQ(result, "test command");
 
     // Cleanup
     close(accepted_sock);

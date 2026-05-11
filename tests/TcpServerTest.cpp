@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <memory>
 #include <cstdio>
+#include <string>
 
 #include "TcpServer.hpp"
 #include "App.hpp"
@@ -18,16 +19,16 @@ protected:
     }
 };
 
-// טסט פשוט שמוודא שניתן לאתחל את השרת ללא קריסות
+// Basic test to ensure the server can be initialized without crashing
 TEST_F(TcpServerBasicTest, InitializationDoesNotCrash) {
-    // 1. אתחול התלויות עם סוקטים מנותקים (-1)
+    // 1. Initialize dependencies with disconnected sockets (-1)
     auto input = std::make_shared<SocketInputSource>(-1);
     auto output = std::make_shared<SocketOutputWriter>(-1);
     FileDataRepository repo(dummyFile);
     Recommender recommender(repo);
     App app(input, output, repo, recommender);
 
-    // 2. יצירת השרת - הטסט עובר אם הקוד לא זורק חריגה (Exception) ולא קורס
+    // 2. Create the server - test passes if no exception is thrown
     EXPECT_NO_THROW({
         TcpServer server(5555, app, input, output);
     });

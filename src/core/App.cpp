@@ -10,13 +10,14 @@ App::App(std::shared_ptr<IInputSource> in,
          Recommender& recommender)
     : input(std::move(in)), output(std::move(out)), isRunning(true) {
     
-    // Commands are fixed per application instance
     auto addCmd = std::make_shared<AddCommand>(repo);
     commands["add"] = addCmd;
-    commands["add_"] = addCmd; // Support for the add_ command
+    commands["add_"] = addCmd; 
     
     commands["recommend"] = std::make_shared<RecommendCommand>(recommender, *output);
-    commands["help"] = std::make_shared<HelpCommand>(*output);
+    
+    // Pass the commands map to HelpCommand constructor
+    commands["help"] = std::make_shared<HelpCommand>(*output, commands);
 }
 
 void App::run() {
@@ -32,11 +33,17 @@ void App::run() {
         std::string commandName = tokens[0];
         std::vector<std::string> args(tokens.begin() + 1, tokens.end());
 
-        try {
-            auto it = commands.find(commandName);
-            if (it != commands.end()) {
+        auto it = commands.find(commandName);
+        if (it != commands.end()) {
+            try {
                 it->second->execute(args);
-            } catch (...) { }
+            } catch (const BaseNotFoundException&) {
+                output->write("404 Not Found\n");
+            } catch (const BaseBadRequestException&) {
+                output->write("400 Bad Request\n");
+            } catch (...) {
+                // Catch any other unexpected exceptions
+            }
         } else {
             output->write("400 Bad Request");
         }
