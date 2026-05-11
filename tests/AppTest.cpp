@@ -9,9 +9,11 @@
 #include "IOutputWriter.hpp"
 #include "IDataRepository.hpp"
 #include "Recommender.hpp"
+#include "Exceptions.hpp"
 
 // --- Mocks ---
 
+namespace {
 class MockInputSource : public IInputSource {
 public:
     std::vector<std::string> inputsToFeed;
@@ -43,6 +45,7 @@ public:
     std::map<std::string, std::vector<std::string>> getAllData() const override { return data; }
     std::vector<std::string> getUserViews(const std::string& u) const override { return {}; }
 };
+}
 
 // --- Tests ---
 
@@ -89,4 +92,44 @@ TEST_F(AppTest, HandlesEmptyInput) {
     // the empty string causes a clean break, so no exception should be thrown
     EXPECT_NO_THROW(app.run());
     EXPECT_TRUE(fakeRepo->data.empty());
+}
+
+// --- Test for Exception
+
+// Test 1: Verify App catches BaseNotFoundException and outputs "404 Not Found\n"
+TEST_F(AppTest, CatchesNotFoundExceptionAndOutputs404) {
+    // A mock command that throws a not found exception
+    class ThrowNotFoundCommand : public ICommand {
+    public:
+        void execute(const std::vector<std::string>& args) override {
+            throw UserNotFoundException();
+        }
+    };
+
+    commandMap["bad_logic_cmd"] = std::make_shared<ThrowNotFoundCommand>();
+    mockInput->inputsToFeed = {"bad_logic_cmd 1 100"};
+    
+    App app(mockInput, mockOutput, commandMap);
+    
+    EXPECT_THROW(app.run(), std::runtime_error); 
+    EXPECT_EQ(mockOutput->capturedOutput, "404 Not Found\n");
+}
+
+// Test 2: Verify App catches BaseBadRequestException and outputs "400 Bad Request\n"
+TEST_F(AppTest, CatchesBadRequestExceptionAndOutputs400) {
+    // A mock command that throws a bad request exception
+    class ThrowBadRequestCommand : public ICommand {
+    public:
+        void execute(const std::vector<std::string>& args) override {
+            throw InvalidArgumentsException();
+        }
+    };
+
+    commandMap["invalid_format_cmd"] = std::make_shared<ThrowBadRequestCommand>();
+    mockInput->inputsToFeed = {"invalid_format_cmd 1"};
+    
+    App app(mockInput, mockOutput, commandMap);
+    
+    EXPECT_THROW(app.run(), std::runtime_error); 
+    EXPECT_EQ(mockOutput->capturedOutput, "400 Bad Request\n");
 }

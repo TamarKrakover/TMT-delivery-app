@@ -25,6 +25,12 @@ public:
         return {}; 
     }
     bool loadAllData() override { return true; }
+    bool userExists(const std::string& userId) const override {
+        return fakeData.find(userId) != fakeData.end();
+    }
+    void removeUserViews(const std::string& userId, const std::vector<std::string>& productIds) override {
+        // Not needed for this test, left empty
+    }
 };
 
 // Test fixture that sets up the environment for RecommendCommand tests.

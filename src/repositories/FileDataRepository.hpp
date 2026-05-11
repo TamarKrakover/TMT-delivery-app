@@ -22,6 +22,8 @@ public:
     bool loadAllData() override;
     // returns the current in memory dataset
     std::map<std::string, std::vector<std::string>> getAllData() const override;
+    bool userExists(const std::string& userId) const override;
+    void removeUserViews(const std::string& userId, const std::vector<std::string>& productIds) override;
 
 private:
     std::string filePath; // path to the data storage file

@@ -30,7 +30,7 @@ public:
         if (currentIndex < commandsToFeed.size()) {
             return commandsToFeed[currentIndex++];
         }
-        return ""; // Empty string stops the app loop
+        throw std::runtime_error("EOF"); 
     }
 };
 

@@ -1,4 +1,5 @@
 #include "App.hpp"
+#include "Exceptions.hpp"
 #include "AddCommand.hpp"
 #include "RecommendCommand.hpp"
 #include "HelpCommand.hpp"
@@ -31,9 +32,9 @@ void App::run() {
         std::string commandName = tokens[0];
         std::vector<std::string> args(tokens.begin() + 1, tokens.end());
 
-        auto it = commands.find(commandName);
-        if (it != commands.end()) {
-            try {
+        try {
+            auto it = commands.find(commandName);
+            if (it != commands.end()) {
                 it->second->execute(args);
             } catch (...) { }
         } else {

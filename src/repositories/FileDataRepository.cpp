@@ -72,3 +72,35 @@ void FileDataRepository::persistToFile() const {
         outFile << "\n";
     }
 }
+
+// Checks if the user exists by searching the map
+bool FileDataRepository::userExists(const std::string& userId) const {  
+    return userInteractions.find(userId) != userInteractions.end();
+}
+
+// Removes specific products from a user's history and saves to file if changed
+void FileDataRepository::removeUserViews(const std::string& userId, const std::vector<std::string>& productIds) {
+    auto it = userInteractions.find(userId);
+
+    // If the user does not exist, there is nothing to remove
+    if (it == userInteractions.end()) {
+        return;
+    }
+    bool hasChanges = false;
+    std::vector<std::string>& userProds = it->second;
+
+    // Iterate through all the product IDs the user wants to delete
+    for (const auto& productId : productIds) {
+        // Find if the product actually exists in the user's viewing history
+        auto prodIt = std::find(userProds.begin(), userProds.end(), productId);
+        if (prodIt != userProds.end()) {
+            // Remove the product and mark that a change occurred
+            userProds.erase(prodIt);
+            hasChanges = true;
+        }
+    }
+    // Only rewrite the file to disk if we actually deleted something
+    if (hasChanges) {
+        persistToFile();
+    }
+}

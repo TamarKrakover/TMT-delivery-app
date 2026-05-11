@@ -11,6 +11,7 @@
 class AddCommand : public ICommand {
 public:
     explicit AddCommand(IDataRepository& repository);
+    std::string getHelpText() const override;
     
     /**
      * Executes the add operation.

@@ -19,6 +19,9 @@ public:
     
     // Returns existing products for a specific user to help check for duplicates
     virtual std::vector<std::string> getUserViews(const std::string& userId) const = 0;
+
+    virtual bool userExists(const std::string& userId) const = 0;
+    virtual void removeUserViews(const std::string& userId, const std::vector<std::string>& productIds) = 0;
 };
 
 #endif
