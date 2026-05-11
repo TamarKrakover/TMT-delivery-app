@@ -28,6 +28,11 @@ void RecommendCommand::execute(const std::vector<std::string>& args) {
     // Add a newline at the end and print the result
     output += "\n";
     outputWriter.write(output);
+
+}
+
+std::string RecommendCommand::getHelpText() const {
+    return "recommend [userid] [productid]";
 }
 
 

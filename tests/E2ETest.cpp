@@ -88,7 +88,7 @@ protected:
         std::map<std::string, std::shared_ptr<ICommand>> commands;
         commands["add"] = std::make_shared<AddCommand>(*repository);
         commands["recommend"] = std::make_shared<RecommendCommand>(recommender, *mockOutput);
-        commands["help"] = std::make_shared<HelpCommand>(*mockOutput);
+        commands["help"] = std::make_shared<HelpCommand>(*mockOutput, commands);
 
         // Create and run the app
         App app(mockInput, mockOutput, std::move(commands));

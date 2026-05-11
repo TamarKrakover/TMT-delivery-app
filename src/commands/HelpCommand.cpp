@@ -1,20 +1,30 @@
 #include "HelpCommand.hpp"
 
-// initialize with a specific output writer
-HelpCommand::HelpCommand(IOutputWriter& writer) : outputWriter(writer) {}
+using namespace std;
 
-void HelpCommand::execute(const std:: vector<std::string>& args) {
+// initialize with a specific output writer
+HelpCommand::HelpCommand(IOutputWriter& writer, const map<string, shared_ptr<ICommand>>&cmds) : outputWriter(writer), commandsMap(cmds) {}
+
+string HelpCommand::getHelpText() const {
+    return "help";
+}
+
+void HelpCommand::execute(const vector<string>& args) {
     // if help command takes no arguments
     if(!args.empty()){
         return;
     }
 
-    // the help menu
-    std::string helpText = 
-        "add [userid] [productid1] [productid2] ...\n"
-        "recommend [userid] [productid]\n"
-        "help\n";
+   string output = "";
+    
+   for (const auto& [name, command] : commandsMap) {
+    if (name != "help") {
+        output += command->getHelpText() + "\n";
+    }
+   }
+
+   output += "help\n";
 
     // print to the chosen output    
-    outputWriter.write(helpText);
+    outputWriter.write(output);
 }

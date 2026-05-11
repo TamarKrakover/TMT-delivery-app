@@ -13,6 +13,7 @@ class RecommendCommand : public ICommand {
 public:
     // Injecting both the logic engine and the output handler
     RecommendCommand(Recommender& recommender, IOutputWriter& writer);
+    std::string getHelpText() const override;
     
     /**
      * Executes the recommendation process.

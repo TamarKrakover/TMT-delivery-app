@@ -11,6 +11,7 @@
 
 // --- Mocks ---
 
+namespace {
 // Fake Input Source: Feeds predefined strings one by one
 class MockInputSource : public IInputSource {
 public:
@@ -46,7 +47,11 @@ public:
         wasExecuted = true;
         receivedArgs = args;
     }
+    std::string getHelpText() const override {
+        return "mock help text";
+    }
 };
+}
 
 // --- Tests ---
 
