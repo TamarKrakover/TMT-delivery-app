@@ -35,6 +35,14 @@ public:
     std::map<std::string, std::vector<std::string>> getAllData() const override {
         return fakeData;
     }
+
+    bool userExists(const std::string& userId) const override {
+        return fakeData.find(userId) != fakeData.end();
+    }
+
+    void removeUserViews(const std::string& userId, const std::vector<std::string>& productIds) override {
+        // Not needed for recommender tests, left empty
+    }
 };
 
 // Test Fixture 
