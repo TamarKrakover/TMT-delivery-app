@@ -86,6 +86,7 @@ TEST_F(AppTest, HandlesEmptyInput) {
     mockInput->inputsToFeed = {"   ", ""};
     App app(mockInput, mockOutput, *fakeRepo, *recommender);
     
-    EXPECT_THROW(app.run(), std::runtime_error);
+    // the empty string causes a clean break, so no exception should be thrown
+    EXPECT_NO_THROW(app.run());
     EXPECT_TRUE(fakeRepo->data.empty());
 }

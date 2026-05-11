@@ -205,11 +205,10 @@ TEST_F(E2ETest, InvalidCommandsIgnored) {
  */
 TEST_F(E2ETest, EmptyAndWhitespaceCommands) {
     mockInput->commandsToFeed = {
-        "",
         "   ",
         "add 1 100",
         "  \t  "
-    };
+    }; // The MockInputSourceE2E will automatically return "" after these are done
 
     runAppWithCommands();
 
