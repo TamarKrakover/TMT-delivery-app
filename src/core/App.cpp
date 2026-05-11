@@ -1,4 +1,5 @@
 #include "App.hpp"
+#include "Exceptions.hpp"
 #include <sstream>
 
 App::App(std::shared_ptr<IInputSource> in, 
@@ -24,15 +25,22 @@ void App::run() {
         // the other arguments
         std::vector<std::string> args(tokens.begin() + 1, tokens.end());
 
-        auto it = commands.find(commandName);
-        if (it != commands.end()) {
-            try {
+        try {
+            auto it = commands.find(commandName);
+            if (it != commands.end()) {
                 it->second->execute(args);
-            } catch (...) {
-               // Ignore execution errors silently as per requirement
+            } else {
+                throw UnknownCommandException();
+            }
+        } catch (const BaseNotFoundException& e) {
+                // Logical errors
+                output->write("404 Not Found\n");
+            } 
+            catch (const BaseBadRequestException& e) {
+                // Syntax errors, invalid args, or unknown commands
+                output->write("400 Bad Request\n");
             }
         }
-    }
 }
 
 void App::stop() {
