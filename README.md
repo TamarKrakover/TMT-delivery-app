@@ -32,6 +32,12 @@ test run command:
 docker run -it --rm tmt-project ./runTests
 ```
 
+run for server:
+docker run -it --rm -p 5555:5555 -v "${PWD}/data:/usr/src/mytest/data" tmt-project ./TMTApp 5555
+
+run client:
+python3 src/client/client.py 127.0.0.1 5555
+
 ### available commands:
 
 The application supports the following commands:  
