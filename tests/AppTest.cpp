@@ -7,11 +7,11 @@
 #include "App.hpp"
 #include "IInputSource.hpp"
 #include "IOutputWriter.hpp"
-#include "ICommand.hpp"
+#include "IDataRepository.hpp"
+#include "Recommender.hpp"
 
 // --- Mocks ---
 
-// Fake Input Source: Feeds predefined strings one by one
 class MockInputSource : public IInputSource {
 public:
     std::vector<std::string> inputsToFeed;
@@ -21,31 +21,27 @@ public:
         if (currentIndex < inputsToFeed.size()) {
             return inputsToFeed[currentIndex++];
         }
-        // Throw exception to break the infinite loop
         throw std::runtime_error("EOF"); 
     }
 };
 
-// Fake Output Writer: Captures output for verification
 class MockOutputWriter : public IOutputWriter {
 public:
     std::string capturedOutput = "";
-
     void write(const std::string& message) override {
         capturedOutput += message;
     }
 };
 
-// Fake Command: Records if it was executed and with what arguments
-class MockCommand : public ICommand {
+class FakeRepo : public IDataRepository {
 public:
-    bool wasExecuted = false;
-    std::vector<std::string> receivedArgs;
-
-    void execute(const std::vector<std::string>& args) override {
-        wasExecuted = true;
-        receivedArgs = args;
+    std::map<std::string, std::vector<std::string>> data;
+    void saveUserViews(const std::string& u, const std::vector<std::string>& p) override {
+        data[u] = p;
     }
+    bool loadAllData() override { return true; }
+    std::map<std::string, std::vector<std::string>> getAllData() const override { return data; }
+    std::vector<std::string> getUserViews(const std::string& u) const override { return {}; }
 };
 
 // --- Tests ---
@@ -54,59 +50,42 @@ class AppTest : public ::testing::Test {
 protected:
     std::shared_ptr<MockInputSource> mockInput;
     std::shared_ptr<MockOutputWriter> mockOutput;
-    std::map<std::string, std::shared_ptr<ICommand>> commandMap;
-    std::shared_ptr<MockCommand> mockAddCmd;
+    std::unique_ptr<FakeRepo> fakeRepo;
+    std::unique_ptr<Recommender> recommender;
     
     void SetUp() override {
         mockInput = std::make_shared<MockInputSource>();
         mockOutput = std::make_shared<MockOutputWriter>();
-        
-        mockAddCmd = std::make_shared<MockCommand>();
-        commandMap["add"] = mockAddCmd;
+        fakeRepo = std::make_unique<FakeRepo>();
+        recommender = std::make_unique<Recommender>(*fakeRepo);
     }
 };
 
-// Test 1: Verify valid command parsing and execution
 TEST_F(AppTest, ParsesAndExecutesValidCommand) {
-    // We mock typing "add 1 100 101"
     mockInput->inputsToFeed = {"add 1 100 101"};
     
-    App app(mockInput, mockOutput, commandMap);
+    // Updated constructor call according to new signature
+    App app(mockInput, mockOutput, *fakeRepo, *recommender);
     
-    // Catch the exception we threw to let the test finish successfully
     EXPECT_THROW(app.run(), std::runtime_error); 
     
-    EXPECT_TRUE(mockAddCmd->wasExecuted);
-    // The App should pass the arguments correctly (excluding the command name itself)
-    ASSERT_EQ(mockAddCmd->receivedArgs.size(), 3);
-    EXPECT_EQ(mockAddCmd->receivedArgs[0], "1");
-    EXPECT_EQ(mockAddCmd->receivedArgs[1], "100");
-    EXPECT_EQ(mockAddCmd->receivedArgs[2], "101");
+    // Verify internal AddCommand was called by checking the repo
+    ASSERT_EQ(fakeRepo->data.count("1"), 1);
+    EXPECT_EQ(fakeRepo->data["1"].size(), 2);
 }
 
-// Test 2: Verify unknown commands are ignored
 TEST_F(AppTest, IgnoresUnknownCommand) {
-    // We mock typing an unknown command
     mockInput->inputsToFeed = {"delete 1 100"};
+    App app(mockInput, mockOutput, *fakeRepo, *recommender);
     
-    App app(mockInput, mockOutput, commandMap);
-    
-    // Catch the exception here as well
     EXPECT_THROW(app.run(), std::runtime_error);
-    
-    // The AddCommand should NOT have been executed
-    EXPECT_FALSE(mockAddCmd->wasExecuted);
+    EXPECT_EQ(mockOutput->capturedOutput, "400 Bad Request");
 }
 
-// Test 3: Verify empty input is handled correctly
 TEST_F(AppTest, HandlesEmptyInput) {
-    // Provide blank spaces, then empty string
     mockInput->inputsToFeed = {"   ", ""};
+    App app(mockInput, mockOutput, *fakeRepo, *recommender);
     
-    App app(mockInput, mockOutput, commandMap);
-    
-    // Catch the exception here as well
     EXPECT_THROW(app.run(), std::runtime_error);
-    
-    EXPECT_FALSE(mockAddCmd->wasExecuted);
+    EXPECT_TRUE(fakeRepo->data.empty());
 }

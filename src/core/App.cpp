@@ -1,15 +1,28 @@
 #include "App.hpp"
+#include "AddCommand.hpp"
+#include "RecommendCommand.hpp"
+#include "HelpCommand.hpp"
 
 App::App(std::shared_ptr<IInputSource> in, 
          std::shared_ptr<IOutputWriter> out, 
-         std::map<std::string, std::shared_ptr<ICommand>> cmds)
-    : input(std::move(in)), output(std::move(out)), commands(std::move(cmds)), isRunning(true) {}
+         IDataRepository& repo, 
+         Recommender& recommender)
+    : input(std::move(in)), output(std::move(out)), isRunning(true) {
+    
+    // Commands are fixed per application instance
+    auto addCmd = std::make_shared<AddCommand>(repo);
+    commands["add"] = addCmd;
+    commands["add_"] = addCmd; // Support for the add_ command
+    
+    commands["recommend"] = std::make_shared<RecommendCommand>(recommender, *output);
+    commands["help"] = std::make_shared<HelpCommand>(*output);
+}
 
 void App::run() {
     while (isRunning) {
         std::string line = input->readNextLine();
         if (line.empty()) {
-            break; // הלקוח התנתק, יוצאים מהלולאה
+            break; 
         }
 
         std::vector<std::string> tokens = parser.parse(line);

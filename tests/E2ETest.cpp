@@ -80,22 +80,18 @@ protected:
     /**
      * Helper method to create and run the app with the mocked input/output.
      */
-    void runAppWithCommands() {
+  void runAppWithCommands() {
         // Create the recommender engine
         Recommender recommender(*repository);
 
-        // Create command map with real commands
-        std::map<std::string, std::shared_ptr<ICommand>> commands;
-        commands["add"] = std::make_shared<AddCommand>(*repository);
-        commands["recommend"] = std::make_shared<RecommendCommand>(recommender, *mockOutput);
-        commands["help"] = std::make_shared<HelpCommand>(*mockOutput);
+        // No need to create a command map here anymore!
+        // App now handles it internally.
 
-        // Create and run the app
-        App app(mockInput, mockOutput, std::move(commands));
+        // Create and run the app with the new signature
+        App app(mockInput, mockOutput, *repository, recommender);
         app.run();
     }
 };
-
 // ===== Tests =====
 
 /**
