@@ -10,29 +10,25 @@
 #include "IOutputWriter.hpp"
 #include "ICommand.hpp"
 #include "CommandParser.hpp"
-
+#include "IDataRepository.hpp"
+#include "Recommender.hpp"
 
 class App {
 private:
     std::shared_ptr<IInputSource> input;
     std::shared_ptr<IOutputWriter> output;
-    std::map<std::string, std::shared_ptr<ICommand>> commands;
-
+    std::map<std::string, std::shared_ptr<ICommand>> commands; // The map is now internal
     CommandParser parser;
-    
-    // Flag to control the run loop for testing purposes
     bool isRunning;
 
 public:
+    // Constructor now initializes dependencies and commands internally
     App(std::shared_ptr<IInputSource> in, 
         std::shared_ptr<IOutputWriter> out, 
-        std::map<std::string, std::shared_ptr<ICommand>> cmds);
+        IDataRepository& repo, 
+        Recommender& recommender);
 
-    // Runs the application loop
     void run();
-    
-    // Method to break the infinite loop specifically for testing
     void stop();
 };
-
 #endif

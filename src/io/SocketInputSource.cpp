@@ -1,38 +1,23 @@
 #include "SocketInputSource.hpp"
-#include <sys/socket.h> // For recv function
-#include <stdexcept>    // For std::runtime_error
+#include <unistd.h>
 
-SocketInputSource::SocketInputSource(int clientSocket) : socket(clientSocket) {}
+SocketInputSource::SocketInputSource(int socket) : clientSocket(socket) {}
+
+void SocketInputSource::setSocket(int socket) {
+    clientSocket = socket;
+}
 
 std::string SocketInputSource::readNextLine() {
-    std::string line = "";
-    char ch = 0;
-    ssize_t bytesRead = 0;
-
-    // Read exactly one byte at a time to safely find the newline character
-    while (true) {
-        // The flags parameter is set to 0
-        bytesRead = recv(socket, &ch, 1, 0);
-        
-        if (bytesRead > 0) {
-            line += ch;
-            // Stop reading if we reached the end of the line
-            if (ch == '\n') {
-                break;
-            }
-        } 
-        else if (bytesRead == 0) {
-            // Client has closed the connection
-            if (line.empty()) {
-                throw std::runtime_error("EOF");
-            }
-            break; // Return whatever is left if connection closed mid-line
-        } 
-        else {
-            // An error occurred during reading (-1)
-            throw std::runtime_error("Socket read error");
-        }
-    }
+    if (clientSocket == -1) return "";
     
-    return line;
+    std::string result = "";
+    char buffer;
+    while (read(clientSocket, &buffer, 1) > 0) {
+        if (buffer == '\n') break;
+        result += buffer;
+    }
+    if (!result.empty() && result.back() == '\r') {
+        result.pop_back();
+    }
+    return result;
 }

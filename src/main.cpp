@@ -1,34 +1,42 @@
-#include "core/TcpServer.hpp"
-#include "repositories/FileDataRepository.hpp"
-#include "core/Recommender.hpp"
 #include <iostream>
 #include <memory>
+#include <string>
 
-int main() {
-    // Define the port the server will listen on
-    const int port = 5555;
+#include "App.hpp"
+#include "TcpServer.hpp"
+#include "FileDataRepository.hpp"
+#include "Recommender.hpp"
+#include "SocketInputSource.hpp"
+#include "SocketOutputWriter.hpp"
 
-    try {
-        // Initialize repository and load data ONCE for all future clients
-        auto repo = std::make_unique<FileDataRepository>("../data/data.txt");
-        repo->loadAllData();
-
-        // Create the recommendation engine ONCE using the loaded repository
-        Recommender recommender(*repo);
-
-        // Instantiate the server, passing the shared data resources
-        TcpServer server(port, *repo, recommender);
-
-        std::cout << "Server is starting on port " << port << "..." << std::endl;
-
-        // Launch the infinite server loop to start accepting connections
-        server.start();
-    } 
-    catch (const std::exception& e) {
-        // Catch errors during initialization (port already in use)
-        std::cerr << "Fatal error: " << e.what() << std::endl;
+int main(int argc, char* argv[]) {
+    if (argc < 2) {
+        std::cerr << "Usage: ./TMTApp [port]" << std::endl;
         return 1;
     }
+
+    int port;
+    try {
+        port = std::stoi(argv[1]);
+    } catch (...) {
+        std::cerr << "Invalid port number" << std::endl;
+        return 1;
+    }
+
+    auto repo = std::make_shared<FileDataRepository>("../data/data.txt");
+    repo->loadAllData();
+
+    Recommender recommender(*repo);
+
+    auto input = std::make_shared<SocketInputSource>(-1);
+    auto output = std::make_shared<SocketOutputWriter>(-1);
+
+    // No need to build the map here anymore
+    App app(input, output, *repo, recommender);
+
+    TcpServer server(port, app, input, output);
+    std::cout << "Server is running on port " << port << "..." << std::endl;
+    server.start();
 
     return 0;
 }
