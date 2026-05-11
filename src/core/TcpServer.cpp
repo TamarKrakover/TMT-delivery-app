@@ -79,7 +79,7 @@ void TcpServer::handleClient(int client_socket) {
     // Inject shared dependencies (repo, recommender) and client-specific dependencies (output)
     commands["add"] = std::make_shared<AddCommand>(m_repo);
     commands["recommend"] = std::make_shared<RecommendCommand>(m_recommender, *output);
-    commands["help"] = std::make_shared<HelpCommand>(*output);
+    commands["help"] = std::make_shared<HelpCommand>(*output, commands);
 
     try {
         // Instantiate the App with the client's context and execute its main loop

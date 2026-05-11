@@ -18,4 +18,10 @@ void AddCommand::execute(const std::vector<std::string>& args) {
     
     // pass the raw list to the repository
     repo.saveUserViews(userId, productsToSave);
+
+
+}
+
+std::string AddCommand::getHelpText() const {
+        return "add [userid] [productid1] [productid2] ...";
 }
