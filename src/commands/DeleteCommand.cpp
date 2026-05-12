@@ -43,6 +43,7 @@ void DeleteCommand::execute(const std::vector<std::string>& args) {
     outputWriter.write("204 No Content\n");
 }
 
+// return the command's identifier
 std::string DeleteCommand::getHelpText() const {
-    return "delete <user_id> <product_id> [product_id...] - Deletes products from a user's view history";
+    return "DELETE, arguments: [userid] [productid]";
 }

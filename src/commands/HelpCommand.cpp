@@ -2,13 +2,10 @@
 
 using namespace std;
 
-// initialize with a specific output writer
+
 HelpCommand::HelpCommand(IOutputWriter& writer, const map<string, shared_ptr<ICommand>>&cmds) : outputWriter(writer), commandsMap(cmds) {}
 
-string HelpCommand::getHelpText() const {
-    return "help";
-}
-
+// generate and output the help menu
 void HelpCommand::execute(const vector<string>& args) {
     // if help command takes no arguments
     if(!args.empty()){
@@ -17,14 +14,22 @@ void HelpCommand::execute(const vector<string>& args) {
 
    string output = "";
     
+   // map automatically sorts keys alphabetically
    for (const auto& [name, command] : commandsMap) {
+    // append all commands except help
     if (name != "help") {
         output += command->getHelpText() + "\n";
     }
    }
 
+   // append help last
    output += "help\n";
 
-    // print to the chosen output    
+    // print the output    
     outputWriter.write(output);
+}
+
+// return the command's identifier
+string HelpCommand::getHelpText() const {
+    return "help";
 }

@@ -22,6 +22,7 @@ void AddCommand::execute(const std::vector<std::string>& args) {
 
 }
 
+// return the command's identifier
 std::string AddCommand::getHelpText() const {
-        return "add [userid] [productid1] [productid2] ...";
+        return "FALSE";
 }

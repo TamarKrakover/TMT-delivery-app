@@ -32,6 +32,7 @@ void PatchCommand::execute(const vector<string>& args) {
     outputWriter.write("204 No Content\n");
 }
 
+// return the command's identifier
 string PatchCommand::getHelpText() const {
     return "PATCH, arguments: [userid] [productid]";
 }

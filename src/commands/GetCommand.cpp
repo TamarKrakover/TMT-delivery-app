@@ -44,6 +44,7 @@ void GetCommand::execute(const std::vector<std::string>& args) {
     outputWriter.write(output);
 }
 
+// return the command's identifier
 std::string GetCommand::getHelpText() const {
-    return "get <user_id> <product_id> - Returns recommendations for a user based on a target product";
+    return "GET, arguments: [userid] [productid]";
 }

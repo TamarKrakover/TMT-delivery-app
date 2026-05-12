@@ -13,7 +13,7 @@ public:
     // injects dependencies
     PatchCommand(IDataRepository& repository, IOutputWriter& writer);
 
-     // Executes the main Patch command logic
+    // Executes the main Patch command logic
     void execute(const std::vector<std::string>& args) override;
 
     std::string getHelpText() const override;
