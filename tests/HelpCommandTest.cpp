@@ -16,10 +16,11 @@ public:
     
     // override to save the message to a string variable
     void write(const string& message) override {
-        savedText += message;
+        savedText += message; // append output to string
     }
 };
 
+// dummy command that does nothing except returning a specific help string
 class MockCommand : public ICommand {
 private:
     string helpText;
@@ -29,16 +30,17 @@ public:
     void execute(const vector<string>& args) override {}
 
     string getHelpText() const override {
-        return helpText;
+        return helpText; // return dummy text
     }
 };
 
 }
 
-// Test 1:
+// test 1: verify commands print alphabetically, with help last
 TEST(HelpCommandTest, PrintsCorrectHelpText) {
     TestPrinter writer;
 
+    // setup dummy commands
     map<string, shared_ptr<ICommand>> fakeCommands;
     fakeCommands["POST"] = make_shared<MockCommand>("POST, arguments: [userid] [productid1] [productid2] ...");
     fakeCommands["GET"] = make_shared<MockCommand>("GET, arguments: [userid] [productid]");
@@ -47,9 +49,11 @@ TEST(HelpCommandTest, PrintsCorrectHelpText) {
 
     HelpCommand helpCmd(writer, fakeCommands);
 
+    // execute with no arguments
     vector<string> args;
     helpCmd.execute(args);
 
+    // define expected sorted output
     string expectedOutput = 
         "DELETE, arguments: [userid] [productid1] [productid2]...\n"
         "GET, arguments: [userid] [productid]\n"
@@ -57,17 +61,20 @@ TEST(HelpCommandTest, PrintsCorrectHelpText) {
         "POST, arguments: [userid] [productid1] [productid2] ...\n"
         "help\n";
 
+    // assert captured text matches expected output
     EXPECT_EQ(writer.savedText, expectedOutput);
 }
-// Test 2:
+// test 2: verify command does nothing if arguments are provided
 TEST(HelpCommandTest, IgnoresMoreArguments) {
     TestPrinter writer;
     map<string, shared_ptr<ICommand>> fakeCommands;
 
     HelpCommand helpCmd(writer, fakeCommands);
 
+    // execute with unwanted arguments
     vector<string> args = {"me", "please"};
     helpCmd.execute(args);
 
+    // assert no output was generated
     EXPECT_EQ(writer.savedText,"");
 }
