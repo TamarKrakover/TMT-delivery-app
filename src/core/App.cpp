@@ -6,7 +6,8 @@
 #include "GetCommand.hpp"
 #include "RecommendCommand.hpp"
 #include "HelpCommand.hpp"
-
+#include <algorithm>
+#include <cctype>
 using namespace std;
 
 App::App(shared_ptr<IInputSource> in, 
@@ -34,6 +35,9 @@ void App::run() {
 
         string commandName = tokens[0];
 
+        transform(commandName.begin(), commandName.end(), commandName.begin(),
+        [](unsigned char c){ return tolower(c); });
+        
         vector<string> args(tokens.begin() + 1, tokens.end());
 
         auto it = commands.find(commandName);
