@@ -17,7 +17,7 @@ class App {
 private:
     std::shared_ptr<IInputSource> input;
     std::shared_ptr<IOutputWriter> output;
-    std::map<std::string, std::shared_ptr<ICommand>> commands; // The map is now internal
+    std::map<std::string, std::shared_ptr<ICommand>> commands; 
     CommandParser parser;
     bool isRunning;
 

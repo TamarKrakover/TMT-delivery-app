@@ -6,7 +6,7 @@ GetCommand::GetCommand(IDataRepository& repo, Recommender& recommender, IOutputW
     : repository(repo), engine(recommender), outputWriter(writer) {}
 
 void GetCommand::execute(const std::vector<std::string>& args) {
-    // GET command must have exactly 2 arguments
+    // GET command must have 2 arguments
     if (args.size() != 2) {
         throw InvalidArgumentsException();
     }
