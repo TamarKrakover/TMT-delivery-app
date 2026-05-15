@@ -1,37 +1,44 @@
 #include "App.hpp"
 #include "Exceptions.hpp"
-#include "AddCommand.hpp"
+#include "PostCommand.hpp"
+#include "PatchCommand.hpp"
+#include "DeleteCommand.hpp"
+#include "GetCommand.hpp"
 #include "RecommendCommand.hpp"
 #include "HelpCommand.hpp"
+#include <algorithm>
+#include <cctype>
+using namespace std;
 
-App::App(std::shared_ptr<IInputSource> in, 
-         std::shared_ptr<IOutputWriter> out, 
+App::App(shared_ptr<IInputSource> in, 
+         shared_ptr<IOutputWriter> out, 
          IDataRepository& repo, 
          Recommender& recommender)
-    : input(std::move(in)), output(std::move(out)), isRunning(true) {
+    : input(move(in)), output(move(out)), isRunning(true) {
     
-    auto addCmd = std::make_shared<AddCommand>(repo);
-    commands["add"] = addCmd;
-    commands["add_"] = addCmd; 
-    
-    commands["recommend"] = std::make_shared<RecommendCommand>(recommender, *output);
-    
-    // Pass the commands map to HelpCommand constructor
-    commands["help"] = std::make_shared<HelpCommand>(*output, commands);
+    commands["post"] = make_shared<PostCommand>(repo, *output);
+    commands["patch"] = make_shared<PatchCommand>(repo, *output);
+    commands["delete"] = make_shared<DeleteCommand>(repo, *output);
+    commands["get"] = make_shared<GetCommand>(repo, recommender, *output);
+    commands["help"] = make_shared<HelpCommand>(*output, commands);
 }
 
 void App::run() {
     while (isRunning) {
-        std::string line = input->readNextLine();
+        string line = input->readNextLine();
         if (line.empty()) {
             break; 
         }
 
-        std::vector<std::string> tokens = parser.parse(line);
+        vector<string> tokens = parser.parse(line);
         if (tokens.empty()) continue;
 
-        std::string commandName = tokens[0];
-        std::vector<std::string> args(tokens.begin() + 1, tokens.end());
+        string commandName = tokens[0];
+
+        transform(commandName.begin(), commandName.end(), commandName.begin(),
+        [](unsigned char c){ return tolower(c); });
+        
+        vector<string> args(tokens.begin() + 1, tokens.end());
 
         auto it = commands.find(commandName);
         if (it != commands.end()) {
