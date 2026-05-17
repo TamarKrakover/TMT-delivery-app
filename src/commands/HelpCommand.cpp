@@ -1,4 +1,5 @@
 #include "HelpCommand.hpp"
+#include "Exceptions.hpp"
 
 using namespace std;
 
@@ -9,7 +10,7 @@ HelpCommand::HelpCommand(IOutputWriter& writer, const map<string, shared_ptr<ICo
 void HelpCommand::execute(const vector<string>& args) {
     // if help command takes no arguments
     if(!args.empty()){
-        return;
+        throw InvalidArgumentsException();
     }
 
    string output = "";
