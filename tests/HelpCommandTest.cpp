@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include "HelpCommand.hpp"
 #include "IOutputWriter.hpp"
+#include "Exceptions.hpp"
 #include <string>
 #include <vector>
 #include <map>
@@ -64,7 +65,7 @@ TEST(HelpCommandTest, PrintsCorrectHelpText) {
     // assert captured text matches expected output
     EXPECT_EQ(writer.savedText, expectedOutput);
 }
-// test 2: verify command does nothing if arguments are provided
+// test 2: verify command throw the right exception when unwanted arguments are provided
 TEST(HelpCommandTest, IgnoresMoreArguments) {
     TestPrinter writer;
     map<string, shared_ptr<ICommand>> fakeCommands;
@@ -73,8 +74,7 @@ TEST(HelpCommandTest, IgnoresMoreArguments) {
 
     // execute with unwanted arguments
     vector<string> args = {"me", "please"};
-    helpCmd.execute(args);
 
-    // assert no output was generated
-    EXPECT_EQ(writer.savedText,"");
+    // throw the right exception
+    EXPECT_THROW(helpCmd.execute(args), InvalidArgumentsException);
 }
