@@ -13,7 +13,7 @@ With the client-server architecture, the C++ server listens on a TCP port, proce
 
 
 
-![Run Screenshot](runScreenShot2.png)
+![Run Screenshot](runScreenShot3.png)
 
 ## How to Run
 
@@ -105,8 +105,6 @@ Advanced-Programming/
 │   │   ├── DeleteCommand.hpp
 │   │   ├── HelpCommand.cpp
 │   │   ├── HelpCommand.hpp
-│   │   ├── RecommendCommand.cpp
-│   │   └── RecommendCommand.hpp
 │   ├── core/
 │   │   ├── App.cpp
 │   │   ├── App.hpp
@@ -144,8 +142,6 @@ Advanced-Programming/
     ├── HelpCommandTest.cpp
     ├── PatchCommandTest.cpp
     ├── PostCommandTest.cpp
-    ├── RecommaderTest.cpp
-    ├── RecommendCommandTest.cpp
     ├── SocketInputSourceTest.cpp
     ├── SocketIOTest.cpp
     ├── SocketOutputWriterTest.cpp
