@@ -1,0 +1,48 @@
+services:
+  # C++ Server Service
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tmt-server
+    ports:
+      - "${PORT:-5555}:${PORT:-5555}"
+    volumes:
+      - ./data:/app/data
+    networks:
+      - tmt-net
+    stdin_open: true
+    tty: true
+    # Override CMD to pass the port argument to the executable
+    command: ["./TMTApp", "${PORT:-5555}"]
+
+  # Python Client Service
+  client:
+    build:
+      context: .
+      dockerfile: src/client/Dockerfile.client
+    container_name: tmt-client
+    # depends_on: - server  <-- מחקנו את זה כדי שדוקר יפסיק לרצוח את השרת!
+    networks:
+      - tmt-net
+    stdin_open: true
+    tty: true
+    # מעבירים רק את משתני הרשת, ה-ENTRYPOINT כבר מריץ את פייתון
+    command: ["${IP:-server}", "${PORT:-5555}"]
+
+  # Tests Service
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tmt-tests
+    entrypoint: ["./runTests"]
+    working_dir: /data/app/build
+    volumes:
+      - ./data:/app/data
+    networks:
+      - tmt-net
+
+networks:
+  tmt-net:
+    driver: bridge

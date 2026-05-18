@@ -8,20 +8,19 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Set the working directory for the project
-WORKDIR /usr/src/mytest
+WORKDIR /app
 
 # Copy the project files into the container
 COPY . .
 
 # Create build directory, configure with CMake, and compile all targets
-# This builds both 'TMTApp' and 'runTests'
 RUN mkdir build && cd build && cmake .. && make
 
 # Declare the data directory as a mount point for external volumes
-VOLUME ["/usr/src/mytest/data"]
+VOLUME ["/app/data"]
 
 # Set the working directory to the location of the binaries
-WORKDIR /usr/src/mytest/build
+WORKDIR /app/build
 
-# Default command: Runs the recommendation CLI application
+# Default command: Runs the server app (Compose will append the port)
 CMD ["./TMTApp"]

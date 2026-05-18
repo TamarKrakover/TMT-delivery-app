@@ -28,6 +28,30 @@ test run command:
 ```bash
 docker run -it --rm tmt-project ./runTests
 ```
+build:
+```bash
+docker compose build
+```
+
+run server:
+```bash
+PORT=<port> docker compose run --service-ports --use-aliases server
+```
+
+run client:
+```bash
+IP=server PORT=<port> docker compose run client
+```
+
+run test:
+```bash
+docker compose run tests
+```
+
+clean containers:
+```bash
+ docker compose down --remove-orphans
+```
 
 run for server:
 ```bash

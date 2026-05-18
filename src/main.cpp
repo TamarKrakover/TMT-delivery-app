@@ -1,6 +1,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <csignal>
 
 #include "App.hpp"
 #include "TcpServer.hpp"
@@ -10,6 +11,8 @@
 #include "SocketOutputWriter.hpp"
 
 int main(int argc, char* argv[]) {
+    signal(SIGINT, SIG_IGN);
+
     if (argc < 2) {
         std::cerr << "Usage: ./TMTApp [port]" << std::endl;
         return 1;
@@ -35,7 +38,6 @@ int main(int argc, char* argv[]) {
     App app(input, output, *repo, recommender);
 
     TcpServer server(port, app, input, output);
-    std::cout << "Server is running on port " << port << "..." << std::endl;
     server.start();
 
     return 0;
