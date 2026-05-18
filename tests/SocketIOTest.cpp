@@ -8,10 +8,10 @@
 
 class SocketIOTest : public ::testing::Test {
 protected:
-    int sockets[2]; // מערך שיחזיק את שני צדדי הצינור שלנו
+    int sockets[2]; // Array to hold both ends of our connected pipeline
 
     void SetUp() override {
-        // יוצרים זוג סוקטים מחוברים. sockets[0] יהיה השרת, sockets[1] יהיה הלקוח המדומה
+        // Create a pair of connected sockets. sockets[0] acts as the server, sockets[1] acts as the mock client
         if (socketpair(AF_UNIX, SOCK_STREAM, 0, sockets) < 0) {
             FAIL() << "Failed to create socket pair for testing";
         }
@@ -23,61 +23,61 @@ protected:
     }
 };
 
-// בודק שהקלט מצליח לקרוא שורה שלמה עד לירידת שורה
+// verifies that the input source successfully reads a full line until a newline character
 TEST_F(SocketIOTest, ReadsLineSuccessfully) {
     SocketInputSource inputSource(sockets[0]);
     
-    // הלקוח המדומה שולח הודעה
+    // mock client sends a message containing a trailing newline
     std::string messageFromClient = "hello server\n";
     write(sockets[1], messageFromClient.c_str(), messageFromClient.length());
     
-    // השרת קורא את ההודעה
+    // server reads the message from the stream
     std::string result = inputSource.readNextLine();
     
     EXPECT_EQ(result, "hello server");
 }
 
-// בודק שהקלט מתמודד נכון עם סוף קובץ (לקוח שהתנתק)
+// verifies that the input source gracefully handles EOF when the client disconnects
 TEST_F(SocketIOTest, HandlesClientDisconnectOnRead) {
     SocketInputSource inputSource(sockets[0]);
     
-    // סוגרים את הצד של הלקוח כדי לדמות ניתוק
+    // close the client's end to simulate a sudden disconnection
     close(sockets[1]);
     
-    // ניסיון קריאה צריך להחזיר מחרוזת ריקה
+    // attempting to read after disconnection should return an empty string
     std::string result = inputSource.readNextLine();
     
     EXPECT_EQ(result, "");
 }
 
-// בודק שהפלט נכתב בהצלחה לסוקט עם ירידת שורה בסוף
+// verifies that the output writer successfully writes a message and appends a newline
 TEST_F(SocketIOTest, WritesMessageSuccessfully) {
     SocketOutputWriter outputWriter(sockets[0]);
     
-    // השרת כותב הודעה
+    // server transmits a message response 
     std::string messageToClient = "400 Bad Request";
     outputWriter.write(messageToClient);
     
-    // הלקוח המדומה קורא את ההודעה
+    // mock client reads the incoming message data    
     char buffer[256] = {0};
     int bytesRead = read(sockets[1], buffer, sizeof(buffer) - 1);
     
     ASSERT_GT(bytesRead, 0);
     std::string received(buffer);
     
-    // מוודאים שההודעה הגיעה ושנוספה לה ירידת שורה אוטומטית
+    // verify that the message arrived intact with an automatically appended newline
     EXPECT_EQ(received, "400 Bad Request\n");
 }
 
-// בודק התנהגות כשאין סוקט חוקי (למשל סוקט -1 כמו באתחול של main)
+// verifies system behavior when provided with an invalid socket descriptor (e.g., -1)
 TEST_F(SocketIOTest, HandlesInvalidSocketGracefully) {
     SocketInputSource inputSource(-1);
     SocketOutputWriter outputWriter(-1);
     
-    // לא אמור לקרוס, רק להחזיר ריק / לא לעשות כלום
+    // should handle the error safely and return an empty string instead of crashing
     std::string result = inputSource.readNextLine();
     EXPECT_EQ(result, "");
     
-    // כתיבה לא אמורה לזרוק חריגה
+    // writing to an invalid socket should not throw any unexpected internal exceptions
     EXPECT_NO_THROW(outputWriter.write("test message"));
 }

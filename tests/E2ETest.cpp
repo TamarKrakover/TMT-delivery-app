@@ -62,20 +62,20 @@ protected:
     std::unique_ptr<FileDataRepository> repository;
 
     void SetUp() override {
-        // Clean up any existing test file
+        // clean up any existing test file
         std::remove(testDataFile.c_str());
         
-        // Initialize mock input and output
+        // initialize mock input and output
         mockInput = std::make_shared<MockInputSourceE2E>();
         mockOutput = std::make_shared<MockOutputWriterE2E>();
         
-        // Initialize the repository (empty at start)
+        // initialize the repository
         repository = std::make_unique<FileDataRepository>(testDataFile);
         repository->loadAllData();
     }
 
     void TearDown() override {
-        // Clean up the test data file
+        // clean up the test data file
         std::remove(testDataFile.c_str());
     }
 
@@ -83,10 +83,10 @@ protected:
      * Helper method to create and run the app with the mocked input/output.
      */
     void runAppWithCommands() {
-        // Create the recommender engine
+        // create the recommender engine
         Recommender recommender(*repository);
 
-        // Create and run the app using the correct constructor signature
+        // create and run the app using the correct constructor signature
         App app(mockInput, mockOutput, *repository, recommender);
         EXPECT_THROW(app.run(), std::runtime_error);
     }
@@ -105,7 +105,7 @@ TEST_F(E2ETest, BasicPostCommand) {
 
     runAppWithCommands();
 
-    // Verify data was saved to repository
+    // verify data was saved to repository
     auto allData = repository->getAllData();
     ASSERT_EQ(allData.count("1"), 1);
     EXPECT_EQ(allData["1"].size(), 3);
@@ -154,14 +154,14 @@ TEST_F(E2ETest, PostAndGet) {
 
     runAppWithCommands();
 
-    // Verify data was saved
+    // verify data was saved
     auto allData = repository->getAllData();
     ASSERT_EQ(allData.count("1"), 1);
     ASSERT_EQ(allData.count("2"), 1);
     EXPECT_EQ(allData["1"].size(), 1);
     EXPECT_EQ(allData["2"].size(), 2);
 
-    // Verify the app ran without crashing
+    // verify the app ran without crashing
     EXPECT_TRUE(true);
 }
 
@@ -182,7 +182,7 @@ TEST_F(E2ETest, InvalidCommandsIgnored) {
 
     runAppWithCommands();
 
-    // Only the "post" command should have executed
+    // only the "post" command should have executed
     auto allData = repository->getAllData();
     ASSERT_EQ(allData.count("1"), 1);
     EXPECT_EQ(allData["1"].size(), 1);
@@ -202,7 +202,7 @@ TEST_F(E2ETest, HelpCommandExecution) {
 
     runAppWithCommands();
 
-    // Help command should have written some output
+    // help command should have written some output
     EXPECT_FALSE(mockOutput->capturedOutput.empty());
 }
 
@@ -221,7 +221,7 @@ TEST_F(E2ETest, ComplexScenarioMultipleOperations) {
 
     runAppWithCommands();
 
-    // Verify all posts and patches were successful
+    // verify all posts and patches were successful
     auto allData = repository->getAllData();
     ASSERT_EQ(allData.count("1"), 1);
     ASSERT_EQ(allData.count("2"), 1);
@@ -231,7 +231,7 @@ TEST_F(E2ETest, ComplexScenarioMultipleOperations) {
     EXPECT_EQ(allData["2"].size(), 3);
     EXPECT_EQ(allData["3"].size(), 3);
     
-    // Help output should be present
+    // help output should be present
     EXPECT_FALSE(mockOutput->capturedOutput.empty());
 }
 
@@ -259,19 +259,19 @@ TEST_F(E2ETest, PostSingleProductToUser) {
  */
 TEST_F(E2ETest, MixedValidAndInvalidCommands) {
     mockInput->commandsToFeed = {
-        "post",             // Missing arguments - should fail 
-        "post 1",           // Missing product IDs - should fail
-        "post 1 100 101",   // Valid - should work
-        "patch",            // Missing arguments - should fail 
-        "get",              // Missing arguments - should fail 
-        "post 2 200",       // Valid - should work
-        "patch 1 102"       // Valid - should work
+        "post",             // missing arguments - should fail 
+        "post 1",           // missing product IDs - should fail
+        "post 1 100 101",   // valid - should work
+        "patch",            // missing arguments - should fail 
+        "get",              // missing arguments - should fail 
+        "post 2 200",       // valid - should work
+        "patch 1 102"       // valid - should work
     };
 
     runAppWithCommands();
 
     auto allData = repository->getAllData();
-    // Only the valid posts and patches should have succeeded
+    // only the valid posts and patches should have succeeded
     EXPECT_EQ(allData.count("1"), 1);
     EXPECT_EQ(allData.count("2"), 1);
     EXPECT_EQ(allData["1"].size(), 3);
@@ -294,7 +294,7 @@ TEST_F(E2ETest, DuplicateProductsForUser) {
 
     auto allData = repository->getAllData();
     ASSERT_EQ(allData.count("1"), 1);
-    // The exact number of products depends on duplicate handling logic
+    // the exact number of products depends on duplicate handling logic
     EXPECT_GE(allData["1"].size(), 1);
 }
 
@@ -315,10 +315,10 @@ TEST_F(E2ETest, DeleteProductFromUser) {
     auto allData = repository->getAllData();
     ASSERT_EQ(allData.count("1"), 1);
     
-    // Expecting 2 products left after deleting 1
+    // expecting 2 products left after deleting 1
     EXPECT_EQ(allData["1"].size(), 2);
     
-    // Check remaining elements are 100 and 102
+    // check remaining elements are 100 and 102
     bool has100 = false;
     bool has102 = false;
     for (const auto& item : allData["1"]) {

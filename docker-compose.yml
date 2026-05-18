@@ -6,14 +6,16 @@ services:
       dockerfile: Dockerfile
     container_name: tmt-server
     ports:
+    # forward the host port to the container port
       - "${PORT:-8080}:${PORT:-8080}"
     volumes:
+    # mount local data directory to persist database/files between restarts
       - ./data:/app/data
     networks:
       - tmt-net
     stdin_open: true
     tty: true
-    # Override CMD to pass the port argument to the executable
+    # override default Dockerfile CMD to pass the dynamic port argument
     command: ["./TMTApp", "${PORT:-8080}"]
 
   # Python Client Service
@@ -22,12 +24,11 @@ services:
       context: .
       dockerfile: src/client/Dockerfile.client
     container_name: tmt-client
-    # depends_on: - server  <-- מחקנו את זה כדי שדוקר יפסיק לרצוח את השרת!
     networks:
       - tmt-net
     stdin_open: true
     tty: true
-    # מעבירים רק את משתני הרשת, ה-ENTRYPOINT כבר מריץ את פייתון
+    # passes arguments directly to the Dockerfile's ENTRYPOINT [IP, PORT]
     command: ["${IP:-server}", "${PORT:-8080}"]
 
   # Tests Service
@@ -36,6 +37,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: tmt-tests
+    # explicitly run the test suite binary instead of the standard server app
     entrypoint: ["./runTests"]
     working_dir: /app/build
     volumes:

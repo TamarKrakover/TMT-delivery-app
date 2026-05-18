@@ -4,12 +4,12 @@
 #include <vector>
 #include <string>
 
-// Test suite for FileDataRepository
+// test suite for FileDataRepository
 class FileDataRepositoryTest : public ::testing::Test {
 protected:
     std::string testFileName = "test_data.txt";
 
-    // Clean up the test file before and after each test
+    // clean up the test file before and after each test
     void SetUp() override {
         std::remove(testFileName.c_str());
     }

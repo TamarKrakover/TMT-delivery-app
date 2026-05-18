@@ -12,6 +12,7 @@
 #include "Exceptions.hpp"
 
 namespace {
+// simulated input source to feed predefined commands line-by-line into the application
 class MockInputSource : public IInputSource {
 public:
     std::vector<std::string> inputsToFeed;
@@ -25,6 +26,7 @@ public:
     }
 };
 
+// simulated output writer to capture and inspect the application's string responses
 class MockOutputWriter : public IOutputWriter {
 public:
     std::string capturedOutput = "";
@@ -33,6 +35,7 @@ public:
     }
 };
 
+// in-memory repository used to isolate tests from actual database or file I/O
 class FakeRepo : public IDataRepository {
 public:
     std::map<std::string, std::vector<std::string>> data;
@@ -47,6 +50,7 @@ public:
 };
 }
 
+// test fixture to manage lifecycle and shared resources for the main application tests
 class AppTest : public ::testing::Test {
 protected:
     std::shared_ptr<MockInputSource> mockInput;
@@ -54,6 +58,7 @@ protected:
     std::unique_ptr<FakeRepo> fakeRepo;
     std::unique_ptr<Recommender> recommender;
     
+    // setup initialized environment before each individual test execution
     void SetUp() override {
         mockInput = std::make_shared<MockInputSource>();
         mockOutput = std::make_shared<MockOutputWriter>();
@@ -62,6 +67,7 @@ protected:
     }
 };
 
+// verify that a valid command (e.g., 'post') is correctly parsed, processed, and stored
 TEST_F(AppTest, ParsesAndExecutesValidCommand) {
     mockInput->inputsToFeed = {"post 1 100 101"};
     
@@ -73,6 +79,7 @@ TEST_F(AppTest, ParsesAndExecutesValidCommand) {
     EXPECT_EQ(fakeRepo->data["1"].size(), 2);
 }
 
+// verify that an unknown or invalid command correctly triggers a 400 Bad Request response
 TEST_F(AppTest, IgnoresUnknownCommand) {
     mockInput->inputsToFeed = {"recommend 1 100"};
     App app(mockInput, mockOutput, *fakeRepo, *recommender);
@@ -81,6 +88,7 @@ TEST_F(AppTest, IgnoresUnknownCommand) {
     EXPECT_EQ(mockOutput->capturedOutput, "400 Bad Request");
 }
 
+// verify that empty lines or whitespaces are gracefully ignored without affecting data or stability
 TEST_F(AppTest, HandlesEmptyInput) {
     mockInput->inputsToFeed = {"   ", ""};
     App app(mockInput, mockOutput, *fakeRepo, *recommender);

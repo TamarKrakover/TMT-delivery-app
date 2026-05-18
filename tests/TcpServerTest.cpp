@@ -19,16 +19,16 @@ protected:
     }
 };
 
-// Basic test to ensure the server can be initialized without crashing
+// basic test to ensure the server can be initialized without crashing
 TEST_F(TcpServerBasicTest, InitializationDoesNotCrash) {
-    // 1. Initialize dependencies with disconnected sockets (-1)
+    // initialize dependencies with disconnected sockets (-1)
     auto input = std::make_shared<SocketInputSource>(-1);
     auto output = std::make_shared<SocketOutputWriter>(-1);
     FileDataRepository repo(dummyFile);
     Recommender recommender(repo);
     App app(input, output, repo, recommender);
 
-    // 2. Create the server - test passes if no exception is thrown
+    // create the server - test passes if no exception is thrown
     EXPECT_NO_THROW({
         TcpServer server(5555, app, input, output);
     });

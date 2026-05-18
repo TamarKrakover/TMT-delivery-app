@@ -17,7 +17,7 @@ public:
     }
 };
 
-// Fake Repository for GET
+// fake Repository for GET
 class FakeRepoForGet : public IDataRepository {
 public:
     std::map<std::string, std::vector<std::string>> fakeData;
@@ -58,8 +58,8 @@ protected:
 
 // Test 1: Valid GET outputs 200 Ok + recommendations
 TEST_F(GetCommandTest, ValidGetOutputs200AndRecommendations) {
-    // User 1 watched 100
-    // User 2 watched 100, 105
+    // user 1 watched 100
+    // user 2 watched 100, 105
     repo.fakeData["1"] = {"100"};
     repo.fakeData["2"] = {"100", "105"};
 
@@ -68,7 +68,7 @@ TEST_F(GetCommandTest, ValidGetOutputs200AndRecommendations) {
 
     cmd.execute(args);
 
-    // Expecting exactly the 200 Ok with double newline, 
+    // expecting exactly the 200 Ok with double newline, 
     // followed by the recommendation
     EXPECT_EQ(writer.capturedMessage, "200 Ok\n\n105\n");
 }
@@ -91,7 +91,7 @@ TEST_F(GetCommandTest, UserNotFoundThrows404) {
 
 // Test 4: Product not found in user's history throws 404
 TEST_F(GetCommandTest, ProductNotFoundThrows404) {
-    // User exists but watched only 100, attempting to get recommendations for 999
+    // user exists but watched only 100, attempting to get recommendations for 999
     repo.fakeData["1"] = {"100"};
     GetCommand cmd(repo, *recommender, writer);
     std::vector<std::string> args = {"1", "999"};

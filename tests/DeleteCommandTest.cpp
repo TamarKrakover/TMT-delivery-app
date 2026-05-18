@@ -9,7 +9,7 @@
 #include <memory>
 #include <algorithm>
 
-// Mock Output Writer
+// mock Output Writer
 class MockOutputWriterDelete : public IOutputWriter {
 public:
     std::string capturedMessage = "";
@@ -18,7 +18,7 @@ public:
     }
 };
 
-// Fake Repository
+// fake Repository
 class FakeRepoForDelete : public IDataRepository {
 public:
     std::map<std::string, std::vector<std::string>> fakeData;
@@ -39,7 +39,7 @@ public:
     }
     
     void removeUserViews(const std::string& userId, const std::vector<std::string>& productIds) override {
-        // Simple mock implementation
+        // mock implementation
         if (fakeData.find(userId) != fakeData.end()) {
             for (const auto& pid : productIds) {
                 auto& prods = fakeData[userId];
@@ -68,7 +68,7 @@ TEST_F(DeleteCommandTest, ValidDeleteOutputs204) {
     cmd.execute(args);
     
     EXPECT_EQ(writer.capturedMessage, "204 No Content\n");
-    EXPECT_TRUE(repo.fakeData["1"].empty()); // Product was removed
+    EXPECT_TRUE(repo.fakeData["1"].empty()); // product was removed
 }
 
 // Test 2: User not found throws exception
@@ -86,7 +86,7 @@ TEST_F(DeleteCommandTest, InvalidArgsThrows400) {
 
     DeleteCommand cmd(repo, writer);
     
-    std::vector<std::string> args = {"1"}; // Missing product ID
+    std::vector<std::string> args = {"1"}; // missing product ID
     
     EXPECT_THROW(cmd.execute(args), InvalidArgumentsException);
 }
