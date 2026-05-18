@@ -23,10 +23,7 @@ build command:
 ```bash
 docker build -t tmt-project .
 ```
-run command:
-```bash
-docker run -it --rm -v "${PWD}/data:/usr/src/mytest/data" tmt-project
-```
+
 test run command:
 ```bash
 docker run -it --rm tmt-project ./runTests
@@ -56,12 +53,14 @@ clean containers:
  docker compose down --remove-orphans
 ```
 
-<!-- run for server:
+run for server:
+```bash
 docker run -it --rm -p 5555:5555 -v "${PWD}/data:/usr/src/mytest/data" tmt-project ./TMTApp 5555
-
+```
 run client:
-python3 src/client/client.py 127.0.0.1 5555 -->
-
+```bash
+python3 src/client/client.py 127.0.0.1 5555
+```
 ### available commands:
 
 The application supports the following commands:  
