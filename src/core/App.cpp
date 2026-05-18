@@ -26,33 +26,46 @@ App::App(shared_ptr<IInputSource> in,
 void App::run() {
     while (isRunning) {
         string line = input->readNextLine();
-        if (line.empty()) {
+        
+        // Handle client disconnection
+        if (line == "CLIENT_DISCONNECTED") {
             break; 
         }
 
-        vector<string> tokens = parser.parse(line);
-        if (tokens.empty()) continue;
+        // Handle empty line from client
+        if (line.empty()) {
+            output->write("400 Bad Request\n");
+            continue;
+        }
 
-        string commandName = tokens[0];
-
-        transform(commandName.begin(), commandName.end(), commandName.begin(),
-        [](unsigned char c){ return tolower(c); });
-        
-        vector<string> args(tokens.begin() + 1, tokens.end());
-
-        auto it = commands.find(commandName);
-        if (it != commands.end()) {
-            try {
-                it->second->execute(args);
-            } catch (const BaseNotFoundException&) {
-                output->write("404 Not Found\n");
-            } catch (const BaseBadRequestException&) {
+        try {
+            vector<string> tokens = parser.parse(line);
+            
+            // Handle space/tab only commands
+            if (tokens.empty()) {
                 output->write("400 Bad Request\n");
-            } catch (...) {
-                // Catch any other unexpected exceptions
+                continue;
             }
-        } else {
-            output->write("400 Bad Request");
+
+            string commandName = tokens[0];
+
+            transform(commandName.begin(), commandName.end(), commandName.begin(),
+            [](unsigned char c){ return tolower(c); });
+            
+            vector<string> args(tokens.begin() + 1, tokens.end());
+
+            auto it = commands.find(commandName);
+            if (it != commands.end()) {
+                it->second->execute(args);
+            } else {
+                output->write("400 Bad Request\n");
+            }
+        } catch (const BaseNotFoundException&) {
+            output->write("404 Not Found\n");
+        } catch (const BaseBadRequestException&) {
+            output->write("400 Bad Request\n");
+        } catch (...) {
+            // Catch any other unexpected exceptions
         }
     }
 }
