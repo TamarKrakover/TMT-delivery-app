@@ -6,7 +6,7 @@ services:
       dockerfile: Dockerfile
     container_name: tmt-server
     ports:
-      - "${PORT:-5555}:${PORT:-5555}"
+      - "${PORT:-8080}:${PORT:-8080}"
     volumes:
       - ./data:/app/data
     networks:
@@ -14,7 +14,7 @@ services:
     stdin_open: true
     tty: true
     # Override CMD to pass the port argument to the executable
-    command: ["./TMTApp", "${PORT:-5555}"]
+    command: ["./TMTApp", "${PORT:-8080}"]
 
   # Python Client Service
   client:
@@ -28,7 +28,7 @@ services:
     stdin_open: true
     tty: true
     # מעבירים רק את משתני הרשת, ה-ENTRYPOINT כבר מריץ את פייתון
-    command: ["${IP:-server}", "${PORT:-5555}"]
+    command: ["${IP:-server}", "${PORT:-8080}"]
 
   # Tests Service
   tests:
