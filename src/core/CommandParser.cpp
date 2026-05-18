@@ -1,4 +1,5 @@
 #include "CommandParser.hpp"
+#include "Exceptions.hpp"
 #include <sstream>
 #include <cctype>
 
@@ -11,7 +12,7 @@ vector<string> CommandParser::parse(const string& input) {
     // ignoring white spaces
     for (char c : input) {
         if(isspace(static_cast<unsigned char>(c)) && c != ' ') {
-            return words;
+            throw InvalidArgumentsException();
         }
     }
 
