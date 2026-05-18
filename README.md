@@ -19,15 +19,7 @@ The application is containerized using Docker.
 ### Build the Image
 To build the Docker image, run the following command in the root directory of the project:
 
-build command:
-```bash
-docker build -t tmt-project .
-```
-
-test run command:
-```bash
-docker run -it --rm tmt-project ./runTests
-```
+# new commands:
 build:
 ```bash
 docker compose build
@@ -35,12 +27,12 @@ docker compose build
 
 run server:
 ```bash
-PORT=<port> docker compose run --service-ports --use-aliases server
+PORT=8080 docker compose run --service-ports --use-aliases server
 ```
 
 run client:
 ```bash
-IP=server PORT=<port> docker compose run client
+IP=server PORT=8080 docker compose run client
 ```
 
 run test:
@@ -51,6 +43,17 @@ docker compose run tests
 clean containers:
 ```bash
  docker compose down --remove-orphans
+```
+# end of new commands
+
+build command:
+```bash
+docker build -t tmt-project .
+```
+
+test run command:
+```bash
+docker run -it --rm tmt-project ./runTests
 ```
 
 run for server:
