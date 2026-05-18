@@ -1,4 +1,3 @@
-// src/core/Exceptions.hpp
 #ifndef EXCEPTIONS_HPP
 #define EXCEPTIONS_HPP
 
