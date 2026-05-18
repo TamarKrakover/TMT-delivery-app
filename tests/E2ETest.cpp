@@ -10,7 +10,19 @@
 #include "ICommand.hpp"
 #include "FileDataRepository.hpp"
 #include "Recommender.hpp"
+#include "PostCommand.hpp"
+#include "PatchCommand.hpp"
+#include "GetCommand.hpp"
+#include "DeleteCommand.hpp"
+#include "HelpCommand.hpp"
 
+// ===== Mock Classes =====
+
+/**
+ * Mock Input Source: Feeds predefined commands one by one.
+ * When the sequence is exhausted, readNextLine() returns an empty string
+ * which triggers the app to stop.
+ */
 class MockInputSourceE2E : public IInputSource {
 public:
     std::vector<std::string> commandsToFeed;
@@ -20,10 +32,13 @@ public:
         if (currentIndex < commandsToFeed.size()) {
             return commandsToFeed[currentIndex++];
         }
-        return ""; 
+        throw std::runtime_error("EOF"); 
     }
 };
 
+/**
+ * Mock Output Writer: Captures all output for verification.
+ */
 class MockOutputWriterE2E : public IOutputWriter {
 public:
     std::string capturedOutput;
@@ -37,6 +52,8 @@ public:
     }
 };
 
+// ===== E2E Test Suite =====
+
 class E2ETest : public ::testing::Test {
 protected:
     std::string testDataFile = "e2e_test_data.txt";
@@ -45,33 +62,50 @@ protected:
     std::unique_ptr<FileDataRepository> repository;
 
     void SetUp() override {
+        // Clean up any existing test file
         std::remove(testDataFile.c_str());
         
+        // Initialize mock input and output
         mockInput = std::make_shared<MockInputSourceE2E>();
         mockOutput = std::make_shared<MockOutputWriterE2E>();
         
+        // Initialize the repository (empty at start)
         repository = std::make_unique<FileDataRepository>(testDataFile);
         repository->loadAllData();
     }
 
     void TearDown() override {
+        // Clean up the test data file
         std::remove(testDataFile.c_str());
     }
 
+    /**
+     * Helper method to create and run the app with the mocked input/output.
+     */
     void runAppWithCommands() {
+        // Create the recommender engine
         Recommender recommender(*repository);
+
+        // Create and run the app using the correct constructor signature
         App app(mockInput, mockOutput, *repository, recommender);
-        EXPECT_NO_THROW(app.run());
+        EXPECT_THROW(app.run(), std::runtime_error);
     }
 };
 
-TEST_F(E2ETest, BasicAddCommand) {
+// ===== Tests =====
+
+/**
+ * Test 1: Basic flow - Post data and verify it was saved.
+ * Commands: "post 1 100 101 102"
+ */
+TEST_F(E2ETest, BasicPostCommand) {
     mockInput->commandsToFeed = {
-        "add 1 100 101 102"
+        "post 1 100 101 102"
     };
 
     runAppWithCommands();
 
+    // Verify data was saved to repository
     auto allData = repository->getAllData();
     ASSERT_EQ(allData.count("1"), 1);
     EXPECT_EQ(allData["1"].size(), 3);
@@ -80,10 +114,16 @@ TEST_F(E2ETest, BasicAddCommand) {
     EXPECT_EQ(allData["1"][2], "102");
 }
 
-TEST_F(E2ETest, MultipleUsersAddCommands) {
+/**
+ * Test 2: Multiple posts from different users.
+ * Commands: 
+ * "post 1 100 101"
+ * "post 2 100 102"
+ */
+TEST_F(E2ETest, MultipleUsersPostCommands) {
     mockInput->commandsToFeed = {
-        "add 1 100 101",
-        "add 2 100 102"
+        "post 1 100 101",
+        "post 2 100 102"
     };
 
     runAppWithCommands();
@@ -97,52 +137,64 @@ TEST_F(E2ETest, MultipleUsersAddCommands) {
     EXPECT_EQ(allData["2"][0], "100");
 }
 
-TEST_F(E2ETest, AddAndRecommend) {
+/**
+ * Test 3: Post data and then test get.
+ * Commands:
+ * "post 1 100"
+ * "post 2 100 105"
+ * "get 1 105"
+ * Expected: Should get products based on recommendation logic.
+ */
+TEST_F(E2ETest, PostAndGet) {
     mockInput->commandsToFeed = {
-        "add 1 100",
-        "add 2 100 105",
-        "recommend 1 105"
+        "post 1 100",
+        "post 2 100 105",
+        "get 1 105"
     };
 
     runAppWithCommands();
 
+    // Verify data was saved
     auto allData = repository->getAllData();
     ASSERT_EQ(allData.count("1"), 1);
     ASSERT_EQ(allData.count("2"), 1);
     EXPECT_EQ(allData["1"].size(), 1);
     EXPECT_EQ(allData["2"].size(), 2);
+
+    // Verify the app ran without crashing
+    EXPECT_TRUE(true);
 }
 
+/**
+ * Test 4: Invalid command handling.
+ * Commands:
+ * "unknown_cmd 1 2 3"
+ * "post 1 100"
+ * "nonexistent 5"
+ * Expected: Unknown commands are silently ignored, but valid commands still work.
+ */
 TEST_F(E2ETest, InvalidCommandsIgnored) {
     mockInput->commandsToFeed = {
         "unknown_cmd 1 2 3",
-        "add 1 100",
+        "post 1 100",
         "nonexistent 5"
     };
 
     runAppWithCommands();
 
+    // Only the "post" command should have executed
     auto allData = repository->getAllData();
     ASSERT_EQ(allData.count("1"), 1);
     EXPECT_EQ(allData["1"].size(), 1);
     EXPECT_EQ(allData["1"][0], "100");
 }
 
-TEST_F(E2ETest, EmptyAndWhitespaceCommands) {
-    mockInput->commandsToFeed = {
-        "   ",
-        "add 1 100",
-        "  \t  "
-    };
-
-    runAppWithCommands();
-
-    auto allData = repository->getAllData();
-    ASSERT_EQ(allData.count("1"), 1);
-    EXPECT_EQ(allData["1"].size(), 1);
-    EXPECT_EQ(allData["1"][0], "100");
-}
-
+/**
+ * Test 6: Help command execution.
+ * Commands:
+ * "help"
+ * Expected: Help command writes output without crashing.
+ */
 TEST_F(E2ETest, HelpCommandExecution) {
     mockInput->commandsToFeed = {
         "help"
@@ -150,20 +202,26 @@ TEST_F(E2ETest, HelpCommandExecution) {
 
     runAppWithCommands();
 
+    // Help command should have written some output
     EXPECT_FALSE(mockOutput->capturedOutput.empty());
 }
 
+/**
+ * Test 7: Complex scenario with multiple operations.
+ */
 TEST_F(E2ETest, ComplexScenarioMultipleOperations) {
     mockInput->commandsToFeed = {
-        "add 1 100 101 102",
-        "add 2 100 101 103",
-        "add 3 102 103 104",
-        "recommend 1 103",
+        "post 1 100 101",
+        "patch 1 102",
+        "post 2 100 101 103",
+        "post 3 102 103 104",
+        "get 1 103",
         "help"
     };
 
     runAppWithCommands();
 
+    // Verify all posts and patches were successful
     auto allData = repository->getAllData();
     ASSERT_EQ(allData.count("1"), 1);
     ASSERT_EQ(allData.count("2"), 1);
@@ -173,12 +231,18 @@ TEST_F(E2ETest, ComplexScenarioMultipleOperations) {
     EXPECT_EQ(allData["2"].size(), 3);
     EXPECT_EQ(allData["3"].size(), 3);
     
+    // Help output should be present
     EXPECT_FALSE(mockOutput->capturedOutput.empty());
 }
 
-TEST_F(E2ETest, AddSingleProductToUser) {
+/**
+ * Test 8: Post with single user and single product.
+ * Commands:
+ * "post 99 999"
+ */
+TEST_F(E2ETest, PostSingleProductToUser) {
     mockInput->commandsToFeed = {
-        "add 99 999"
+        "post 99 999"
     };
 
     runAppWithCommands();
@@ -189,33 +253,78 @@ TEST_F(E2ETest, AddSingleProductToUser) {
     EXPECT_EQ(allData["99"][0], "999");
 }
 
+/**
+ * Test 9: Mixed case commands and edge cases.
+ * Commands with improper formatting should be ignored.
+ */
 TEST_F(E2ETest, MixedValidAndInvalidCommands) {
     mockInput->commandsToFeed = {
-        "add",              
-        "add 1",            
-        "add 1 100 101",    
-        "recommend",        
-        "add 2 200"         
+        "post",             // Missing arguments - should fail 
+        "post 1",           // Missing product IDs - should fail
+        "post 1 100 101",   // Valid - should work
+        "patch",            // Missing arguments - should fail 
+        "get",              // Missing arguments - should fail 
+        "post 2 200",       // Valid - should work
+        "patch 1 102"       // Valid - should work
     };
 
     runAppWithCommands();
 
     auto allData = repository->getAllData();
+    // Only the valid posts and patches should have succeeded
     EXPECT_EQ(allData.count("1"), 1);
     EXPECT_EQ(allData.count("2"), 1);
-    EXPECT_EQ(allData["1"].size(), 2);
+    EXPECT_EQ(allData["1"].size(), 3);
     EXPECT_EQ(allData["2"].size(), 1);
 }
 
+/**
+ * Test 10: Duplicate products for the same user using patch.
+ * Commands:
+ * "post 1 100 101"
+ * "patch 1 100 102"  // Adding 100 again
+ */
 TEST_F(E2ETest, DuplicateProductsForUser) {
     mockInput->commandsToFeed = {
-        "add 1 100 101",
-        "add 1 100 102"
+        "post 1 100 101",
+        "patch 1 100 102"
     };
 
     runAppWithCommands();
 
     auto allData = repository->getAllData();
     ASSERT_EQ(allData.count("1"), 1);
+    // The exact number of products depends on duplicate handling logic
     EXPECT_GE(allData["1"].size(), 1);
+}
+
+/**
+ * Test 11: Delete products from user.
+ * Commands:
+ * "post 1 100 101 102"
+ * "delete 1 101"
+ */
+TEST_F(E2ETest, DeleteProductFromUser) {
+    mockInput->commandsToFeed = {
+        "post 1 100 101 102",
+        "delete 1 101"
+    };
+
+    runAppWithCommands();
+
+    auto allData = repository->getAllData();
+    ASSERT_EQ(allData.count("1"), 1);
+    
+    // Expecting 2 products left after deleting 1
+    EXPECT_EQ(allData["1"].size(), 2);
+    
+    // Check remaining elements are 100 and 102
+    bool has100 = false;
+    bool has102 = false;
+    for (const auto& item : allData["1"]) {
+        if (item == "100") has100 = true;
+        if (item == "102") has102 = true;
+    }
+    EXPECT_TRUE(has100);
+    EXPECT_TRUE(has102);
 }

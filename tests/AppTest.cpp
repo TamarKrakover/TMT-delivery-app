@@ -63,7 +63,7 @@ protected:
 };
 
 TEST_F(AppTest, ParsesAndExecutesValidCommand) {
-    mockInput->inputsToFeed = {"add 1 100 101"};
+    mockInput->inputsToFeed = {"post 1 100 101"};
     
     App app(mockInput, mockOutput, *fakeRepo, *recommender);
     
@@ -74,7 +74,7 @@ TEST_F(AppTest, ParsesAndExecutesValidCommand) {
 }
 
 TEST_F(AppTest, IgnoresUnknownCommand) {
-    mockInput->inputsToFeed = {"delete 1 100"};
+    mockInput->inputsToFeed = {"recommend 1 100"};
     App app(mockInput, mockOutput, *fakeRepo, *recommender);
     
     EXPECT_NO_THROW(app.run());
