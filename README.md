@@ -17,36 +17,33 @@ With the client-server architecture, the C++ server listens on a TCP port, proce
 
 ## How to Run
 
-The application is completely containerized and managed using Docker Compose.
+The application is completely containerized and managed using `Docker Compose`.
 
 ### Build the Image
 To build the Docker image, run the following command in the root directory of the project:
 
-# new commands:
-build:
+Build:
 ```bash
 docker compose build
 ```
 
-run server:
+Run server:
 ```bash
 docker compose down --remove-orphans && PORT=8080 docker compose run --service-ports --use-aliases server
 ```
+*Note: The `down --remove-orphans` command is intentionally prepended to clear any lingering background containers and free up the port before starting a new server instance.*
 
-run client:
+Run client:
 ```bash
 IP=server PORT=8080 docker compose run client
 ```
 
-run test:
+Run tests:
 ```bash
 docker compose run tests
 ```
 
-end of new commands
-
-```
-### available commands:
+### Available commands:
 
 The application supports the following commands:  
 
@@ -81,6 +78,7 @@ Below is a demonstration of adding user data and requesting a recommendation:
 
 104 106
 ```
+## Architecture:
 
 ```
 Advanced-Programming/
