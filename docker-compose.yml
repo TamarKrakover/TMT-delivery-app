@@ -37,7 +37,7 @@ services:
       dockerfile: Dockerfile
     container_name: tmt-tests
     entrypoint: ["./runTests"]
-    working_dir: /data/app/build
+    working_dir: /app/build
     volumes:
       - ./data:/app/data
     networks:
