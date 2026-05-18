@@ -13,7 +13,7 @@ With the client-server architecture, the C++ server listens on a TCP port, proce
 
 
 
-![Run Screenshot](runScreenShot.png)
+![Run Screenshot](runScreenShot2.png)
 
 ## How to Run
 
@@ -165,20 +165,16 @@ Following SOLID principles, the project strictly binds logic to generic abstract
 
 ## Design and SOLID Principles Analysis from EX1
 
-In this iteration, we focused heavily on maintaining a **loosely coupled** architecture and adhering strictly to the **SOLID principles**, with a strong emphasis on the **Open/Closed Principle (OCP)**. This ensures that the codebase remains highly maintainable and easily extendable for future modifications.
+#### 1. Did changing the command names require modifying code that should be "closed for modification but open for extension"?
+No, The command execution engine is completely decoupled from the string representations of the commands. Command names are bound to their respective objects inside a centralized command registry mapping (within app.cpp). Altering a name only required a minor update to this registry configuration, leaving the core business logic completely untouched and closed to modification.
 
-### 1. Changes to Command Names
-* **Impact:** Minimal.
-* **Analysis:** Altering command names only required updating the command registry mapping (e.g., inside `app.cpp`) where names are bound to their respective objects, without modifying any core business logic. Because the command execution engine is completely decoupled from the string representations of the commands, the core system remained closed to modification.
+#### 2. Did adding new commands require modifying code that should be "closed for modification but open for extension"?
+No, By utilizing a polymorphic Command Pattern based on the ICommand interface, the system is natively open for extension. Introducing new capabilities only required creating new standalone classes that implement the interface. The core execution engine and existing, tested command classes remained entirely unaffected.
 
-### 2. Addition of New Commands
-* **Impact:** minimal
-* **Analysis:** Introducing new commands did not require any modifications to existing command classes or the core execution engine. Utilizing a polymorphic Command Pattern allowed us to extend the system's capabilities simply by adding new classes that implement the standard command interface, leaving the existing, tested code entirely untouched.
+#### 3. Did changing the command output format require modifying code that should be "closed for modification but open for extension"?
+Yes, the help command directly managed the printing logic and details of all available commands. This setup broke the Open/Closed Principle because any change to a command's arguments or output specifications forced us to modify the inner logic of the help command.
+To fix this, we refactored the ICommand interface to include a dedicated metadata method. Now, each command encapsulates and exposes its own signature and arguments, and the help command dynamically aggregates this information polymorphically. Future format changes are now entirely contained within their specific command classes.
 
-### 3. Changes to Command Output Format
-* **Impact:** Required refactoring for better encapsulation.
-* **Analysis:** Initially, the `help` command directly handled the printing logic and details of all available commands. This setup violated the Open/Closed Principle when command arguments or output specifications changed, as it forced modifications inside the `help` logic. To resolve this, we refactored the `ICommand` interface to include a dedicated method that enables each command to expose its own metadata and arguments. The `help` command now dynamically aggregates and displays this information polymorphically. This adjustment ensures that any future changes to a command's signature or output format are entirely encapsulated within that specific command class.
-
-### 4. Transitioning Input/Output from Console to Sockets
-* **Impact:** minimal
-* **Analysis:** Shifting the data source and destination from the standard console (`std::cin`/`std::cout`) to network sockets did not require any modifications to our core logic or command implementations. By abstracting the input and output streams behind dedicated interfaces, the commands remain completely agnostic of the underlying communication medium. Whether data is transmitted via the terminal or a socket connection, the execution logic treats it identically, demonstrating strong separation of concerns and loose coupling.
+#### 4. Did transitioning the input/output from the console to sockets require modifying code that should be "closed for modification but open for extension"?
+No, Following strict Interface-Driven Design, input and output streams were abstracted behind generic interfaces (IInputSource and IOutputWriter). The core application layer and command logic remain entirely agnostic of the underlying communication medium.
+Whether data passes through the standard terminal (std::cin/std::cout) or raw network sockets (dynamically updated by the TcpServer via SocketInputSource and SocketOutputWriter), the execution logic treats them identically.
