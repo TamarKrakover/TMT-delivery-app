@@ -14,7 +14,6 @@ void DeleteCommand::execute(const std::vector<std::string>& args) {
         throw InvalidArgumentsException();
     }
 
-    
     std::string userId = args[0];
 
     // Check if user exists. If not, throw 404 (which App will catch)
@@ -25,14 +24,20 @@ void DeleteCommand::execute(const std::vector<std::string>& args) {
     // Extract all products to delete (skipping the userId at index 0)
     std::vector<std::string> productsToDelete(args.begin() + 1, args.end());
 
-    // Verify all products exist before deleting anything
+    // Verify all products exist before deleting anything, and not duplicates
     std::vector<std::string> userHistory = repo.getUserViews(userId);
     
     for (size_t i = 0; i < productsToDelete.size(); ++i) {
         const std::string& pid = productsToDelete[i];
-        if (std::find(userHistory.begin(), userHistory.end(), pid) == userHistory.end()) {
-            // Product not found in user's history, Logical error -> 404
+
+        auto it = std::find(userHistory.begin(), userHistory.end(), pid);
+
+        if (it == userHistory.end()) {
+            // Product not found, or duplicates in the requested list (same error)
             throw ProductNotFoundException(); 
+        } else {
+            //Remove the matched item from the temporary list
+            userHistory.erase(it);
         }
     }
 
