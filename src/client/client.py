@@ -26,18 +26,20 @@ def main():
                 command = input()
             except EOFError:
                 break
-            
-            if not command.strip():
-                continue
 
-            # Send command to server
-            client_socket.sendall((command + '\n').encode('utf-8'))
+            # Send command to server safely
+            try:
+                client_socket.sendall((command + '\n').encode('utf-8'))
+            except (BrokenPipeError, ConnectionResetError):
+                break
 
             # Wait for and read the response
             response = b""
+            server_disconnected = False
             while True:
                 chunk = client_socket.recv(4096)
                 if not chunk:
+                    server_disconnected = True
                     break
                 response += chunk
                 
@@ -45,6 +47,9 @@ def main():
                 if response.endswith(b'\n'):
                     break
             
+            if server_disconnected:
+                break
+
             # Print the server's output
             if response:
                 print(response.decode('utf-8').rstrip('\n'))
