@@ -36,7 +36,3 @@ void PatchCommand::execute(const vector<string>& args) {
 string PatchCommand::getHelpText() const {
     return "PATCH, arguments: [userid] [productid]";
 }
-
-
-    
-

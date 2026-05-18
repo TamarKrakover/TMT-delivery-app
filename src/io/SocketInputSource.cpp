@@ -1,12 +1,15 @@
 #include "SocketInputSource.hpp"
 #include <unistd.h>
 
+// constructor: Initializes the input source with a client socket descriptor
 SocketInputSource::SocketInputSource(int socket) : clientSocket(socket) {}
 
+// updates the active client socket descriptor dynamically
 void SocketInputSource::setSocket(int socket) {
     clientSocket = socket;
 }
 
+// reads from the socket byte-by-byte until a full line is captured
 std::string SocketInputSource::readNextLine() {
     if (clientSocket == -1) return "CLIENT_DISCONNECTED";
     

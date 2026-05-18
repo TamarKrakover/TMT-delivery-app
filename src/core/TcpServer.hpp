@@ -6,20 +6,24 @@
 #include "SocketOutputWriter.hpp"
 #include <memory>
 
+// manages the TCP server lifecycle and dispatches client connections
 class TcpServer {
 private:
-    int port;
-    int serverSocket;
-    App& app;
-    std::shared_ptr<SocketInputSource> input;
-    std::shared_ptr<SocketOutputWriter> output;
+    int port;                                            // port number the server listens on                            
+    int serverSocket;                                   // file descriptor for the main listening socket
+    App& app;                                           // reference to the core application logic
+    std::shared_ptr<SocketInputSource> input;          // shared abstraction for reading socket data  
+    std::shared_ptr<SocketOutputWriter> output;        // shared abstraction for writing socket data 
 
 public:
-    // השרת מקבל גם את מקורות ה-I/O כדי לעדכן אותם
+    // constructor: Initializes server configuration and binds I/O dependencies
     TcpServer(int port, App& appRef, std::shared_ptr<SocketInputSource> in, std::shared_ptr<SocketOutputWriter> out);
+    // destructor: Safely closes the server socket and releases resources
     ~TcpServer();
     
+    // binds the socket, starts listening, and enters the client acceptance loop
     void start();
+    // assigns the connected client socket to I/O streams and runs the app logic
     void handleClient(int clientSocket);
 };
 #endif
