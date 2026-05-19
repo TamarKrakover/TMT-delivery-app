@@ -50,5 +50,5 @@ void DeleteCommand::execute(const std::vector<std::string>& args) {
 
 // return the command's identifier
 std::string DeleteCommand::getHelpText() const {
-    return "DELETE, arguments: [userid] [productid]";
+    return "DELETE, arguments: [userid] [productid1] [productid2] ...";
 }

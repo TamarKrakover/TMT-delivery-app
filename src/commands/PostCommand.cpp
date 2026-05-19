@@ -34,5 +34,5 @@ void PostCommand::execute(const vector<string>& args) {
 
 // return the command's identifier
 string PostCommand::getHelpText() const {
-    return "POST, arguments: [userid] [productid]";
+    return "POST, arguments: [userid] [productid1] [productid2] ...";
 }
