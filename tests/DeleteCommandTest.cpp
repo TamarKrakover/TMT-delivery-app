@@ -80,7 +80,7 @@ TEST_F(DeleteCommandTest, UserNotFoundThrows404) {
     EXPECT_THROW(cmd.execute(args), UserNotFoundException);
 }
 
-// Test 3: Invalid arguments throws exception (TMT-110)
+// Test 3: Invalid arguments throws exception 
 TEST_F(DeleteCommandTest, InvalidArgsThrows400) {
     repo.fakeData["1"] = {"100"};
 
