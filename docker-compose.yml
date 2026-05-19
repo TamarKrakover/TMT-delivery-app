@@ -22,12 +22,10 @@ services:
       context: .
       dockerfile: src/client/Dockerfile.client
     container_name: tmt-client
-    # depends_on: - server  <-- מחקנו את זה כדי שדוקר יפסיק לרצוח את השרת!
     networks:
       - tmt-net
     stdin_open: true
     tty: true
-    # מעבירים רק את משתני הרשת, ה-ENTRYPOINT כבר מריץ את פייתון
     command: ["${IP:-server}", "${PORT:-8080}"]
 
   # Tests Service

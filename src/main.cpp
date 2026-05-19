@@ -16,7 +16,7 @@ int main(int argc, char* argv[]) {
 
     // validate command-line arguments
     if (argc < 2) {
-        std::cerr << "Usage: ./TMTApp [port]" << std::endl;
+       
         return 1;
     }
 
@@ -25,7 +25,7 @@ int main(int argc, char* argv[]) {
     try {
         port = std::stoi(argv[1]);
     } catch (...) {
-        std::cerr << "Invalid port number" << std::endl;
+        
         return 1;
     }
 

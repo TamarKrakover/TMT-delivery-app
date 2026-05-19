@@ -10,7 +10,7 @@
 using namespace std;
  
 namespace {
-// mock output writer to capture text for testing instead of printing it
+// mock output writer to capture text for testing
 class TestPrinter : public IOutputWriter {
 public:
     string savedText = "";
