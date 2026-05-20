@@ -3,17 +3,18 @@
 #include <sstream>
 #include <algorithm>
 
-FileDataRepository::FileDataRepository(std::string path) : filePath(std::move(path)) {}
+using namespace std;
+
+FileDataRepository::FileDataRepository(string path) : filePath(move(path)) {}
 
 // Appends new products to a user's history and instantly saves to the file
-void FileDataRepository::saveUserViews(const std::string& userId, const std::vector<std::string>& productIds) {
-
+void FileDataRepository::saveUserViews(const string& userId, const vector<string>& productIds) {
     auto& userProds = userInteractions[userId];
     bool hasChanges = false;
 
     for (const auto& productId : productIds) {
         // check if the product does not exist in the user's history
-        if (std::find(userProds.begin(), userProds.end(), productId) == userProds.end()) {
+        if (find(userProds.begin(), userProds.end(), productId) == userProds.end()) {
             userProds.push_back(productId);
             hasChanges = true;
         }
@@ -27,18 +28,18 @@ void FileDataRepository::saveUserViews(const std::string& userId, const std::vec
 
 // Loads all user product interactions from the file into memory
 bool FileDataRepository::loadAllData() {
-    std::ifstream inFile(filePath);
+    ifstream inFile(filePath);
     if (!inFile) return false; // File doesn't exist yet
 
     userInteractions.clear();
-    std::string line;
+    string line;
 
-    while (std::getline(inFile, line)) {
+    while (getline(inFile, line)) {
         if (line.empty()) continue;
-        std::stringstream ss(line);
-        std::string userId;
+        stringstream ss(line);
+        string userId;
         ss >> userId;
-        std::string productId;
+        string productId;
         while (ss >> productId) {
             userInteractions[userId].push_back(productId);
         }
@@ -46,11 +47,13 @@ bool FileDataRepository::loadAllData() {
     return true;
 }
 
-std::map<std::string, std::vector<std::string>> FileDataRepository::getAllData() const {
-    return userInteractions;
+map<string, vector<string>> FileDataRepository::getAllData() const {
+    // copy the naturally sorted map into a standard map for the interface return type
+    map<string, vector<string>> standardMap(userInteractions.begin(), userInteractions.end());
+    return standardMap;
 }
 
-std::vector<std::string> FileDataRepository::getUserViews(const std::string& userId) const {
+vector<string> FileDataRepository::getUserViews(const string& userId) const {
     auto it = userInteractions.find(userId);
     if (it != userInteractions.end()) {
         return it->second;
@@ -60,8 +63,8 @@ std::vector<std::string> FileDataRepository::getUserViews(const std::string& use
 
 // Overwrites the entire file with the current in-memory data
 void FileDataRepository::persistToFile() const {
-    // std::ios::trunc ensures we overwrite the file, creating it if it doesn't exist
-    std::ofstream outFile(filePath, std::ios::trunc);
+    // ios::trunc ensures we overwrite the file, creating it if it doesn't exist
+    ofstream outFile(filePath, ios::trunc);
     if (!outFile) return;
 
     for (const auto& pair : userInteractions) {
@@ -74,12 +77,12 @@ void FileDataRepository::persistToFile() const {
 }
 
 // Checks if the user exists by searching the map
-bool FileDataRepository::userExists(const std::string& userId) const {  
+bool FileDataRepository::userExists(const string& userId) const {  
     return userInteractions.find(userId) != userInteractions.end();
 }
 
 // Removes specific products from a user's history and saves to file if changed
-void FileDataRepository::removeUserViews(const std::string& userId, const std::vector<std::string>& productIds) {
+void FileDataRepository::removeUserViews(const string& userId, const vector<string>& productIds) {
     auto it = userInteractions.find(userId);
 
     // If the user does not exist, there is nothing to remove
@@ -87,12 +90,12 @@ void FileDataRepository::removeUserViews(const std::string& userId, const std::v
         return;
     }
     bool hasChanges = false;
-    std::vector<std::string>& userProds = it->second;
+    vector<string>& userProds = it->second;
 
     // Iterate through all the product IDs the user wants to delete
     for (const auto& productId : productIds) {
         // Find if the product actually exists in the user's viewing history
-        auto prodIt = std::find(userProds.begin(), userProds.end(), productId);
+        auto prodIt = find(userProds.begin(), userProds.end(), productId);
         if (prodIt != userProds.end()) {
             // Remove the product and mark that a change occurred
             userProds.erase(prodIt);
