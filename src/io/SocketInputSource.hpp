@@ -3,7 +3,7 @@
 
 #include "IInputSource.hpp"
 #include <string>
-
+using namespace std;
 // concrete implementation of IInputSource for reading from network sockets
 class SocketInputSource : public IInputSource {
 private:
@@ -17,6 +17,6 @@ public:
     // dynamically updates the active client socket descriptor
     void setSocket(int socket);
     // reads a single line from the socket
-    std::string readNextLine() override;
+    string readNextLine() override;
 };
 #endif

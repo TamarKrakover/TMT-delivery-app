@@ -9,12 +9,12 @@
 #define IINPUT_SOURCE_HPP
 
 #include <string>
-
+using namespace std;
 class IInputSource {
 public:
     virtual ~IInputSource() = default;
     
-    virtual std::string readNextLine() = 0;
+    virtual string readNextLine() = 0;
 };
 
 #endif

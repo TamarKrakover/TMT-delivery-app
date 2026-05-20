@@ -10,16 +10,16 @@
 #include "IDataRepository.hpp"
 #include "Recommender.hpp"
 #include "Exceptions.hpp"
-
+using namespace std;
 namespace {
 // mock class to simulate user input instead of reading from a real socket or console
 class MockInputSource : public IInputSource {
 public:
-    std::vector<std::string> inputsToFeed; // list of simulated commands
+    vector<string> inputsToFeed; // list of simulated commands
     size_t currentIndex = 0;
 
     // returns the next simulated line or simulates a disconnect when out of commands
-    std::string readNextLine() override {
+    string readNextLine() override {
         if (currentIndex < inputsToFeed.size()) {
             return inputsToFeed[currentIndex++];
         }
@@ -30,9 +30,9 @@ public:
 // mock class to capture the application's output for verification during tests
 class MockOutputWriter : public IOutputWriter {
 public:
-    std::string capturedOutput = "";
+    string capturedOutput = "";
     // appends the written message to the captured output string
-    void write(const std::string& message) override {
+    void write(const string& message) override {
         capturedOutput += message;
     }
 };
@@ -40,31 +40,31 @@ public:
 // fake repository to simulate database/file storage in memory
 class FakeRepo : public IDataRepository {
 public:
-    std::map<std::string, std::vector<std::string>> data; // in-memory storage
-    void saveUserViews(const std::string& u, const std::vector<std::string>& p) override {
+    map<string, vector<string>> data; // in-memory storage
+    void saveUserViews(const string& u, const vector<string>& p) override {
         data[u] = p;
     }
     bool loadAllData() override { return true; }
-    std::map<std::string, std::vector<std::string>> getAllData() const override { return data; }
-    std::vector<std::string> getUserViews(const std::string& u) const override { return {}; }
-    bool userExists(const std::string& u) const override { return data.find(u) != data.end(); }
-    void removeUserViews(const std::string& u, const std::vector<std::string>& p) override {}
+    map<string, vector<string>> getAllData() const override { return data; }
+    vector<string> getUserViews(const string& u) const override { return {}; }
+    bool userExists(const string& u) const override { return data.find(u) != data.end(); }
+    void removeUserViews(const string& u, const vector<string>& p) override {}
 };
 }
 
 class AppTest : public ::testing::Test {
 protected:
-    std::shared_ptr<MockInputSource> mockInput;
-    std::shared_ptr<MockOutputWriter> mockOutput;
-    std::unique_ptr<FakeRepo> fakeRepo;
-    std::unique_ptr<Recommender> recommender;
+    shared_ptr<MockInputSource> mockInput;
+    shared_ptr<MockOutputWriter> mockOutput;
+    unique_ptr<FakeRepo> fakeRepo;
+    unique_ptr<Recommender> recommender;
     
     // setup runs before each test to initialize clean mocks and dependencies
     void SetUp() override {
-        mockInput = std::make_shared<MockInputSource>();
-        mockOutput = std::make_shared<MockOutputWriter>();
-        fakeRepo = std::make_unique<FakeRepo>();
-        recommender = std::make_unique<Recommender>(*fakeRepo);
+        mockInput = make_shared<MockInputSource>();
+        mockOutput = make_shared<MockOutputWriter>();
+        fakeRepo = make_unique<FakeRepo>();
+        recommender = make_unique<Recommender>(*fakeRepo);
     }
 };
 

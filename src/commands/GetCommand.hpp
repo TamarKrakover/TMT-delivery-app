@@ -5,7 +5,7 @@
 #include "IDataRepository.hpp"
 #include "Recommender.hpp"
 #include "IOutputWriter.hpp"
-
+using namespace std;
 /**
  * @class GetCommand
  * @brief Implements the 'GET' logic (replacing the old 'recommend' command).
@@ -20,9 +20,9 @@ public:
      * Executes the recommendation process.
      * @param args Expected: [0] userId, [1] productId.
      */
-    void execute(const std::vector<std::string>& args) override;
+    void execute(const vector<string>& args) override;
 
-    std::string getHelpText() const override;
+    string getHelpText() const override;
 
 private:
     IDataRepository& repository;

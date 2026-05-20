@@ -1,7 +1,7 @@
 #include "StandardOutput.hpp"
 #include <iostream>
-
+using namespace std;
 // writes the given message to the standard console output
-void StandardOutput::write(const std::string& message) {
-    std::cout << message;
+void StandardOutput::write(const string& message) {
+    cout << message;
 }

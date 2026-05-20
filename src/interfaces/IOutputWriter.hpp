@@ -9,12 +9,12 @@
 #define IOUTPUT_WRITER_HPP
 
 #include <string>
-
+using namespace std;
 class IOutputWriter {
 public:
     virtual ~IOutputWriter() = default;
     
-    virtual void write(const std::string& message) = 0;
+    virtual void write(const string& message) = 0;
 };
 
 #endif

@@ -8,11 +8,11 @@
 #include <vector>
 #include <map>
 #include <algorithm>
-
+using namespace std;
 class MockOutputWriterGet : public IOutputWriter {
 public: 
-    std::string capturedMessage = "";
-    void write(const std::string& message) override {
+    string capturedMessage = "";
+    void write(const string& message) override {
         capturedMessage += message;
     }
 };
@@ -20,13 +20,13 @@ public:
 // Fake Repository for GET
 class FakeRepoForGet : public IDataRepository {
 public:
-    std::map<std::string, std::vector<std::string>> fakeData;
+    map<string, vector<string>> fakeData;
 
-    void saveUserViews(const std::string& userId, const std::vector<std::string>& productIds) override {}
+    void saveUserViews(const string& userId, const vector<string>& productIds) override {}
     bool loadAllData() override { return true; }
-    std::map<std::string, std::vector<std::string>> getAllData() const override { return fakeData; }
+    map<string, vector<string>> getAllData() const override { return fakeData; }
     
-    std::vector<std::string> getUserViews(const std::string& userId) const override {
+    vector<string> getUserViews(const string& userId) const override {
         auto it = fakeData.find(userId);
         if (it != fakeData.end()) {
             return it->second;
@@ -34,11 +34,11 @@ public:
         return {}; 
     }
 
-    bool userExists(const std::string& userId) const override {
+    bool userExists(const string& userId) const override {
         return fakeData.find(userId) != fakeData.end();
     }
     
-    void removeUserViews(const std::string& userId, const std::vector<std::string>& productIds) override {}
+    void removeUserViews(const string& userId, const vector<string>& productIds) override {}
 };
 
 class GetCommandTest : public ::testing::Test {
@@ -64,7 +64,7 @@ TEST_F(GetCommandTest, ValidGetOutputs200AndRecommendations) {
     repo.fakeData["2"] = {"100", "105"};
 
     GetCommand cmd(repo, *recommender, writer);
-    std::vector<std::string> args = {"1", "100"};
+    vector<string> args = {"1", "100"};
 
     cmd.execute(args);
 
@@ -76,7 +76,7 @@ TEST_F(GetCommandTest, ValidGetOutputs200AndRecommendations) {
 // Test 2: Invalid arguments length throws 400
 TEST_F(GetCommandTest, InvalidArgsThrows400) {
     GetCommand cmd(repo, *recommender, writer);
-    std::vector<std::string> args ={"1"};
+    vector<string> args ={"1"};
 
     EXPECT_THROW(cmd.execute(args), InvalidArgumentsException);
 }
@@ -84,7 +84,7 @@ TEST_F(GetCommandTest, InvalidArgsThrows400) {
 // Test 3: User not found throws 404
 TEST_F(GetCommandTest, UserNotFoundThrows404) {
     GetCommand cmd(repo, *recommender, writer);
-    std::vector<std::string> args = {"99", "100"};
+    vector<string> args = {"99", "100"};
     
     EXPECT_THROW(cmd.execute(args), UserNotFoundException);
 }

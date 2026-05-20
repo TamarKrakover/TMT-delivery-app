@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include <thread>
 #include <string>
-
+using namespace std;
 TEST(SocketInputSourceTest, ReadsDataOverInet) {
     // Setup server socket
     int server_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -30,7 +30,7 @@ TEST(SocketInputSourceTest, ReadsDataOverInet) {
     client_sin.sin_port = htons(port);
 
     int accepted_sock;
-    std::thread server_thread([&]() {
+    thread server_thread([&]() {
         struct sockaddr_in from;
         unsigned int from_len = sizeof(from);
         accepted_sock = accept(server_fd, (struct sockaddr*)&from, &from_len);
@@ -40,12 +40,12 @@ TEST(SocketInputSourceTest, ReadsDataOverInet) {
     server_thread.join();
 
     // 3. Client sends a message directly using send()
-    std::string test_msg = "test command\n";
+    string test_msg = "test command\n";
     send(client_fd, test_msg.c_str(), test_msg.length(), 0);
 
     // 4. Verification: SocketInputSource reads the message
     SocketInputSource inputSource(accepted_sock);
-    std::string result = inputSource.readNextLine();
+    string result = inputSource.readNextLine();
 
     // The implementation of readNextLine strips the newline character
     EXPECT_EQ(result, "test command");

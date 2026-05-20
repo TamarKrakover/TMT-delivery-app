@@ -3,12 +3,12 @@
 
 #include "IInputSource.hpp"
 #include <string>
-
+using namespace std;
 // implementation of IInputSource for reading from the console
 class StandardInput : public IInputSource {
 public:
     // reads a single line from the standard input
-    std::string readNextLine() override;
+    string readNextLine() override;
 };
 
 #endif

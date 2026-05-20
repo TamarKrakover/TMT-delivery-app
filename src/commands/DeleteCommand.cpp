@@ -4,17 +4,18 @@
 #include <string>
 #include <algorithm>
 
+using namespace std;
 
 DeleteCommand::DeleteCommand(IDataRepository& repository, IOutputWriter& writer)
     : repo(repository), outputWriter(writer) {}
 
-void DeleteCommand::execute(const std::vector<std::string>& args) {
+void DeleteCommand::execute(const vector<string>& args) {
     // Command must have at least a userId and one productId
     if (args.size() < 2) {
         throw InvalidArgumentsException();
     }
 
-    std::string userId = args[0];
+    string userId = args[0];
 
     // Check if user exists. If not, throw 404 (which App will catch)
     if (!repo.userExists(userId)) {
@@ -22,15 +23,15 @@ void DeleteCommand::execute(const std::vector<std::string>& args) {
     }
 
     // Extract all products to delete (skipping the userId at index 0)
-    std::vector<std::string> productsToDelete(args.begin() + 1, args.end());
+    vector<string> productsToDelete(args.begin() + 1, args.end());
 
     // Verify all products exist before deleting anything, and not duplicates
-    std::vector<std::string> userHistory = repo.getUserViews(userId);
+    vector<string> userHistory = repo.getUserViews(userId);
     
     for (size_t i = 0; i < productsToDelete.size(); ++i) {
-        const std::string& pid = productsToDelete[i];
+        const string& pid = productsToDelete[i];
 
-        auto it = std::find(userHistory.begin(), userHistory.end(), pid);
+        auto it = find(userHistory.begin(), userHistory.end(), pid);
 
         if (it == userHistory.end()) {
             // Product not found, or duplicates in the requested list (same error)
@@ -49,6 +50,6 @@ void DeleteCommand::execute(const std::vector<std::string>& args) {
 }
 
 // return the command's identifier
-std::string DeleteCommand::getHelpText() const {
+string DeleteCommand::getHelpText() const {
     return "DELETE, arguments: [userid] [productid1] [productid2] ...";
 }
