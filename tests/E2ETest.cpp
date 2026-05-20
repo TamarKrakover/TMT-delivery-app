@@ -15,7 +15,7 @@
 #include "GetCommand.hpp"
 #include "DeleteCommand.hpp"
 #include "HelpCommand.hpp"
-
+using namespace std;
 // ===== Mock Classes =====
 
 /**
@@ -25,14 +25,14 @@
  */
 class MockInputSourceE2E : public IInputSource {
 public:
-    std::vector<std::string> commandsToFeed;
+    vector<string> commandsToFeed;
     size_t currentIndex = 0;
 
-    std::string readNextLine() override {
+    string readNextLine() override {
         if (currentIndex < commandsToFeed.size()) {
             return commandsToFeed[currentIndex++];
         }
-        throw std::runtime_error("EOF"); 
+        throw runtime_error("EOF"); 
     }
 };
 
@@ -41,9 +41,9 @@ public:
  */
 class MockOutputWriterE2E : public IOutputWriter {
 public:
-    std::string capturedOutput;
+    string capturedOutput;
 
-    void write(const std::string& message) override {
+    void write(const string& message) override {
         capturedOutput += message;
     }
 
@@ -56,27 +56,27 @@ public:
 
 class E2ETest : public ::testing::Test {
 protected:
-    std::string testDataFile = "e2e_test_data.txt";
-    std::shared_ptr<MockInputSourceE2E> mockInput;
-    std::shared_ptr<MockOutputWriterE2E> mockOutput;
-    std::unique_ptr<FileDataRepository> repository;
+    string testDataFile = "e2e_test_data.txt";
+    shared_ptr<MockInputSourceE2E> mockInput;
+    shared_ptr<MockOutputWriterE2E> mockOutput;
+    unique_ptr<FileDataRepository> repository;
 
     void SetUp() override {
         // Clean up any existing test file
-        std::remove(testDataFile.c_str());
+        remove(testDataFile.c_str());
         
         // Initialize mock input and output
-        mockInput = std::make_shared<MockInputSourceE2E>();
-        mockOutput = std::make_shared<MockOutputWriterE2E>();
+        mockInput = make_shared<MockInputSourceE2E>();
+        mockOutput = make_shared<MockOutputWriterE2E>();
         
         // Initialize the repository (empty at start)
-        repository = std::make_unique<FileDataRepository>(testDataFile);
+        repository = make_unique<FileDataRepository>(testDataFile);
         repository->loadAllData();
     }
 
     void TearDown() override {
         // Clean up the test data file
-        std::remove(testDataFile.c_str());
+        remove(testDataFile.c_str());
     }
 
     /**
@@ -88,7 +88,7 @@ protected:
 
         // Create and run the app using the correct constructor signature
         App app(mockInput, mockOutput, *repository, recommender);
-        EXPECT_THROW(app.run(), std::runtime_error);
+        EXPECT_THROW(app.run(), runtime_error);
     }
 };
 

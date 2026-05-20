@@ -5,6 +5,7 @@
 #include "IDataRepository.hpp"
 #include "IOutputWriter.hpp"
 
+using namespace std;
 /**
  * @class DeleteCommand
  * @brief Implements the 'DELETE' logic.
@@ -16,8 +17,8 @@ public:
     DeleteCommand(IDataRepository& repository, IOutputWriter& writer);
 
     // Executes the delete operation
-    void execute(const std::vector<std::string>& args) override;
-    std::string getHelpText() const override;
+    void execute(const vector<string>& args) override;
+    string getHelpText() const override;
 
 private:
     IDataRepository& repo;

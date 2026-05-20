@@ -1,6 +1,6 @@
 #include "SocketInputSource.hpp"
 #include <unistd.h>
-
+using namespace std;
 // constructor: Initializes the input source with a client socket descriptor
 SocketInputSource::SocketInputSource(int socket) : clientSocket(socket) {}
 
@@ -10,10 +10,10 @@ void SocketInputSource::setSocket(int socket) {
 }
 
 // reads from the socket byte-by-byte until a full line is captured
-std::string SocketInputSource::readNextLine() {
+string SocketInputSource::readNextLine() {
     if (clientSocket == -1) return "CLIENT_DISCONNECTED";
     
-    std::string result = "";
+    string result = "";
     char buffer;
     int bytesRead;
     bool readSomething = false;

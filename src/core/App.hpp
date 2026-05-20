@@ -13,20 +13,20 @@
 #include "IDataRepository.hpp"
 #include "Recommender.hpp"
 
-
+using namespace std;
 
 class App {
 private:
-    std::shared_ptr<IInputSource> input;
-    std::shared_ptr<IOutputWriter> output;
-    std::map<std::string, std::shared_ptr<ICommand>> commands; 
+    shared_ptr<IInputSource> input;
+    shared_ptr<IOutputWriter> output;
+    map<string, shared_ptr<ICommand>> commands; 
     CommandParser parser;
     bool isRunning;
 
 public:
     // Constructor now initializes dependencies and commands internally
-    App(std::shared_ptr<IInputSource> in, 
-        std::shared_ptr<IOutputWriter> out, 
+    App(shared_ptr<IInputSource> in, 
+        shared_ptr<IOutputWriter> out, 
         IDataRepository& repo, 
         Recommender& recommender);
 

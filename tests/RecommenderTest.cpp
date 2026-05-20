@@ -5,25 +5,25 @@
 #include <vector>
 #include <map>
 #include <memory>
-
+using namespace std;
 // Fakes files for Testing
 // Fake Repository to simulate data without relying on actual files
 class FakeDataRepository : public IDataRepository {
 private:
-    std::map<std::string, std::vector<std::string>> fakeData;
+    map<string, vector<string>> fakeData;
 
 public:
     // Helper method to inject specific test data
-    void setFakeData(const std::map<std::string, std::vector<std::string>>& data) {
+    void setFakeData(const map<string, vector<string>>& data) {
         fakeData = data;
     }
 
     // IDataRepository interface implementation
-    void saveUserViews(const std::string& userId, const std::vector<std::string>& productIds) override {
+    void saveUserViews(const string& userId, const vector<string>& productIds) override {
         // Not needed for Recommender tests
     }
 
-    std::vector<std::string> getUserViews(const std::string& userId) const override {
+    vector<string> getUserViews(const string& userId) const override {
         
         return {};
     }
@@ -32,15 +32,15 @@ public:
         return true; 
     }
 
-    std::map<std::string, std::vector<std::string>> getAllData() const override {
+    map<string, vector<string>> getAllData() const override {
         return fakeData;
     }
 
-    bool userExists(const std::string& userId) const override {
+    bool userExists(const string& userId) const override {
         return fakeData.find(userId) != fakeData.end();
     }
 
-    void removeUserViews(const std::string& userId, const std::vector<std::string>& productIds) override {
+    void removeUserViews(const string& userId, const vector<string>& productIds) override {
         // Not needed for recommender tests, left empty
     }
 };
@@ -50,11 +50,11 @@ public:
 class RecommenderTest : public ::testing::Test {
 protected:
     FakeDataRepository fakeRepo;
-    std::unique_ptr<Recommender> recommender;
+    unique_ptr<Recommender> recommender;
 
     // SetUp runs before each test
     void SetUp() override {
-        recommender = std::make_unique<Recommender>(fakeRepo);
+        recommender = make_unique<Recommender>(fakeRepo);
     }
 
     // TearDown runs after each test
@@ -69,13 +69,13 @@ TEST_F(RecommenderTest, BasicRecommendationReturnsCorrectProduct) {
     // Target User "1" watched product "104".
     // Other User "2" watched "104" AND "105".
     // We inject this scenario into our fake database.
-    std::map<std::string, std::vector<std::string>> mockDatabase = {
+    map<string, vector<string>> mockDatabase = {
         {"1", {"104"}},
         {"2", {"104", "105"}}
     };
     fakeRepo.setFakeData(mockDatabase);
     // Ask for recommendations for User "1" based on product "104"
-    std::vector<std::string> results = recommender->recommend("1", "104");
+    vector<string> results = recommender->recommend("1", "104");
     // We expect exactly one recommendation, and it should be "105"
     ASSERT_EQ(results.size(), 1);
     EXPECT_EQ(results[0], "105");
@@ -86,13 +86,13 @@ TEST_F(RecommenderTest, BasicRecommendationReturns2Products) {
     // Target User "1" watched product "104".
     // Other User "2" watched "104","105","106".
     // We inject this scenario into our fake database.
-    std::map<std::string, std::vector<std::string>> mockDatabase = {
+    map<string, vector<string>> mockDatabase = {
         {"1", {"104"}},
         {"2", {"104", "105","106"}}
     };
     fakeRepo.setFakeData(mockDatabase);
     // Ask for recommendations for User "1" based on product "104"
-    std::vector<std::string> results = recommender->recommend("1", "104");
+    vector<string> results = recommender->recommend("1", "104");
     // We expect 2 recommendation, and it should be "105". "106"
     ASSERT_EQ(results.size(), 2);
     EXPECT_EQ(results[0], "105");
@@ -105,14 +105,14 @@ TEST_F(RecommenderTest, NoDuplicatesAndScoring) {
     // User "2" watched "100" and "105".
     // User "3" watched "100" and "105" and "106".
     // "105" should be recommended by both, so it should have a higher score than "106".
-    std::map<std::string, std::vector<std::string>> mockDatabase = {
+    map<string, vector<string>> mockDatabase = {
         {"1", {"100"}},
         {"2", {"100", "105"}},
         {"3", {"100", "105", "106"}}
     };
     fakeRepo.setFakeData(mockDatabase);
 
-    std::vector<std::string> results = recommender->recommend("1", "100");
+    vector<string> results = recommender->recommend("1", "100");
 
     // We expect "105" to be the first recommendation because it has more "votes"
     ASSERT_FALSE(results.empty());
@@ -132,14 +132,14 @@ TEST_F(RecommenderTest, RanksByUserSimilarity) {
     // User "2" (Weak similarity): watched "100" (target) and "999"
     // User "3" (Strong similarity): watched "100" (target), "101", "102" and "888"
     
-    std::map<std::string, std::vector<std::string>> mockDatabase = {
+    map<string, vector<string>> mockDatabase = {
         {"1", {"100", "101", "102"}},
         {"2", {"100", "999"}},
         {"3", {"100", "101", "102", "888"}}
     };
     fakeRepo.setFakeData(mockDatabase);
 
-    std::vector<std::string> results = recommender->recommend("1", "100");
+    vector<string> results = recommender->recommend("1", "100");
 
     ASSERT_GE(results.size(), 2);
     
@@ -152,24 +152,24 @@ TEST_F(RecommenderTest, RanksByUserSimilarity) {
 
 // Test 5: Non-existent user should return empty recommendations
 TEST_F(RecommenderTest, NonExistentUserReturnsEmpty) {
-    std::map<std::string, std::vector<std::string>> mockDatabase = {
+    map<string, vector<string>> mockDatabase = {
         {"1", {"100", "101"}}
     };
     fakeRepo.setFakeData(mockDatabase);
 
-    std::vector<std::string> results = recommender->recommend("999", "100");
+    vector<string> results = recommender->recommend("999", "100");
     EXPECT_TRUE(results.empty());
 }
 
 // Test 6: User with no product history should return empty recommendations
 TEST_F(RecommenderTest, UserWithNoHistoryReturnsEmpty) {
-    std::map<std::string, std::vector<std::string>> mockDatabase = {
+    map<string, vector<string>> mockDatabase = {
         {"1", {}}, // User exists but has no history
         {"2", {"100", "105"}}
     };
     fakeRepo.setFakeData(mockDatabase);
 
-    std::vector<std::string> results = recommender->recommend("1", "100");
+    vector<string> results = recommender->recommend("1", "100");
     EXPECT_TRUE(results.empty());
 }
 
@@ -177,19 +177,19 @@ TEST_F(RecommenderTest, UserWithNoHistoryReturnsEmpty) {
 TEST_F(RecommenderTest, CapsRecommendationsAtTen) {
     // Target user watched product "0"
     // Other user watched "0" AND products "1" through "15"
-    std::vector<std::string> targetHistory = {"0"};
-    std::vector<std::string> otherHistory = {"0"};
+    vector<string> targetHistory = {"0"};
+    vector<string> otherHistory = {"0"};
     for(int i = 1; i <= 15; ++i) {
-        otherHistory.push_back(std::to_string(i));
+        otherHistory.push_back(to_string(i));
     }
 
-    std::map<std::string, std::vector<std::string>> mockDatabase = {
+    map<string, vector<string>> mockDatabase = {
         {"1", targetHistory},
         {"2", otherHistory}
     };
     fakeRepo.setFakeData(mockDatabase);
 
-    std::vector<std::string> results = recommender->recommend("1", "0");
+    vector<string> results = recommender->recommend("1", "0");
     
     // Even though 15 products are available, we only want the top 10
     EXPECT_EQ(results.size(), 10);

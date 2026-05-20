@@ -6,7 +6,7 @@
 #include "IOutputWriter.hpp"
 #include <vector>
 #include <string>
-
+using namespace std;
 // handles the POST command: adds products to a new user
 class PostCommand : public ICommand {
 public:
@@ -14,8 +14,8 @@ public:
     PostCommand(IDataRepository& repository, IOutputWriter& writer);
 
     // Executes the main Post command logic
-    void execute(const std::vector<std::string>& args) override;
-    std::string getHelpText() const override;
+    void execute(const vector<string>& args) override;
+    string getHelpText() const override;
 
 private:
     // reference to the injected output dependency

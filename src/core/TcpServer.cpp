@@ -3,10 +3,10 @@
 #include <netinet/in.h>
 #include <unistd.h>
 #include <cstring>
-
+using namespace std;
 // constructor: Initializes server configuration and moves I/O dependencies
-TcpServer::TcpServer(int port, App& appRef, std::shared_ptr<SocketInputSource> in, std::shared_ptr<SocketOutputWriter> out) 
-    : port(port), serverSocket(-1), app(appRef), input(std::move(in)), output(std::move(out)) {}
+TcpServer::TcpServer(int port, App& appRef, shared_ptr<SocketInputSource> in, shared_ptr<SocketOutputWriter> out) 
+    : port(port), serverSocket(-1), app(appRef), input(move(in)), output(move(out)) {}
 
 // destructor: Ensures the server socket is safely closed upon destruction
 TcpServer::~TcpServer() {

@@ -6,12 +6,12 @@
 #include <string>
 #include <vector>
 #include <map>
-
+using namespace std;
 // mock writer to capture output instead of sending it
 class MockOutputWriterPatch : public IOutputWriter {
 public:
-    std::string capturedMessage = "";
-    void write(const std::string& message) override {
+    string capturedMessage = "";
+    void write(const string& message) override {
         capturedMessage += message;
     }
 };
@@ -19,24 +19,24 @@ public:
 // fake in memory repository
 class FakeRepoForPatch : public IDataRepository {
 public:
-    std::map<std::string, std::vector<std::string>> fakeData;
+    map<string, vector<string>> fakeData;
 
-    void saveUserViews(const std::string& userId, const std::vector<std::string>& productIds) override {
+    void saveUserViews(const string& userId, const vector<string>& productIds) override {
         for(const auto& pid : productIds) {
             fakeData[userId].push_back(pid);
         }
 
     }
 
-    bool userExists(const std::string& userId) const override {
+    bool userExists(const string& userId) const override {
         return fakeData.find(userId) != fakeData.end();
     }
 
     // unused interface methods, required for compilation
-    std::vector<std::string> getUserViews(const std::string& userId) const override { return {}; }
+    vector<string> getUserViews(const string& userId) const override { return {}; }
     bool loadAllData() override { return true; }
-    std::map<std::string, std::vector<std::string>> getAllData() const override { return fakeData; }
-    void removeUserViews(const std::string& userId, const std::vector<std::string>& productIds) override {}
+    map<string, vector<string>> getAllData() const override { return fakeData; }
+    void removeUserViews(const string& userId, const vector<string>& productIds) override {}
 
 };
 
@@ -51,7 +51,7 @@ protected:
 TEST_F(PatchCommandTest, ValidPatchOutputs204) {
     repo.fakeData["1"] = {"100"};
     PatchCommand cmd(repo, writer);
-    std::vector<std::string> args = {"1", "101", "102"};
+    vector<string> args = {"1", "101", "102"};
     cmd.execute(args);
 
     EXPECT_EQ(writer.capturedMessage, "204 No Content\n");
@@ -61,13 +61,13 @@ TEST_F(PatchCommandTest, ValidPatchOutputs204) {
 // tests logic error: attempting to patch a non-existent user
 TEST_F(PatchCommandTest, UserNotFound) {
     PatchCommand cmd(repo, writer);
-    std::vector<std::string> args = {"99", "100"};
+    vector<string> args = {"99", "100"};
     EXPECT_THROW(cmd.execute(args), UserNotFoundException);
 }
  // tests input validation: missing product arguments
 TEST_F(PatchCommandTest, InvalidArgs) {
     repo.fakeData["1"] = {"100"};
     PatchCommand cmd(repo, writer);
-    std::vector<std::string> args = {"1"};
+    vector<string> args = {"1"};
     EXPECT_THROW(cmd.execute(args), InvalidArgumentsException);
 }

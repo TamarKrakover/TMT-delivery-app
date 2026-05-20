@@ -3,7 +3,7 @@
 
 #include "IOutputWriter.hpp"
 #include <string>
-
+using namespace std;
 // concrete implementation of IOutputWriter for sending data over network sockets
 class SocketOutputWriter : public IOutputWriter {
 private:
@@ -17,6 +17,6 @@ public:
     // dynamically updates the active client socket descriptor
     void setSocket(int socket);
     // sends a message through the socket
-    void write(const std::string& message) override;
+    void write(const string& message) override;
 };
 #endif

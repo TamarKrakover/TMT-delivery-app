@@ -3,27 +3,27 @@
 #include <fstream>
 #include <vector>
 #include <string>
-
+using namespace std;
 // Test suite for FileDataRepository
 class FileDataRepositoryTest : public ::testing::Test {
 protected:
-    std::string testFileName = "test_data.txt";
+    string testFileName = "test_data.txt";
 
     // Clean up the test file before and after each test
     void SetUp() override {
-        std::remove(testFileName.c_str());
+        remove(testFileName.c_str());
     }
 
     void TearDown() override {
-        std::remove(testFileName.c_str());
+        remove(testFileName.c_str());
     }
 };
 
 // 1. Test saving and retrieving data
 TEST_F(FileDataRepositoryTest, SaveAndGetAllData) {
     FileDataRepository repo(testFileName);
-    std::string userId = "1";
-    std::vector<std::string> products = {"100", "101"};
+    string userId = "1";
+    vector<string> products = {"100", "101"};
 
     repo.saveUserViews(userId, products);
     auto data = repo.getAllData();
@@ -54,6 +54,6 @@ TEST_F(FileDataRepositoryTest, AppendProductsTest) {
     repo.saveUserViews("1", {"101"});
 
     auto data = repo.getAllData();
-    std::vector<std::string> expected = {"100", "101"};
+    vector<string> expected = {"100", "101"};
     EXPECT_EQ(data["1"], expected);
 }

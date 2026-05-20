@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include <thread>
 #include <string>
-
+using namespace std;
 TEST(SocketOutputWriterTest, SendsDataOverInet) {
     // Setup a dummy server socket to accept a connection
     int server_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -32,7 +32,7 @@ TEST(SocketOutputWriterTest, SendsDataOverInet) {
 
     // Create a thread to accept the connection on the server side
     int accepted_sock;
-    std::thread server_thread([&]() {
+    thread server_thread([&]() {
         struct sockaddr_in from;
         unsigned int from_len = sizeof(from);
         accepted_sock = accept(server_fd, (struct sockaddr*)&from, &from_len);
@@ -43,7 +43,7 @@ TEST(SocketOutputWriterTest, SendsDataOverInet) {
 
     // Use SocketOutputWriter on the accepted socket (server side)
     SocketOutputWriter writer(accepted_sock);
-    std::string test_msg = "test_inet_message";
+    string test_msg = "test_inet_message";
     writer.write(test_msg);
 
     // Verify the client received the correct data
@@ -51,7 +51,7 @@ TEST(SocketOutputWriterTest, SendsDataOverInet) {
     int bytes_received = recv(client_fd, buffer, sizeof(buffer), 0);
 
     // The implementation of write() appends a newline character
-    EXPECT_EQ(std::string(buffer, bytes_received), test_msg);
+    EXPECT_EQ(string(buffer, bytes_received), test_msg);
 
     // Cleanup
     close(accepted_sock);

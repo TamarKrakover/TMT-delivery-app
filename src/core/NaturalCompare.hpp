@@ -3,19 +3,19 @@
 
 #include <string>
 #include <cctype>
-
+using namespace std;
 // Comparator to sort strings using natural alphanumeric ordering
 struct NaturalCompare {
-    bool operator()(const std::string& a, const std::string& b) const {
+    bool operator()(const string& a, const string& b) const {
         size_t i = 0, j = 0;
         while (i < a.length() && j < b.length()) {
-            if (std::isdigit(a[i]) && std::isdigit(b[j])) {
+            if (isdigit(a[i]) && isdigit(b[j])) {
                 size_t startA = i, startB = j;
-                while (i < a.length() && std::isdigit(a[i])) i++;
-                while (j < b.length() && std::isdigit(b[j])) j++;
+                while (i < a.length() && isdigit(a[i])) i++;
+                while (j < b.length() && isdigit(b[j])) j++;
                 
-                std::string numA = a.substr(startA, i - startA);
-                std::string numB = b.substr(startB, j - startB);
+                string numA = a.substr(startA, i - startA);
+                string numB = b.substr(startB, j - startB);
                 
                 size_t nonZeroA = 0;
                 while (nonZeroA < numA.length() - 1 && numA[nonZeroA] == '0') nonZeroA++;
@@ -33,8 +33,8 @@ struct NaturalCompare {
                 }
             } else {
                 if (a[i] != b[j]) {
-                    if (std::isdigit(a[i]) && !std::isdigit(b[j])) return true;
-                    if (!std::isdigit(a[i]) && std::isdigit(b[j])) return false;
+                    if (isdigit(a[i]) && !isdigit(b[j])) return true;
+                    if (!isdigit(a[i]) && isdigit(b[j])) return false;
                     return a[i] < b[j];
                 }
                 i++;
