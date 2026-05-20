@@ -18,12 +18,6 @@ void GetCommand::execute(const std::vector<std::string>& args) {
         throw UserNotFoundException();
     }
 
-    // Check if the target product actually exists in the user's history
-    std::vector<std::string> userHistory = repository.getUserViews(userId);
-    if (std::find(userHistory.begin(), userHistory.end(), productId) == userHistory.end()) {
-        throw ProductNotFoundException();
-    }
-
     // Get recommendations from the engine
     std::vector<std::string> results = engine.recommend(userId, productId);
 
