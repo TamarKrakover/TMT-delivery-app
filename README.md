@@ -31,12 +31,13 @@ Run server:
 ```bash
 docker compose down --remove-orphans && PORT=8080 docker compose run --service-ports --use-aliases server
 ```
-*Note: The `down --remove-orphans` command is intentionally prepended to clear any lingering background containers and free up the port before starting a new server instance.*
+*__Note:__ The `down --remove-orphans` command is intentionally prepended to clear any lingering background containers and free up the port before starting a new server instance.*
 
 Run client:
 ```bash
 IP=server PORT=8080 docker compose run client
 ```
+*__Note:__ The port number is fully configurable. You can choose any available port for the server and client by changing the `PORT=8080` variable in the commands above. Just ensure that both the server and the client are set to use the same port.*
 
 Run tests:
 ```bash
@@ -78,73 +79,6 @@ Below is a demonstration of adding user data and requesting a recommendation:
 
 104 106
 ```
-## Architecture:
-
-```
-Advanced-Programming/
-├── CMakeLists.txt
-├── Dockerfile
-├── docker-compose.yml
-├── README.md
-├── runScreenShot.png
-├── data/
-│   └── data.txt
-├── src/
-│   ├── main.cpp
-│   ├── client/
-│   │   ├── client.py
-│   │   └── Dockerfile.client
-│   ├── commands/
-│   │   ├── PostCommand.cpp
-│   │   ├── PostCommand.hpp
-│   │   ├── PatchCommand.cpp
-│   │   ├── PatchCommand.hpp
-│   │   ├── DeleteCommand.cpp
-│   │   ├── DeleteCommand.hpp
-│   │   ├── HelpCommand.cpp
-│   │   ├── HelpCommand.hpp
-│   ├── core/
-│   │   ├── App.cpp
-│   │   ├── App.hpp
-│   │   ├── CommandParser.cpp
-│   │   ├── CommandParser.hpp
-│   │   ├── Exceptions.hpp
-│   │   ├── Recommender.cpp
-│   │   ├── Recommender.hpp
-│   │   ├── TcpServer.cpp
-│   │   └── TcpServer.hpp
-│   ├── interfaces/
-│   │   ├── ICommand.hpp
-│   │   ├── IDataRepository.hpp
-│   │   ├── IInputSource.hpp
-│   │   └── IOutputWriter.hpp
-│   ├── io/
-│   │   ├── SocketInputSource.cpp
-│   │   ├── SocketInputSource.hpp
-│   │   ├── SocketOutputWriter.cpp
-│   │   ├── SocketOutputWriter.hpp
-│   │   ├── StandardInput.cpp
-│   │   ├── StandardInput.hpp
-│   │   ├── StandardOutput.cpp
-│   │   └── StandardOutput.hpp
-│   └── repositories/
-│       ├── FileDataRepository.cpp
-│       └── FileDataRepository.hpp
-└── tests/
-    ├── AppTest.cpp
-    ├── CommandParserTest.cpp
-    ├── DeleteCommandTest.cpp
-    ├── E2ETest.cpp
-    ├── FileDataRepositoryTest.cpp
-    ├── GetCommandTest.cpp
-    ├── HelpCommandTest.cpp
-    ├── PatchCommandTest.cpp
-    ├── PostCommandTest.cpp
-    ├── SocketInputSourceTest.cpp
-    ├── SocketIOTest.cpp
-    ├── SocketOutputWriterTest.cpp
-    └── TcpServerTest.cpp
-```
 
 ## Architecture & Design Notes
 #### Client-Server & Networking: 
@@ -172,3 +106,75 @@ To fix this, we refactored the ICommand interface to include a dedicated metadat
 #### 4. Did transitioning the input/output from the console to sockets require modifying code that should be "closed for modification but open for extension"?
 No, Following strict Interface-Driven Design, input and output streams were abstracted behind generic interfaces (IInputSource and IOutputWriter). The core application layer and command logic remain entirely agnostic of the underlying communication medium.
 Whether data passes through the standard terminal (std::cin/std::cout) or raw network sockets (dynamically updated by the TcpServer via SocketInputSource and SocketOutputWriter), the execution logic treats them identically.
+
+## Architecture:
+
+```
+Advanced-Programming/
+├── CMakeLists.txt
+├── Dockerfile
+├── README.md
+├── UMLTask2.png
+├── data
+│   └── data.txt
+├── docker-compose.yml
+├── runScreenShot3.png
+├── src
+│   ├── client
+│   │   ├── Dockerfile.client
+│   │   └── client.py
+│   ├── commands
+│   │   ├── DeleteCommand.cpp
+│   │   ├── DeleteCommand.hpp
+│   │   ├── GetCommand.cpp
+│   │   ├── GetCommand.hpp
+│   │   ├── HelpCommand.cpp
+│   │   ├── HelpCommand.hpp
+│   │   ├── PatchCommand.cpp
+│   │   ├── PatchCommand.hpp
+│   │   ├── PostCommand.cpp
+│   │   └── PostCommand.hpp
+│   ├── core
+│   │   ├── App.cpp
+│   │   ├── App.hpp
+│   │   ├── CommandParser.cpp
+│   │   ├── CommandParser.hpp
+│   │   ├── Exceptions.hpp
+│   │   ├── Recommender.cpp
+│   │   ├── Recommender.hpp
+│   │   ├── TcpServer.cpp
+│   │   └── TcpServer.hpp
+│   ├── interfaces
+│   │   ├── ICommand.hpp
+│   │   ├── IDataRepository.hpp
+│   │   ├── IInputSource.hpp
+│   │   └── IOutputWriter.hpp
+│   ├── io
+│   │   ├── SocketInputSource.cpp
+│   │   ├── SocketInputSource.hpp
+│   │   ├── SocketOutputWriter.cpp
+│   │   ├── SocketOutputWriter.hpp
+│   │   ├── StandardInput.cpp
+│   │   ├── StandardInput.hpp
+│   │   ├── StandardOutput.cpp
+│   │   └── StandardOutput.hpp
+│   ├── main.cpp
+│   └── repositories
+│       ├── FileDataRepository.cpp
+│       └── FileDataRepository.hpp
+└── tests
+    ├── AppTest.cpp
+    ├── CommandParserTest.cpp
+    ├── DeleteCommandTest.cpp
+    ├── E2ETest.cpp
+    ├── FileDataRepositoryTest.cpp
+    ├── GetCommandTest.cpp
+    ├── HelpCommandTest.cpp
+    ├── PatchCommandTest.cpp
+    ├── PostCommandTest.cpp
+    ├── RecommenderTest.cpp
+    ├── SocketIOTest.cpp
+    ├── SocketInputSourceTest.cpp
+    ├── SocketOutputWriterTest.cpp
+    └── TcpServerTest.cpp
+```
