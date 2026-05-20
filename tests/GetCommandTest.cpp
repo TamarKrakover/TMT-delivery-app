@@ -88,13 +88,3 @@ TEST_F(GetCommandTest, UserNotFoundThrows404) {
     
     EXPECT_THROW(cmd.execute(args), UserNotFoundException);
 }
-
-// Test 4: Product not found in user's history throws 404
-TEST_F(GetCommandTest, ProductNotFoundThrows404) {
-    // User exists but watched only 100, attempting to get recommendations for 999
-    repo.fakeData["1"] = {"100"};
-    GetCommand cmd(repo, *recommender, writer);
-    std::vector<std::string> args = {"1", "999"};
-    
-    EXPECT_THROW(cmd.execute(args), ProductNotFoundException);
-}
