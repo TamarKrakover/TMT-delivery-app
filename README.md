@@ -13,7 +13,7 @@ With the client-server architecture, the C++ server listens on a TCP port, proce
 
 
 
-![Run Screenshot](runScreenShot3.png)
+![Run Screenshot](runScreenShot.png)
 
 ## How to Run
 
