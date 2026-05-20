@@ -21,7 +21,7 @@ public:
         if (currentIndex < inputsToFeed.size()) {
             return inputsToFeed[currentIndex++];
         }
-        return ""; 
+        return "CLIENT_DISCONNECTED"; 
     }
 };
 
@@ -78,7 +78,8 @@ TEST_F(AppTest, IgnoresUnknownCommand) {
     App app(mockInput, mockOutput, *fakeRepo, *recommender);
     
     EXPECT_NO_THROW(app.run());
-    EXPECT_EQ(mockOutput->capturedOutput, "400 Bad Request");
+    // Expect a newline character at the end
+    EXPECT_EQ(mockOutput->capturedOutput, "400 Bad Request\n");
 }
 
 TEST_F(AppTest, HandlesEmptyInput) {

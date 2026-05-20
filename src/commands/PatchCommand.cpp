@@ -34,5 +34,5 @@ void PatchCommand::execute(const vector<string>& args) {
 
 // return the command's identifier
 string PatchCommand::getHelpText() const {
-    return "PATCH, arguments: [userid] [productid]";
+    return "PATCH, arguments: [userid] [productid1] [productid2] ...";
 }

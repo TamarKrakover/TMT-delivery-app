@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "CommandParser.hpp"
+#include "Exceptions.hpp"
 #include <vector>
 #include <string>
 
@@ -44,9 +45,8 @@ TEST(CommandParserTest, EmptyInput) {
 // confirms rejection of tabs to strictly follow the "spaces only" rule
 TEST(CommandParserTest, RejectsTabs) {
     CommandParser parser;
-
     string input = "add\t1\t2";
-    vector<string> result = parser.parse(input);
-
-    EXPECT_TRUE(result.empty());
+    
+    // Expect an exception to be thrown
+    EXPECT_THROW(parser.parse(input), InvalidArgumentsException);
 }

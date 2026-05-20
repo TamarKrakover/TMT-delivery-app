@@ -29,11 +29,11 @@ class UserNotFoundException : public BaseNotFoundException {};
 
 class ProductNotFoundException : public BaseNotFoundException {};
 
+class UserAlreadyExistsException : public BaseNotFoundException {};
+
 // --- Derived Exceptions (Inherit from BaseBadRequestException) ---
 
 class InvalidArgumentsException : public BaseBadRequestException {};
-
-class UserAlreadyExistsException : public BaseBadRequestException {};
 
 class UnknownCommandException : public BaseBadRequestException {};
 
