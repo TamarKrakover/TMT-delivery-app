@@ -51,8 +51,10 @@ def main():
                 break
 
             # Print the server's output
+            # if response:
+            #     print(response.decode('utf-8').rstrip('\n'))
             if response:
-                print(response.decode('utf-8').rstrip('\n'))
+                print(response.decode('utf-8'), end='')
 
     except KeyboardInterrupt:
         pass

@@ -13,7 +13,7 @@ void SocketOutputWriter::setSocket(int socket) {
 void SocketOutputWriter::write(const std::string& message) {
     // only attempt to send if the socket is valid
     if (clientSocket != -1) {
-        std::string toSend = message + "\n";
+        std::string toSend = message; //+ "\n";
         send(clientSocket, toSend.c_str(), toSend.size(), 0);
     }
 }
