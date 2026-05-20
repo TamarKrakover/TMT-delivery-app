@@ -4,7 +4,6 @@
 #include "PatchCommand.hpp"
 #include "DeleteCommand.hpp"
 #include "GetCommand.hpp"
-#include "RecommendCommand.hpp"
 #include "HelpCommand.hpp"
 #include <algorithm>
 #include <cctype>

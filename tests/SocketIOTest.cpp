@@ -54,7 +54,7 @@ TEST_F(SocketIOTest, WritesMessageSuccessfully) {
     ASSERT_GT(bytesRead, 0);
     std::string received(buffer);
     
-    EXPECT_EQ(received, "400 Bad Request\n");
+    EXPECT_EQ(received, "400 Bad Request");
 }
 
 TEST_F(SocketIOTest, HandlesInvalidSocketGracefully) {

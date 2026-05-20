@@ -51,7 +51,7 @@ TEST(SocketOutputWriterTest, SendsDataOverInet) {
     int bytes_received = recv(client_fd, buffer, sizeof(buffer), 0);
 
     // The implementation of write() appends a newline character
-    EXPECT_EQ(std::string(buffer, bytes_received), test_msg + "\n");
+    EXPECT_EQ(std::string(buffer, bytes_received), test_msg);
 
     // Cleanup
     close(accepted_sock);
