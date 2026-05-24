@@ -111,70 +111,70 @@ Whether data passes through the standard terminal (std::cin/std::cout) or raw ne
 
 ```
 Advanced-Programming/
-├── CMakeLists.txt
-├── Dockerfile
 ├── README.md
 ├── UMLTask2.png
-├── data
+├── client/
+│   ├── Dockerfile.client
+│   └── client.py
+├── cpp/
+│   ├── CMakeLists.txt
+│   ├── Dockerfile
+│   ├── src/
+│   │   ├── commands/
+│   │   │   ├── DeleteCommand.cpp
+│   │   │   ├── DeleteCommand.hpp
+│   │   │   ├── GetCommand.cpp
+│   │   │   ├── GetCommand.hpp
+│   │   │   ├── HelpCommand.cpp
+│   │   │   ├── HelpCommand.hpp
+│   │   │   ├── PatchCommand.cpp
+│   │   │   ├── PatchCommand.hpp
+│   │   │   ├── PostCommand.cpp
+│   │   │   └── PostCommand.hpp
+│   │   ├── core/
+│   │   │   ├── App.cpp
+│   │   │   ├── App.hpp
+│   │   │   ├── CommandParser.cpp
+│   │   │   ├── CommandParser.hpp
+│   │   │   ├── Exceptions.hpp
+│   │   │   ├── Recommender.cpp
+│   │   │   ├── Recommender.hpp
+│   │   │   ├── TcpServer.cpp
+│   │   │   └── TcpServer.hpp
+│   │   ├── interfaces/
+│   │   │   ├── ICommand.hpp
+│   │   │   ├── IDataRepository.hpp
+│   │   │   ├── IInputSource.hpp
+│   │   │   └── IOutputWriter.hpp
+│   │   ├── io/
+│   │   │   ├── SocketInputSource.cpp
+│   │   │   ├── SocketInputSource.hpp
+│   │   │   ├── SocketOutputWriter.cpp
+│   │   │   ├── SocketOutputWriter.hpp
+│   │   │   ├── StandardInput.cpp
+│   │   │   ├── StandardInput.hpp
+│   │   │   ├── StandardOutput.cpp
+│   │   │   └── StandardOutput.hpp
+│   │   ├── main.cpp
+│   │   └── repositories/
+│   │       ├── FileDataRepository.cpp
+│   │       └── FileDataRepository.hpp
+│   └── tests/
+│       ├── AppTest.cpp
+│       ├── CommandParserTest.cpp
+│       ├── DeleteCommandTest.cpp
+│       ├── E2ETest.cpp
+│       ├── FileDataRepositoryTest.cpp
+│       ├── GetCommandTest.cpp
+│       ├── HelpCommandTest.cpp
+│       ├── PatchCommandTest.cpp
+│       ├── PostCommandTest.cpp
+│       ├── RecommenderTest.cpp
+│       ├── SocketIOTest.cpp
+│       ├── SocketInputSourceTest.cpp
+│       ├── SocketOutputWriterTest.cpp
+│       └── TcpServerTest.cpp
+├── data/
 │   └── data.txt
-├── docker-compose.yml
-├── runScreenShot3.png
-├── src
-│   ├── client
-│   │   ├── Dockerfile.client
-│   │   └── client.py
-│   ├── commands
-│   │   ├── DeleteCommand.cpp
-│   │   ├── DeleteCommand.hpp
-│   │   ├── GetCommand.cpp
-│   │   ├── GetCommand.hpp
-│   │   ├── HelpCommand.cpp
-│   │   ├── HelpCommand.hpp
-│   │   ├── PatchCommand.cpp
-│   │   ├── PatchCommand.hpp
-│   │   ├── PostCommand.cpp
-│   │   └── PostCommand.hpp
-│   ├── core
-│   │   ├── App.cpp
-│   │   ├── App.hpp
-│   │   ├── CommandParser.cpp
-│   │   ├── CommandParser.hpp
-│   │   ├── Exceptions.hpp
-│   │   ├── Recommender.cpp
-│   │   ├── Recommender.hpp
-│   │   ├── TcpServer.cpp
-│   │   └── TcpServer.hpp
-│   ├── interfaces
-│   │   ├── ICommand.hpp
-│   │   ├── IDataRepository.hpp
-│   │   ├── IInputSource.hpp
-│   │   └── IOutputWriter.hpp
-│   ├── io
-│   │   ├── SocketInputSource.cpp
-│   │   ├── SocketInputSource.hpp
-│   │   ├── SocketOutputWriter.cpp
-│   │   ├── SocketOutputWriter.hpp
-│   │   ├── StandardInput.cpp
-│   │   ├── StandardInput.hpp
-│   │   ├── StandardOutput.cpp
-│   │   └── StandardOutput.hpp
-│   ├── main.cpp
-│   └── repositories
-│       ├── FileDataRepository.cpp
-│       └── FileDataRepository.hpp
-└── tests
-    ├── AppTest.cpp
-    ├── CommandParserTest.cpp
-    ├── DeleteCommandTest.cpp
-    ├── E2ETest.cpp
-    ├── FileDataRepositoryTest.cpp
-    ├── GetCommandTest.cpp
-    ├── HelpCommandTest.cpp
-    ├── PatchCommandTest.cpp
-    ├── PostCommandTest.cpp
-    ├── RecommenderTest.cpp
-    ├── SocketIOTest.cpp
-    ├── SocketInputSourceTest.cpp
-    ├── SocketOutputWriterTest.cpp
-    └── TcpServerTest.cpp
+└── docker-compose.yml
 ```

@@ -2,7 +2,7 @@ services:
   # C++ Server Service
   server:
     build:
-      context: .
+      context: ./cpp
       dockerfile: Dockerfile
     container_name: tmt-server
     ports:
@@ -19,8 +19,8 @@ services:
   # Python Client Service
   client:
     build:
-      context: .
-      dockerfile: src/client/Dockerfile.client
+      context: ./client
+      dockerfile: Dockerfile.client
     container_name: tmt-client
     networks:
       - tmt-net
@@ -31,7 +31,7 @@ services:
   # Tests Service
   tests:
     build:
-      context: .
+      context: ./cpp
       dockerfile: Dockerfile
     container_name: tmt-tests
     entrypoint: ["./runTests"]
