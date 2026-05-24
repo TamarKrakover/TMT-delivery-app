@@ -4,7 +4,7 @@ FROM python:3
 WORKDIR /app
 
 # Copy only the client script
-COPY src/client/client.py .
+COPY client.py .
 
 # Use ENTRYPOINT to run the script, accepting arguments from Compose
 ENTRYPOINT ["python", "client.py"]
