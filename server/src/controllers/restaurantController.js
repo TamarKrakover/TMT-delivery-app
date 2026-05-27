@@ -1,1 +1,56 @@
+const Restaurant = require('../models/restaurant');
 
+exports.getAllRestaurants = (req, res) => {
+    const restaurants = Restaurant.getAll();
+    res.status(200).json(restaurants);
+};
+
+exports.createRestaurant = (req, res) => {
+    // Validate request
+    if (!req.body.name || !req.body.address) {
+        return res.status(400).json({ error: 'Name and address are required' });
+    }
+
+    // Pass data to the Model to do the heavy lifting
+    const newRestaurant = Restaurant.create(req.body);
+
+    // Set the Location header pointing to the newly created resource
+    const resourceLocation = '/api/restaurants/' + newRestaurant.id;
+
+    // Return 201 status, set the Location header, and end the response with no body
+    res.status(201).location(resourceLocation).end();
+};
+
+exports.getRestaurantById = (req, res) => {
+    const restaurant = Restaurant.findById(req.params.id);
+    
+    if (!restaurant) {
+        return res.status(404).json({ error: 'Restaurant not found' });
+    }
+    
+    res.status(200).json(restaurant);
+};
+
+// Update a restaurant
+exports.updateRestaurant = (req, res) => {
+    // Pass the ID and the new data to the model
+    const updatedRestaurant = RestaurantModel.update(req.params.id, req.body);
+
+    if (!updatedRestaurant) {
+        return res.status(404).json({ error: 'Restaurant not found' });
+    }
+
+    res.status(200).json(updatedRestaurant);
+};
+
+// Delete a restaurant
+exports.deleteRestaurant = (req, res) => {
+    // Attempt to delete via the model
+    const isDeleted = RestaurantModel.delete(req.params.id);
+
+    if (!isDeleted) {
+        return res.status(404).json({ error: 'Restaurant not found' });
+    }
+
+    res.status(200).json({ message: 'Restaurant deleted successfully' });
+};
