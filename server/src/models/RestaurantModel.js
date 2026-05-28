@@ -1,7 +1,7 @@
 
 const db = require('./inMemoryDB');
 
-const generateId = () => {
+const generateRestId = () => {
     return 'r_' + Date.now().toString() + '_' + Math.floor(Math.random() * 1000);
 };
 
@@ -11,7 +11,7 @@ class RestaurantModel {
     }
     static create(data) {
         const newRestaurant = {
-            id: generateId(),
+            id: generateRestId(),
             name: data.name,
             description: data.description || '',
             category: data.category || 'General',
