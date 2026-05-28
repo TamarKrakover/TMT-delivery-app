@@ -1,4 +1,4 @@
-const Restaurant = require('../models/restaurant');
+const RestaurantModel = require('../models/RestaurantModel');
 
 exports.getAllRestaurants = (req, res) => {
     const restaurants = Restaurant.getAll();
@@ -12,7 +12,7 @@ exports.createRestaurant = (req, res) => {
     }
 
     // Pass data to the Model to do the heavy lifting
-    const newRestaurant = Restaurant.create(req.body);
+    const newRestaurant = RestaurantModel.create(req.body);
 
     // Set the Location header pointing to the newly created resource
     const resourceLocation = '/api/restaurants/' + newRestaurant.id;
@@ -22,7 +22,7 @@ exports.createRestaurant = (req, res) => {
 };
 
 exports.getRestaurantById = (req, res) => {
-    const restaurant = Restaurant.findById(req.params.id);
+    const restaurant = RestaurantModel.findById(req.params.id);
     
     if (!restaurant) {
         return res.status(404).json({ error: 'Restaurant not found' });
