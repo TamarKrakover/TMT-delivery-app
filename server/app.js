@@ -18,6 +18,6 @@ app.use('/api/users', userRoutes);
 app.use('/api/restaurants', restaurantRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/search', searchRoutes);
-app.use('/api/tokens', tokenRoutes); // This is the critical line!
+app.use('/api/tokens', tokenRoutes);
 
 app.listen(port);
