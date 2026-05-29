@@ -3,8 +3,8 @@ const router = express.Router();
 
 const tokenController = require('../controllers/tokenController');
 
-// Create a new token (Login)
-// POST /api/tokens
-router.post('/', tokenController.createToken);
+// Group routes by path '/'
+router.route('/')
+    .post(tokenController.createToken); // Create a new token (Login)
 
 module.exports = router;

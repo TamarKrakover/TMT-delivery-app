@@ -3,13 +3,13 @@ const router = express.Router();
 
 const userController = require('../controllers/userController');
 
-// Create new user
-// POST /api/users
-router.post('/', userController.createUser);
+// Group routes by path '/'
+router.route('/')
+    .post(userController.createUser); // Create new user
 
-// Get a spesipic user by id
-// GET /api/users/:id
-router.get('/:id', userController.getUserById)
+// Group routes by path '/:id'
+router.route('/:id')
+    .get(userController.getUserById); // Get a specific user by id
 
 module.exports = router;
 
