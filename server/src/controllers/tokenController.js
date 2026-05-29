@@ -10,8 +10,8 @@ exports.createToken = (req, res) => {
     const user = UserModel.findByCredentials(username, password);
 
     if (!user) {
-        return res.status(404).json({ error: 'Invalid username or password' });
-        // TODO: check if 401 is better
+        return res.status(401).json({ error: 'Invalid username or password' });
+        // TODO: check 401 status (or 404)
     }
     
     res.status(200).json({ id: user.id });
