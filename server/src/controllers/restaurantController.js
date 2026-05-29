@@ -40,7 +40,7 @@ exports.updateRestaurant = (req, res) => {
         return res.status(404).json({ error: 'Restaurant not found' });
     }
 
-    res.status(200).json(updatedRestaurant);
+    res.status(204).end();
 };
 
 // Delete a restaurant
@@ -52,5 +52,5 @@ exports.deleteRestaurant = (req, res) => {
         return res.status(404).json({ error: 'Restaurant not found' });
     }
 
-    res.status(200).json({ message: 'Restaurant deleted successfully' });
+    res.status(204).end();
 };
