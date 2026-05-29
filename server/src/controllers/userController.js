@@ -13,6 +13,7 @@ exports.createUser = (req, res) =>{
     const existingUser = UserModel.findByUsername(username);
     if (existingUser) {
         return res.status(409).json({ error: 'Username already exists' }); 
+        // TODO: check 409 status
     }
 
     // Create the new user via the Model
