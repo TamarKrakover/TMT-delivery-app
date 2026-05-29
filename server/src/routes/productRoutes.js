@@ -3,19 +3,15 @@ const express = require('express');
 const router = express.Router({ mergeParams: true });
 const productController = require('../controllers/productController');
 
-// get all products for a specific restaurant
-router.get('/', productController.getRestaurantProducts);
+// grouping actions for the base path '/'
+router.route('/')
+    .get(productController.getRestaurantProducts)  // Get all products for a specific restaurant
+    .post(productController.addProductToRestaurant); // Add a new product to a specific restaurant
 
-// add a new product to a specific restaurant
-router.post('/', productController.addProductToRestaurant);
-
-// get a specific product by its ID
-router.get('/:pId', productController.getProductById);
-
-// update a specific product's details by its ID
-router.patch('/:pId', productController.updateProduct);
-
-// Delete a specific product from a restaurant by its ID
-router.delete('/:pId', productController.deleteProduct);
+// grouping actions for the dynamic product path '/:pId'
+router.route('/:pId')
+    .get(productController.getProductById)         // Get a specific product by its ID
+    .patch(productController.updateProduct)        // Update a specific product's details by its ID
+    .delete(productController.deleteProduct);      // Delete a specific product from a restaurant by its ID
 
 module.exports = router;
