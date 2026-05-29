@@ -5,28 +5,18 @@ const restaurantController = require('../controllers/restaurantController');
 
 const productRoutes = require('./productRoutes');
 
-// Get all restaurants
-// GET /api/restaurants
-router.get('/', restaurantController.getAllRestaurants);
+// Group routes by path '/'
+router.route('/')
+    .get(restaurantController.getAllRestaurants) // Get all restaurants
+    .post(restaurantController.createRestaurant); // Create a new restaurant
 
-// Create a new restaurant
-// POST /api/restaurants
-router.post('/', restaurantController.createRestaurant);
+// Group routes by path '/:id'
+router.route('/:id')
+    .get(restaurantController.getRestaurantById) // Get a specific restaurant by ID
+    .patch(restaurantController.updateRestaurant) // Update a specific restaurant by ID
+    .delete(restaurantController.deleteRestaurant); // Delete a specific restaurant by ID
 
-// Get a specific restaurant by ID
-// GET /api/restaurants/:id
-router.get('/:id', restaurantController.getRestaurantById);
-
-// Update a specific restaurant by ID
-// PATCH /api/restaurants/:id
-router.patch('/:id', restaurantController.updateRestaurant);
-
-// Delete a specific restaurant by ID
-// DELETE /api/restaurants/:id
-router.delete('/:id', restaurantController.deleteRestaurant);
-
-// Forward any request that targets products to the productRoutes file.
-// The URL will look like: /api/restaurants/:id/products/...
+// Forward any request that targets products to the productRoutes file
 router.use('/:id/products', productRoutes);
 
 module.exports = router;
