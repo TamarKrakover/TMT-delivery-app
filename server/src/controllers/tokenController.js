@@ -1,4 +1,4 @@
-const UserModel = require('../models/userModel');
+const UserModel = require('../models/UserModel');
 
 exports.createToken = (req, res) => {
     const { username, password } = req.body;
@@ -13,6 +13,6 @@ exports.createToken = (req, res) => {
         return res.status(401).json({ error: 'Invalid username or password' });
         // TODO: check 401 status (or 404)
     }
-    
+
     res.status(200).json({ id: user.id });
 };

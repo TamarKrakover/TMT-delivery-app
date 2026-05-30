@@ -1,4 +1,4 @@
-const db = require('./inMemoryDB');
+const db = require('./InMemoryDB');
 
 // generates a unique product ID based on timestamp and a random number
 const generateProductId = () => {
