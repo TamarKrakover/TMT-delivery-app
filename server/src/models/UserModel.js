@@ -1,4 +1,4 @@
-const db = require('./inMemoryDB');
+const db = require('./InMemoryDB');
 
 const generateUserId = () => {
     return 'u_' + Date.now().toString() + '_' + Math.floor(Math.random() * 1000);

@@ -1,5 +1,5 @@
 
-const db = require('./inMemoryDB');
+const db = require('./InMemoryDB');
 
 const generateRestId = () => {
     return 'r_' + Date.now().toString() + '_' + Math.floor(Math.random() * 1000);

@@ -1,9 +1,17 @@
 const Product = require('../models/ProductModel');
+const Restaurant = require('../models/RestaurantModel');
 const recommendationClient = require('../services/recommendationServer');
 
 // retrieve all products for a specific restaurant
 exports.getRestaurantProducts = (req, res) => {
     const { id } = req.params;
+
+    // Check if the restaurant exists
+    const restaurant = Restaurant.findById(id);
+    if (!restaurant) {
+        return res.status(404).json({ error: 'Restaurant not found' });
+    }
+
     const products = Product.getAllByRestaurant(id);
     res.status(200).json(products);
 };
@@ -11,6 +19,12 @@ exports.getRestaurantProducts = (req, res) => {
 // create a new product and link it to a restaurant
 exports.addProductToRestaurant = (req, res) => {
     const { id } = req.params;
+
+    // Check if the restaurant exists
+    const restaurant = Restaurant.findById(id);
+    if (!restaurant) {
+        return res.status(404).json({ error: 'Restaurant not found' });
+    }
 
     // validate required fields
     if (!req.body.name || req.body.price === undefined) {
@@ -27,8 +41,14 @@ exports.addProductToRestaurant = (req, res) => {
 // fetch a single product by its ID and restaurant ID
 exports.getProductById = (req, res) => {
     const { id, pId } = req.params;
-    const product = Product.findById(id, pId);
 
+    // Check if the restaurant exists
+    const restaurant = Restaurant.findById(id);
+    if (!restaurant) {
+        return res.status(404).json({ error: 'Restaurant not found' });
+    }
+
+    const product = Product.findById(id, pId);
     if (!product) {
         return res.status(404).json({ error: 'Product not found' });
     }
@@ -36,31 +56,44 @@ exports.getProductById = (req, res) => {
     // extract the user ID from the custom HTTP header 
     // if a user ID exists, notify the EX2 C++ recommendation server via TCP
     // that this specific user has viewed the product.
-    const userId = req.headers['x-user-id'] 
+    const userId = req.headers['x-user-id']
     if (userId) {
         recommendationClient.notifyProductView(userId, pId);
     }
 
     res.status(200).json(product);
-};   
+};
 
 // update an existing product's details
 exports.updateProduct = (req, res) => {
     const { id, pId } = req.params;
-    const updatedProduct = Product.update(id, pId, req.body);
 
+    // Check if the restaurant exists
+    const restaurant = Restaurant.findById(id);
+    if (!restaurant) {
+        return res.status(404).json({ error: 'Restaurant not found' });
+    }
+
+    const updatedProduct = Product.update(id, pId, req.body);
     if (!updatedProduct) {
         return res.status(404).json({ error: 'Product not found' });
     }
 
-    res.status(204).end(); 
+    res.status(204).end();
 };
 
 // remove a product from the database
 exports.deleteProduct = (req, res) => {
     const { id, pId } = req.params;
+
+    // Check if the restaurant exists
+    const restaurant = Restaurant.findById(id);
+    if (!restaurant) {
+        return res.status(404).json({ error: 'Restaurant not found' });
+    }
+
     const isDeleted = Product.delete(id, pId);
- 
+
     if (!isDeleted) {
         return res.status(404).json({ error: 'Product not found' });
     }

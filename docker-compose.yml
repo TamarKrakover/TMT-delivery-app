@@ -1,23 +1,41 @@
 services:
-  # C++ Server Service
+  # C++ Recommendation Server Service
   server:
     build:
       context: ./cpp
       dockerfile: Dockerfile
     container_name: tmt-server
     ports:
-      - "${PORT:-8080}:${PORT:-8080}"
+      - "5555:5555"
     volumes:
       - ./data:/app/data
     networks:
       - tmt-net
     stdin_open: true
     tty: true
-    # Override CMD to pass the port argument to the executable
-    command: ["./TMTApp", "${PORT:-8080}"]
+    # Override CMD to pass the port argument (5555) to the executable
+    command: ["./TMTApp", "5555"]
+
+  # Node.js Express Web Server Service
+  web-server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.server
+    container_name: tmt-web-server
+    ports:
+      - "8080:8080"
+    environment:
+      - RECOMMENDATION_SERVER_HOST=tmt-server
+      - RECOMMENDATION_SERVER_PORT=5555
+    depends_on:
+      - server
+    networks:
+      - tmt-net
 
   # Python Client Service
   client:
+    profiles:
+      - client
     build:
       context: ./client
       dockerfile: Dockerfile.client
@@ -30,6 +48,8 @@ services:
 
   # Tests Service
   tests:
+    profiles:
+      - test
     build:
       context: ./cpp
       dockerfile: Dockerfile

@@ -1,7 +1,7 @@
 const RestaurantModel = require('../models/RestaurantModel');
 
 exports.getAllRestaurants = (req, res) => {
-    const restaurants = Restaurant.getAll();
+    const restaurants = RestaurantModel.getAll();
     res.status(200).json(restaurants);
 };
 

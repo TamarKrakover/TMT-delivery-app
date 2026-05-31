@@ -1,4 +1,4 @@
-const UserModel = require('../models/userModel');
+const UserModel = require('../models/UserModel');
 
 exports.createUser = (req, res) =>{
     // Extract all expected fields from the request body
