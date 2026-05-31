@@ -1,6 +1,6 @@
 const net = require('net');
 
-class RecommendationServiceClient {
+class RecommendationServer {
     constructor() {
         // set the host and port for the EX2 C++ recommendation server
         this.host = process.env.RECOMMENDATION_SERVER_HOST || 'localhost';
@@ -114,4 +114,4 @@ class RecommendationServiceClient {
 
 }
 
-module.exports = new RecommendationServiceClient();
+module.exports = new RecommendationServer();
