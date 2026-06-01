@@ -27,6 +27,9 @@ The Web API Server will run on `http://localhost:8080`, and it will automaticall
 
 ## Execution Examples (CURL)
 
+> [!NOTE]
+> **Terminal Compatibility:** The `curl` commands below are formatted for Unix-like shells (e.g., Linux, macOS, WSL, or Git Bash) using single quotes for the JSON body. If you are running these in native Windows **PowerShell** or **Command Prompt**, you will need to use `curl.exe` and escape the double quotes appropriately (e.g., `-d "{\"key\": \"value\"}"`).
+
 Here is a demonstration of interacting with the API running on `localhost:8080`:
 
 ### Registration (Users)
