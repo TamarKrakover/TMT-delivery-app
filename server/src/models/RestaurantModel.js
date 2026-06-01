@@ -1,14 +1,17 @@
-
 const db = require('./InMemoryDB');
 
+// Generate a unique restaurant ID based on timestamp and a random number
 const generateRestId = () => {
     return 'r_' + Date.now().toString() + '_' + Math.floor(Math.random() * 1000);
 };
 
 class RestaurantModel {
+    // Retrieve all restaurants from the database
     static getAll() {
         return db.restaurants;
     }
+
+    // Create a new restaurant with default fallback values
     static create(data) {
         const newRestaurant = {
             id: generateRestId(),
@@ -21,6 +24,7 @@ class RestaurantModel {
         return newRestaurant;
     }
 
+    // Retrieve a specific restaurant by its unique ID
     static findById(id) {
         return db.restaurants.find(r => r.id === id);
     }
@@ -47,6 +51,7 @@ class RestaurantModel {
     static delete(id) {
         const index = db.restaurants.findIndex(r => r.id === id);
         
+        // Return false if the restaurant doesn't exist
         if (index === -1) return false;
 
         // Remove from array

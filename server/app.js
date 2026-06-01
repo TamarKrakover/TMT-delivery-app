@@ -2,8 +2,10 @@ const express = require('express');
 const app = express();
 const port = 8080;
 
+// Organize the print format
 app.set('json spaces', 2);
 
+// Allows the server to read JSON data
 app.use(express.json());
 
 // Import all routes

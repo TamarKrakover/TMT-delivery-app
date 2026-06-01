@@ -1,10 +1,12 @@
 const RestaurantModel = require('../models/RestaurantModel');
 
+// Fetch all restaurants
 exports.getAllRestaurants = (req, res) => {
     const restaurants = RestaurantModel.getAll();
     res.status(200).json(restaurants);
 };
 
+// Create a new restaurant
 exports.createRestaurant = (req, res) => {
     // Validate request
     if (!req.body.name || !req.body.address) {
@@ -21,9 +23,11 @@ exports.createRestaurant = (req, res) => {
     res.status(201).location(resourceLocation).end();
 };
 
+// Fetch a single restaurant by its ID
 exports.getRestaurantById = (req, res) => {
     const restaurant = RestaurantModel.findById(req.params.id);
     
+    // Handle case where the requested ID doesn't exist
     if (!restaurant) {
         return res.status(404).json({ error: 'Restaurant not found' });
     }
