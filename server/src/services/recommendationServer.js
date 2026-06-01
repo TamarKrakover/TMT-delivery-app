@@ -46,16 +46,43 @@ class RecommendationServer {
         return response.startsWith('201') || response.startsWith('204') || response.startsWith('200');
     }
 
-    // Sends a stateful command to notify the recommendation server about a product view
-    async notifyProductView(userId, productId) {
+    // Sends a post command to record user product interactions
+    async post(userId, productIds) {
+        const pids = Array.isArray(productIds) ? productIds : [productIds];
+        if (pids.length === 0) return '';
+        const command = `post ${userId} ${pids.join(' ')}`;
+        return await this._sendCommand(command);
+    }
+
+    // Sends a patch command to add product interactions to an existing user profile
+    async patch(userId, productIds) {
+        const pids = Array.isArray(productIds) ? productIds : [productIds];
+        if (pids.length === 0) return '';
+        const command = `patch ${userId} ${pids.join(' ')}`;
+        return await this._sendCommand(command);
+    }
+
+    // Sends a delete command to remove product interactions from a user profile
+    async delete(userId, productIds) {
+        const pids = Array.isArray(productIds) ? productIds : [productIds];
+        if (pids.length === 0) return '';
+        const command = `delete ${userId} ${pids.join(' ')}`;
+        return await this._sendCommand(command);
+    }
+
+    // helper implementing state session logic: tries POST or PATCH depending on initialization,
+    // with try-catch fallback.
+    async save(userId, productIds) {
+        const pids = Array.isArray(productIds) ? productIds : [productIds];
+        if (pids.length === 0) return '';
+
         try {
             const alreadyInitialized = this.initializedUsers.has(userId);
 
             if (alreadyInitialized) {
                 // If we think the user is already initialized, try PATCH first
-                const patchCommand = `patch ${userId} ${productId}`;
                 try {
-                    const patchResponse = await this._sendCommand(patchCommand);
+                    const patchResponse = await this.patch(userId, pids);
                     if (this._isSuccess(patchResponse)) {
                         return patchResponse;
                     }
@@ -65,17 +92,15 @@ class RecommendationServer {
                 }
 
                 // Fallback to POST (e.g. if C++ server restarted and lost state)
-                const postCommand = `post ${userId} ${productId}`;
-                const postResponse = await this._sendCommand(postCommand);
+                const postResponse = await this.post(userId, pids);
                 if (this._isSuccess(postResponse)) {
                     this.initializedUsers.add(userId);
                 }
                 return postResponse;
             } else {
                 // If we think the user is new, try POST first
-                const postCommand = `post ${userId} ${productId}`;
                 try {
-                    const postResponse = await this._sendCommand(postCommand);
+                    const postResponse = await this.post(userId, pids);
                     if (this._isSuccess(postResponse)) {
                         this.initializedUsers.add(userId);
                         return postResponse;
@@ -86,8 +111,7 @@ class RecommendationServer {
                 }
 
                 // Fallback to PATCH (e.g. if Node restarted but C++ server still has the user)
-                const patchCommand = `patch ${userId} ${productId}`;
-                const patchResponse = await this._sendCommand(patchCommand);
+                const patchResponse = await this.patch(userId, pids);
                 if (this._isSuccess(patchResponse)) {
                     this.initializedUsers.add(userId);
                 }
@@ -97,21 +121,6 @@ class RecommendationServer {
             // Silently catch error to avoid crashing the Express thread
         }
     }
-
-    // sends a post command to notify the recommendation server about a product order
-    async notifyProductOrder(userId, productId) {
-        try {
-            const command = `post ${userId} ${productId}`;
-            const response = await this._sendCommand(command);
-            return response;
-        } catch (error) {
-            // Silently catch error to avoid crashing the Express thread
-        }
-    }
-
-    // TODO: add a feature that will GET from cpp server the recommendation. 
-    // it will have to check if a recommended pruduct is exists and not deleted. 
-
 }
 
 module.exports = new RecommendationServer();

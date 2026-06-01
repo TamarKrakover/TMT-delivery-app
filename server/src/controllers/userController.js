@@ -27,10 +27,18 @@ exports.createUser = (req, res) =>{
 };
 
 exports.getUserById = (req, res) => {
-    const user = UserModel.findUserById(req.params.id);    
-    // Check if the user exist
+    const userId = req.headers['x-user-id'];
+    if (!userId) {
+        return res.status(401).json({ error: 'Authentication required' });
+    }
+    const user = UserModel.findUserById(userId);
     if (!user) {
-        return res.status(404).json({ error: 'User not found' });
+        return res.status(401).json({ error: 'User not found or invalid session' });
+    }
+
+    // Ensure users can only retrieve their own profile details
+    if (req.params.id !== userId) {
+        return res.status(403).json({ error: 'Unauthorized to view this profile' });
     }
     
     res.status(200).json(user);

@@ -1,6 +1,7 @@
 const Product = require('../models/ProductModel');
 const Restaurant = require('../models/RestaurantModel');
-const RecommendationServer = require('../services/RecommendationServer');
+const UserModel = require('../models/UserModel');
+const RecommendationServer = require('../services/recommendationServer');
 
 // retrieve all products for a specific restaurant
 exports.getRestaurantProducts = (req, res) => {
@@ -18,6 +19,15 @@ exports.getRestaurantProducts = (req, res) => {
 
 // create a new product and link it to a restaurant
 exports.addProductToRestaurant = (req, res) => {
+    const userId = req.headers['x-user-id'];
+    if (!userId) {
+        return res.status(401).json({ error: 'Authentication required' });
+    }
+    const user = UserModel.findUserById(userId);
+    if (!user) {
+        return res.status(401).json({ error: 'User not found or invalid session' });
+    }
+
     const { id } = req.params;
 
     // Check if the restaurant exists
@@ -58,7 +68,10 @@ exports.getProductById = (req, res) => {
     // that this specific user has viewed the product.
     const userId = req.headers['x-user-id']
     if (userId) {
-        RecommendationServer.notifyProductView(userId, pId);
+        const user = UserModel.findUserById(userId);
+        if (user) {
+            RecommendationServer.save(userId, pId);
+        }
     }
 
     res.status(200).json(product);
@@ -66,6 +79,15 @@ exports.getProductById = (req, res) => {
 
 // update an existing product's details
 exports.updateProduct = (req, res) => {
+    const userId = req.headers['x-user-id'];
+    if (!userId) {
+        return res.status(401).json({ error: 'Authentication required' });
+    }
+    const user = UserModel.findUserById(userId);
+    if (!user) {
+        return res.status(401).json({ error: 'User not found or invalid session' });
+    }
+
     const { id, pId } = req.params;
 
     // Check if the restaurant exists
@@ -84,6 +106,15 @@ exports.updateProduct = (req, res) => {
 
 // remove a product from the database
 exports.deleteProduct = (req, res) => {
+    const userId = req.headers['x-user-id'];
+    if (!userId) {
+        return res.status(401).json({ error: 'Authentication required' });
+    }
+    const user = UserModel.findUserById(userId);
+    if (!user) {
+        return res.status(401).json({ error: 'User not found or invalid session' });
+    }
+
     const { id, pId } = req.params;
 
     // Check if the restaurant exists

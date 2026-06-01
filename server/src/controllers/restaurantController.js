@@ -1,4 +1,5 @@
 const RestaurantModel = require('../models/RestaurantModel');
+const UserModel = require('../models/UserModel');
 
 exports.getAllRestaurants = (req, res) => {
     const restaurants = RestaurantModel.getAll();
@@ -6,6 +7,15 @@ exports.getAllRestaurants = (req, res) => {
 };
 
 exports.createRestaurant = (req, res) => {
+    const userId = req.headers['x-user-id'];
+    if (!userId) {
+        return res.status(401).json({ error: 'Authentication required' });
+    }
+    const user = UserModel.findUserById(userId);
+    if (!user) {
+        return res.status(401).json({ error: 'User not found or invalid session' });
+    }
+
     // Validate request
     if (!req.body.name || !req.body.address) {
         return res.status(400).json({ error: 'Name and address are required' });
@@ -33,6 +43,15 @@ exports.getRestaurantById = (req, res) => {
 
 // Update a restaurant
 exports.updateRestaurant = (req, res) => {
+    const userId = req.headers['x-user-id'];
+    if (!userId) {
+        return res.status(401).json({ error: 'Authentication required' });
+    }
+    const user = UserModel.findUserById(userId);
+    if (!user) {
+        return res.status(401).json({ error: 'User not found or invalid session' });
+    }
+
     // Pass the ID and the new data to the model
     const updatedRestaurant = RestaurantModel.update(req.params.id, req.body);
 
@@ -45,6 +64,15 @@ exports.updateRestaurant = (req, res) => {
 
 // Delete a restaurant
 exports.deleteRestaurant = (req, res) => {
+    const userId = req.headers['x-user-id'];
+    if (!userId) {
+        return res.status(401).json({ error: 'Authentication required' });
+    }
+    const user = UserModel.findUserById(userId);
+    if (!user) {
+        return res.status(401).json({ error: 'User not found or invalid session' });
+    }
+
     // Attempt to delete via the model
     const isDeleted = RestaurantModel.delete(req.params.id);
 
