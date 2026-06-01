@@ -4,7 +4,7 @@ exports.createUser = (req, res) =>{
     // Extract all expected fields from the request body
     const { username, password, name, phone, address } = req.body;
 
-    // Validate that ALL required fields were provided
+    // Validate that all required fields were provided
     if (!username || !password || !name || !phone || !address) {
         return res.status(400).json({ error: 'All fields are required' });
     }
@@ -13,7 +13,6 @@ exports.createUser = (req, res) =>{
     const existingUser = UserModel.findByUsername(username);
     if (existingUser) {
         return res.status(409).json({ error: 'Username already exists' }); 
-        // TODO: check 409 status
     }
 
     // Create the new user via the Model

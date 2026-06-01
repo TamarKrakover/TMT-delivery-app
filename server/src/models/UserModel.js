@@ -1,5 +1,6 @@
 const db = require('./InMemoryDB');
 
+// Generate a unique user ID using a timestamp and a random number
 const generateUserId = () => {
     return 'u_' + Date.now().toString() + '_' + Math.floor(Math.random() * 1000);
 };
@@ -20,6 +21,7 @@ class UserModel {
         return newUser;
     }
 
+    // Retrieve a user by their exact username
     static findByUsername(username) {
         return db.users.find(u => u.username === username);
     }
