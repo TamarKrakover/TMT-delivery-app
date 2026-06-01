@@ -42,7 +42,7 @@ Location: /api/users/u_1717235555_123
 
 ### Creating a Restaurant (Restaurants)
 ```bash
-curl -i -X POST http://localhost:8080/api/restaurants -H "Content-Type: application/json" -d '{"name": "McDonalds", "address": "456 Burger St"}'
+curl -i -X POST http://localhost:8080/api/restaurants -H "Content-Type: application/json" -H "x-user-id: u_1717235555_123" -d '{"name": "McDonalds", "address": "456 Burger St"}'
 ```
 **Expected Output:**
 ```http
@@ -53,7 +53,7 @@ Location: /api/restaurants/r_1717235555_456
 
 ### Adding a Product (Products)
 ```bash
-curl -i -X POST http://localhost:8080/api/restaurants/r_1717235555_456/products -H "Content-Type: application/json" -d '{"name": "Big Mac", "price": 5.99}'
+curl -i -X POST http://localhost:8080/api/restaurants/r_1717235555_456/products -H "Content-Type: application/json" -H "x-user-id: u_1717235555_123" -d '{"name": "Big Mac", "price": 5.99}'
 ```
 **Expected Output:**
 ```http
@@ -97,33 +97,33 @@ Content-Type: application/json; charset=utf-8
 ## Available RESTful API Endpoints
 
 ### Authentication and Registration
-- `POST /api/users` - Create a new user.
-- `GET /api/users/:id` - Retrieve user details.
-- `POST /api/tokens` - Login and get user token.
+- `POST /api/users` - Create a new user. **(Public)**
+- `POST /api/tokens` - Login and get user token. **(Public)**
+- `GET /api/users/:id` - Retrieve user details. **(Auth required)**
 
 ### Restaurants
-- `GET /api/restaurants` - List all restaurants.
-- `POST /api/restaurants` - Create a new restaurant.
-- `GET /api/restaurants/:id` - Get specific restaurant details.
-- `PATCH /api/restaurants/:id` - Edit a restaurant.
-- `DELETE /api/restaurants/:id` - Delete a restaurant.
+- `GET /api/restaurants` - List all restaurants. **(Public)**
+- `GET /api/restaurants/:id` - Get specific restaurant details. **(Public)**
+- `POST /api/restaurants` - Create a new restaurant. **(Auth required)**
+- `PATCH /api/restaurants/:id` - Edit a restaurant. **(Auth required)**
+- `DELETE /api/restaurants/:id` - Delete a restaurant. **(Auth required)**
 
 ### Products
-- `GET /api/restaurants/:id/products` - List restaurant products.
-- `POST /api/restaurants/:id/products` - Add a product.
-- `GET /api/restaurants/:id/products/:pId` - Get a specific product.
-- `PATCH /api/restaurants/:id/products/:pId` - Update a product.
-- `DELETE /api/restaurants/:id/products/:pId` - Delete a product.
+- `GET /api/restaurants/:id/products` - List restaurant products. **(Public)**
+- `GET /api/restaurants/:id/products/:pId` - Get a specific product. **(Public / Optional Auth to track views)**
+- `POST /api/restaurants/:id/products` - Add a product. **(Auth required)**
+- `PATCH /api/restaurants/:id/products/:pId` - Update a product. **(Auth required)**
+- `DELETE /api/restaurants/:id/products/:pId` - Delete a product. **(Auth required)**
 
 ### Orders
-- `POST /api/orders` - Create an order (Auth required).
-- `GET /api/orders` - List user orders (Auth required).
-- `GET /api/orders/:id` - Get specific order details.
-- `PATCH /api/orders/:id` - Update an order.
-- `DELETE /api/orders/:id` - Delete/cancel an order.
+- `POST /api/orders` - Create an order. **(Auth required)**
+- `GET /api/orders` - List user orders. **(Auth required)**
+- `GET /api/orders/:id` - Get specific order details. **(Auth required)**
+- `PATCH /api/orders/:id` - Update an order. **(Auth required)**
+- `DELETE /api/orders/:id` - Delete/cancel an order. **(Auth required)**
 
 ### Search
-- `GET /api/search/:query` - Search for restaurants or products matching the query.
+- `GET /api/search/:query` - Search for restaurants or products matching the query. **(Public)**
 
 ## Architecture & Design Notes
 
