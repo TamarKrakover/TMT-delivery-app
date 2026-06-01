@@ -1,6 +1,6 @@
 const Product = require('../models/ProductModel');
 const Restaurant = require('../models/RestaurantModel');
-const recommendationClient = require('../services/recommendationServer');
+const RecommendationServer = require('../services/RecommendationServer');
 
 // retrieve all products for a specific restaurant
 exports.getRestaurantProducts = (req, res) => {
@@ -58,7 +58,7 @@ exports.getProductById = (req, res) => {
     // that this specific user has viewed the product.
     const userId = req.headers['x-user-id']
     if (userId) {
-        recommendationClient.notifyProductView(userId, pId);
+        RecommendationServer.notifyProductView(userId, pId);
     }
 
     res.status(200).json(product);
