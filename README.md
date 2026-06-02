@@ -12,6 +12,8 @@ This server acts as a client to the **Product Recommendation System**, communica
 
 The code submitted for Exercise 2 has been "locked" in a dedicated branch named `Ex2`. This ensures that the grader can evaluate the previous submission exactly as it was, and the work on Exercise 3 on the `main` branch (and its feature branches) does not overwrite or interfere with Exercise 2.
 
+![Run Screenshot](runScreenShot.png)
+
 ## How to Run
 
 The application is completely containerized and managed using `Docker Compose`.
@@ -40,40 +42,40 @@ curl -i -X POST http://localhost:8080/api/users -H "Content-Type: application/js
 ```http
 HTTP/1.1 201 Created
 X-Powered-By: Express
-Location: /api/users/u_1717235555_123
+Location: /api/users/<userID>
 ```
 
 ### Creating a Restaurant (Restaurants)
 ```bash
-curl -i -X POST http://localhost:8080/api/restaurants -H "Content-Type: application/json" -H "x-user-id: u_1717235555_123" -d '{"name": "McDonalds", "address": "456 Burger St"}'
+curl -i -X POST http://localhost:8080/api/restaurants -H "Content-Type: application/json" -H "x-user-id: <userID>" -d '{"name": "McDonalds", "address": "456 Burger St"}'
 ```
 **Expected Output:**
 ```http
 HTTP/1.1 201 Created
 X-Powered-By: Express
-Location: /api/restaurants/r_1717235555_456
+Location: /api/restaurants/<restaurantID>
 ```
 
 ### Adding a Product (Products)
 ```bash
-curl -i -X POST http://localhost:8080/api/restaurants/r_1717235555_456/products -H "Content-Type: application/json" -H "x-user-id: u_1717235555_123" -d '{"name": "Big Mac", "price": 5.99}'
+curl -i -X POST http://localhost:8080/api/restaurants/<restaurantID>/products -H "Content-Type: application/json" -H "x-user-id: <userID>" -d '{"name": "Big Mac", "price": 5.99}'
 ```
 **Expected Output:**
 ```http
 HTTP/1.1 201 Created
 X-Powered-By: Express
-Location: /api/restaurants/r_1717235555_456/products/p_1717235555_789
+Location: /api/restaurants/<restaurantID>/products/<productID>
 ```
 
 ### Creating an Order (Orders)
 ```bash
-curl -i -X POST http://localhost:8080/api/orders -H "Content-Type: application/json" -H "x-user-id: u_1717235555_123" -d '{"restaurantId": "r_1717235555_456", "productIds": ["p_1717235555_789"], "totalPrice": 5.99}'
+curl -i -X POST http://localhost:8080/api/orders -H "Content-Type: application/json" -H "x-user-id: <userID>" -d '{"restaurantId": "<restaurantID>", "productIds": ["<productID>"], "totalPrice": 5.99}'
 ```
 **Expected Output:**
 ```http
 HTTP/1.1 201 Created
 X-Powered-By: Express
-Location: /api/orders/o_1717235555_001
+Location: /api/orders/<orderID>
 ```
 
 ### Search (Search)
@@ -88,8 +90,8 @@ Content-Type: application/json; charset=utf-8
 
 [
   {
-    "id": "p_1717235555_789",
-    "restaurantId": "r_1717235555_456",
+    "id": "<productID>",
+    "restaurantId": "<restaurantID>",
     "name": "Big Mac",
     "description": "",
     "price": 5.99
