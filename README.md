@@ -12,6 +12,8 @@ This server acts as a client to the **Product Recommendation System**, communica
 
 The code submitted for Exercise 2 has been "locked" in a dedicated branch named `Ex2`. This ensures that the grader can evaluate the previous submission exactly as it was, and the work on Exercise 3 on the `main` branch (and its feature branches) does not overwrite or interfere with Exercise 2.
 
+![Run Screenshot](runScreenShot.png)
+
 ## How to Run
 
 The application is completely containerized and managed using `Docker Compose`.
