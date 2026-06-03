@@ -21,8 +21,7 @@ The application is completely containerized and managed using `Docker Compose`.
 To build and start both servers, run the following command in the root directory:
 
 ```bash
-docker compose build
-docker compose up
+docker compose up --build
 ```
 
 The Web API Server will run on `http://localhost:8080`, and it will automatically connect to the C++ server.
