@@ -50,6 +50,7 @@ exports.getProductById = (req, res) => {
         return res.status(404).json({ error: 'Restaurant not found' });
     }
 
+    // get user ID from header for tracking (not authentication, as this is a public route)
     const userId = req.headers['x-user-id'];
     const product = Product.findById(id, pId, userId);
     

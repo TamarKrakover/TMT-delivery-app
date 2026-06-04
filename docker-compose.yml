@@ -33,7 +33,7 @@ services:
       - tmt-net
 
 
-  # Tests Service
+  # C++ server unit tests Service
   tests:
     profiles:
       - test

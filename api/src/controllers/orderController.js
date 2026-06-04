@@ -58,8 +58,8 @@ exports.updateOrder = (req, res) => {
         return res.status(403).json({ error: 'Unauthorized to update this order' });
     }
 
-    // Since totalPrice and status are securely managed by the server, 
-    // productIds is the only valid field a user can update.
+    // totalPrice and status are securely managed by the server, 
+    // productIds is the only valid field a user can update
     if (!req.body.productIds || !Array.isArray(req.body.productIds)) {
         return res.status(400).json({ error: 'An array of productIds is required to update an order' });
     }
