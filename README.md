@@ -102,28 +102,38 @@ Content-Type: application/json; charset=utf-8
 
 ### Authentication and Registration
 - `POST /api/users` - Create a new user. **(Public)**
+  - *Required JSON body:* `username`, `password`, `name`, `phone`, `address`
 - `POST /api/tokens` - Login and get user token. **(Public)**
+  - *Required JSON body:* `username`, `password`
 - `GET /api/users/:id` - Retrieve user details. **(Auth required)**
 
 ### Restaurants
 - `GET /api/restaurants` - List all restaurants. **(Public)**
 - `GET /api/restaurants/:id` - Get specific restaurant details. **(Public)**
 - `POST /api/restaurants` - Create a new restaurant. **(Auth required)**
+  - *Required JSON body:* `name`, `address`
+  - *Optional JSON body:* `description` (defaults to empty), `category` (defaults to 'General')
 - `PATCH /api/restaurants/:id` - Edit a restaurant. **(Auth required)**
+  - *Optional JSON body:* `name`, `address`, `description`, `category` (Only send what you want to update)
 - `DELETE /api/restaurants/:id` - Delete a restaurant. **(Auth required)**
 
 ### Products
 - `GET /api/restaurants/:id/products` - List restaurant products. **(Public)**
 - `GET /api/restaurants/:id/products/:pId` - Get a specific product. **(Public / Optional Auth to track views)**
 - `POST /api/restaurants/:id/products` - Add a product. **(Auth required)**
+  - *Required JSON body:* `name`, `price`
+  - *Optional JSON body:* `description` (defaults to empty)
 - `PATCH /api/restaurants/:id/products/:pId` - Update a product. **(Auth required)**
+  - *Optional JSON body:* `name`, `price`, `description` (Only send what you want to update)
 - `DELETE /api/restaurants/:id/products/:pId` - Delete a product. **(Auth required)**
 
 ### Orders
 - `POST /api/orders` - Create an order. **(Auth required)**
+  - *Required JSON body:* `restaurantId`, `productIds` (must be an array)
 - `GET /api/orders` - List user orders. **(Auth required)**
 - `GET /api/orders/:id` - Get specific order details. **(Auth required)**
 - `PATCH /api/orders/:id` - Update an order. **(Auth required)**
+  - *Required JSON body:* `productIds` (must be an array)
 - `DELETE /api/orders/:id` - Delete/cancel an order. **(Auth required)**
 
 ### Search
