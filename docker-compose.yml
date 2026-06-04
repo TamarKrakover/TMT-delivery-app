@@ -19,8 +19,8 @@ services:
   # Node.js Express Web Server Service
   web-server:
     build:
-      context: ./server
-      dockerfile: Dockerfile.server
+      context: ./api
+      dockerfile: Dockerfile.api
     container_name: tmt-web-server
     ports:
       - "8080:8080"

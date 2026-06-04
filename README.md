@@ -157,9 +157,9 @@ Content-Type: application/json; charset=utf-8
 .
 ├── README.md
 ├── docker-compose.yml
-|   ├── server/                    # Web API Server (NodeJS/Express)
-│   ├── Dockerfile.server
-│   ├── app.js
+|   ├── api/                       # Web API Server (NodeJS/Express)
+│   ├── Dockerfile.api
+│   ├── package.json
 │   ├── package.json
 │   └── src/
 │       ├── controllers/
