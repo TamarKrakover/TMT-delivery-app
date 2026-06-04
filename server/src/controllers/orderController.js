@@ -3,28 +3,14 @@ const UserModel = require('../models/UserModel');
 
 // get all orders for the authenticated user
 exports.getUserOrders = (req, res) => {
-    const userId = req.headers['x-user-id'];
-    if (!userId) {
-        return res.status(401).json({ error: 'Authentication required' });
-    }
-    const user = UserModel.findUserById(userId);
-    if (!user) {
-        return res.status(401).json({ error: 'User not found or invalid session' });
-    }
+    const userId = req.userId;
     const userOrders = OrderModel.findByUserId(userId);
     res.status(200).json(userOrders);
 };
 
 // create a new order for the authenticated user
 exports.createOrder = (req, res) => {
-    const userId = req.headers['x-user-id'];
-    if (!userId) {
-        return res.status(401).json({ error: 'Authentication required' });
-    }
-    const user = UserModel.findUserById(userId);
-    if (!user) {
-        return res.status(401).json({ error: 'User not found or invalid session' });
-    }
+    const userId = req.userId;
 
     // validate required fields
     if (!req.body.restaurantId || !req.body.productIds || !Array.isArray(req.body.productIds)) {
@@ -42,14 +28,7 @@ exports.createOrder = (req, res) => {
 
 // retrieve a specific order by its ID
 exports.getOrderById = (req, res) => {
-    const userId = req.headers['x-user-id'];
-    if (!userId) {
-        return res.status(401).json({ error: 'Authentication required' });
-    }
-    const user = UserModel.findUserById(userId);
-    if (!user) {
-        return res.status(401).json({ error: 'User not found or invalid session' });
-    }
+    const userId = req.userId;
 
     const order = OrderModel.findById(req.params.id);
     
@@ -67,14 +46,7 @@ exports.getOrderById = (req, res) => {
 
 // update an existing order by its ID
 exports.updateOrder = (req, res) => {
-    const userId = req.headers['x-user-id'];
-    if (!userId) {
-        return res.status(401).json({ error: 'Authentication required' });
-    }
-    const user = UserModel.findUserById(userId);
-    if (!user) {
-        return res.status(401).json({ error: 'User not found or invalid session' });
-    }
+    const userId = req.userId;
 
     const order = OrderModel.findById(req.params.id);
     if (!order) {
@@ -103,14 +75,7 @@ exports.updateOrder = (req, res) => {
 
 // delete an existing order by its ID
 exports.deleteOrder = (req, res) => {
-    const userId = req.headers['x-user-id'];
-    if (!userId) {
-        return res.status(401).json({ error: 'Authentication required' });
-    }
-    const user = UserModel.findUserById(userId);
-    if (!user) {
-        return res.status(401).json({ error: 'User not found or invalid session' });
-    }
+    const userId = req.userId;
 
     const order = OrderModel.findById(req.params.id);
     if (!order) {

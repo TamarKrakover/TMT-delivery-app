@@ -18,14 +18,7 @@ exports.getRestaurantProducts = (req, res) => {
 
 // create a new product and link it to a restaurant
 exports.addProductToRestaurant = (req, res) => {
-    const userId = req.headers['x-user-id'];
-    if (!userId) {
-        return res.status(401).json({ error: 'Authentication required' });
-    }
-    const user = UserModel.findUserById(userId);
-    if (!user) {
-        return res.status(401).json({ error: 'User not found or invalid session' });
-    }
+    const userId = req.userId;
 
     const { id } = req.params;
 
@@ -69,14 +62,7 @@ exports.getProductById = (req, res) => {
 
 // update an existing product's details
 exports.updateProduct = (req, res) => {
-    const userId = req.headers['x-user-id'];
-    if (!userId) {
-        return res.status(401).json({ error: 'Authentication required' });
-    }
-    const user = UserModel.findUserById(userId);
-    if (!user) {
-        return res.status(401).json({ error: 'User not found or invalid session' });
-    }
+    const userId = req.userId;
 
     const { id, pId } = req.params;
 
@@ -96,14 +82,7 @@ exports.updateProduct = (req, res) => {
 
 // remove a product from the database
 exports.deleteProduct = (req, res) => {
-    const userId = req.headers['x-user-id'];
-    if (!userId) {
-        return res.status(401).json({ error: 'Authentication required' });
-    }
-    const user = UserModel.findUserById(userId);
-    if (!user) {
-        return res.status(401).json({ error: 'User not found or invalid session' });
-    }
+    const userId = req.userId;
 
     const { id, pId } = req.params;
 

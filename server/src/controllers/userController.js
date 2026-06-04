@@ -27,14 +27,8 @@ exports.createUser = (req, res) =>{
 };
 
 exports.getUserById = (req, res) => {
-    const userId = req.headers['x-user-id'];
-    if (!userId) {
-        return res.status(401).json({ error: 'Authentication required' });
-    }
-    const user = UserModel.findUserById(userId);
-    if (!user) {
-        return res.status(401).json({ error: 'User not found or invalid session' });
-    }
+    const userId = req.userId;
+    const user = req.user;
 
     // Ensure users can only retrieve their own profile details
     if (req.params.id !== userId) {

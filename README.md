@@ -100,6 +100,9 @@ Content-Type: application/json; charset=utf-8
 
 ## Available RESTful API Endpoints
 
+> [!IMPORTANT]
+> **Authentication:** Endpoints marked with **(Auth required)** expect a custom HTTP header named `x-user-id`. The value of this header must be a valid User ID obtained from the Login (`POST /api/tokens`) endpoint.
+
 ### Authentication and Registration
 - `POST /api/users` - Create a new user. **(Public)**
   - *Required JSON body:* `username`, `password`, `name`, `phone`, `address`
@@ -143,6 +146,9 @@ Content-Type: application/json; charset=utf-8
 
 * **Environment:** NodeJS with Express framework.
 * **Data Persistence:** In-memory databases using volatile data structures. Data is wiped upon server restart.
+* **Error Handling:** All errors return standard HTTP status codes (400, 401, 403, 404, 500) and a consistent JSON format: `{"error": "Description of the error"}`.
+* **Resource IDs:** Unique identifiers are generated on the server using timestamps and prefixes (e.g., `u_` for users, `r_` for restaurants, `p_` for products, `o_` for orders).
+* **Architecture Pattern (MVC):** The server is built strictly using the Model-View-Controller (MVC) pattern.
 * **Design Principles:** SOLID principles and Loose Coupling are strictly followed for modularity, testability, and future extensibility.
 * **Integration:** The Express web server connects over TCP to the C++ Recommendation Server from Ex 2.
 
