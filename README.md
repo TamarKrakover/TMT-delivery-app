@@ -113,7 +113,7 @@ Keep-Alive: timeout=5
     "restaurantId": "<restaurantID>",
     "name": "<name>",
     "description": "<description>",
-    "price": <price>
+    "price": "<price>"
   }
 ]  
 ```
