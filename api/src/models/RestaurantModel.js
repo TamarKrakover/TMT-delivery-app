@@ -13,6 +13,12 @@ class RestaurantModel {
 
     // Create a new restaurant with default fallback values
     static create(data) {
+        // Enforce uniqueness of name + address
+        const isDuplicate = db.restaurants.some(r => r.name === data.name && r.address === data.address);
+        if (isDuplicate) {
+            throw new Error('DUPLICATE_RESTAURANT');
+        }
+
         const newRestaurant = {
             id: generateRestId(),
             name: data.name,
@@ -36,9 +42,21 @@ class RestaurantModel {
         // Return null if restaurant doesn't exist
         if (index === -1) return null;
 
+        const currentRest = db.restaurants[index];
+        const newName = data.name !== undefined ? data.name : currentRest.name;
+        const newAddress = data.address !== undefined ? data.address : currentRest.address;
+
+        // Check for duplicates if name or address are being updated
+        if (data.name !== undefined || data.address !== undefined) {
+            const isDuplicate = db.restaurants.some(r => r.id !== id && r.name === newName && r.address === newAddress);
+            if (isDuplicate) {
+                throw new Error('DUPLICATE_RESTAURANT');
+            }
+        }
+
         // Merge existing data with new data, protecting the original ID
         const updatedRestaurant = {
-            ...db.restaurants[index],
+            ...currentRest,
             ...data,
             id: id 
         };
@@ -47,7 +65,7 @@ class RestaurantModel {
         return updatedRestaurant;
     }
 
-    // Delete a restaurant
+    // Delete a restaurant and all its associated products
     static delete(id) {
         const index = db.restaurants.findIndex(r => r.id === id);
         
@@ -56,6 +74,14 @@ class RestaurantModel {
 
         // Remove from array
         db.restaurants.splice(index, 1);
+
+        // Remove all products associated with this restaurant to prevent memory leaks (zombie products)
+        for (let i = db.products.length - 1; i >= 0; i--) {
+            if (db.products[i].restaurantId === id) {
+                db.products.splice(i, 1);
+            }
+        }
+
         return true;
     }
 }
