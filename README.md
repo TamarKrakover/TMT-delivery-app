@@ -158,16 +158,16 @@ Content-Type: application/json; charset=utf-8
 ├── README.md
 ├── docker-compose.yml
 |   ├── api/                       # Web API Server (NodeJS/Express)
-│   ├── Dockerfile.api
-│   ├── package.json
-│   ├── package.json
-│   └── src/
+│     ├── Dockerfile.api
+│     ├── package.json
+│     ├── package.json
+│     └── src/
 │       ├── controllers/
 │       ├── models/
 │       ├── routes/
 │       └── services/
 |   ├── cpp/                       # Recommendation Server (C++)
-│   ├── Dockerfile
+│     ├── Dockerfile
 │   └── src/
 └── data/                      
 ```
