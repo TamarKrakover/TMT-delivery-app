@@ -1,4 +1,7 @@
 # TMTproject - Web Server API
+## Version Management from Exercise 2
+
+The code submitted for Exercise 2 has been "locked" in a dedicated branch named `Ex2`. This ensures that the grader can evaluate the previous submission exactly as it was, and the work on Exercise 3 on the `main` branch (and its feature branches) does not overwrite or interfere with Exercise 2.
 
 ## About The Application
 
@@ -7,10 +10,6 @@ The server uses an MVC architecture and provides a RESTful API to manage users, 
 All responses are formatted in JSON.
 
 This server acts as a client to the **Product Recommendation System**, communicating via a socket connection to record user actions (e.g., viewing a product).
-
-## Version Management from Exercise 2
-
-The code submitted for Exercise 2 has been "locked" in a dedicated branch named `Ex2`. This ensures that the grader can evaluate the previous submission exactly as it was, and the work on Exercise 3 on the `main` branch (and its feature branches) does not overwrite or interfere with Exercise 2.
 
 ![Run Screenshot](runScreenShot.png)
 
