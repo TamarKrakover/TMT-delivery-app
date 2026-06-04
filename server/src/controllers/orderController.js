@@ -1,6 +1,5 @@
 const OrderModel = require('../models/OrderModel');
 const UserModel = require('../models/UserModel');
-const RecommendationServer = require('../services/recommendationServer');
 
 // get all orders for the authenticated user
 exports.getUserOrders = (req, res) => {
@@ -36,11 +35,6 @@ exports.createOrder = (req, res) => {
     const orderData = { ...req.body, userId: userId };
     const newOrder = OrderModel.create(orderData);
 
-    // Notify recommendation server about the ordered products
-    if (userId && req.body.productIds && req.body.productIds.length > 0) {
-        RecommendationServer.save(userId, req.body.productIds);
-    }
-
     // return 201 Created with the new resource location
     const resourceLocation = '/api/orders/' + newOrder.id;
     res.status(201).location(resourceLocation).end();
@@ -72,7 +66,7 @@ exports.getOrderById = (req, res) => {
 };
 
 // update an existing order by its ID
-exports.updateOrder = async (req, res) => {
+exports.updateOrder = (req, res) => {
     const userId = req.headers['x-user-id'];
     if (!userId) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -92,23 +86,10 @@ exports.updateOrder = async (req, res) => {
         return res.status(403).json({ error: 'Unauthorized to update this order' });
     }
 
-    const oldProductIds = order.productIds || [];
-    const newProductIds = req.body.productIds;
-
-    // If new products are provided and they differ, update the recommendation server
-    if (newProductIds && Array.isArray(newProductIds)) {
-        try {
-            // 1. Delete all old products in this order from the C++ server
-            if (oldProductIds.length > 0) {
-                await RecommendationServer.delete(userId, oldProductIds);
-            }
-            // 2. Add all new products in this order to the C++ server
-            if (newProductIds.length > 0) {
-                await RecommendationServer.save(userId, newProductIds);
-            }
-        } catch (err) {
-            // Silently ignore connection or C++ level errors to keep Express thread stable
-        }
+    // Since totalPrice and status are securely managed by the server, 
+    // productIds is the only valid field a user can update.
+    if (!req.body.productIds || !Array.isArray(req.body.productIds)) {
+        return res.status(400).json({ error: 'An array of productIds is required to update an order' });
     }
 
     const updatedOrder = OrderModel.update(req.params.id, req.body);
@@ -121,7 +102,7 @@ exports.updateOrder = async (req, res) => {
 };
 
 // delete an existing order by its ID
-exports.deleteOrder = async (req, res) => {
+exports.deleteOrder = (req, res) => {
     const userId = req.headers['x-user-id'];
     if (!userId) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -139,15 +120,6 @@ exports.deleteOrder = async (req, res) => {
     // Ensure the order belongs to the user trying to delete it
     if (order.userId !== userId) {
         return res.status(403).json({ error: 'Unauthorized to delete this order' });
-    }
-
-    // Send delete command to the C++ recommendation server
-    if (order.productIds && order.productIds.length > 0) {
-        try {
-            await RecommendationServer.delete(userId, order.productIds);
-        } catch (err) {
-            // Silently ignore connection or C++ level errors to keep Express thread stable
-        }
     }
 
     const isDeleted = OrderModel.delete(req.params.id);
