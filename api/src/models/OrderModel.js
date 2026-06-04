@@ -85,30 +85,29 @@ class OrderModel {
             }
         }
 
+        // Explicitly build the updated order to prevent security hacks (like stealing ownership)
         const updatedOrder = {
-            ...db.orders[index],
-            ...data,
-            id: id 
+            id: oldOrder.id,
+            userId: oldOrder.userId,
+            restaurantId: oldOrder.restaurantId,
+            status: oldOrder.status,
+            createdAt: oldOrder.createdAt,
+            // Allow productIds to be updated if provided
+            productIds: (newProductIds && Array.isArray(newProductIds)) ? newProductIds : oldProductIds,
+            // Initialize totalPrice with the old one, it might be recalculated below
+            totalPrice: oldOrder.totalPrice
         };
 
         // Recalculate price securely if products changed
-        if (data.productIds && Array.isArray(data.productIds)) {
+        if (newProductIds && Array.isArray(newProductIds)) {
             let calculatedTotal = 0;
-            data.productIds.forEach(pid => {
+            newProductIds.forEach(pid => {
                 const product = ProductModel.findById(updatedOrder.restaurantId, pid);
                 if (product && product.price) {
                     calculatedTotal += product.price;
                 }
             });
             updatedOrder.totalPrice = calculatedTotal;
-        } else if ('totalPrice' in data) {
-            // Prevent users from manually overriding the price during updates
-            updatedOrder.totalPrice = db.orders[index].totalPrice;
-        }
-
-        // Prevent users from manually overriding the status
-        if ('status' in data) {
-            updatedOrder.status = db.orders[index].status;
         }
 
         db.orders[index] = updatedOrder;

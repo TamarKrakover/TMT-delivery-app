@@ -17,13 +17,20 @@ exports.createRestaurant = (req, res) => {
     }
 
     // Pass data to the Model
-    const newRestaurant = RestaurantModel.create(req.body);
+    try {
+        const newRestaurant = RestaurantModel.create(req.body);
 
-    // Set the Location header pointing to the newly created resource
-    const resourceLocation = '/api/restaurants/' + newRestaurant.id;
+        // Set the Location header pointing to the newly created resource
+        const resourceLocation = '/api/restaurants/' + newRestaurant.id;
 
-    // Return 201 status, set the Location header, and end the response with no body
-    res.status(201).location(resourceLocation).end();
+        // Return 201 status, set the Location header, and end the response with no body
+        res.status(201).location(resourceLocation).end();
+    } catch (error) {
+        if (error.message === 'DUPLICATE_RESTAURANT') {
+            return res.status(409).json({ error: 'A restaurant with this name and address already exists' });
+        }
+        return res.status(500).json({ error: 'Internal server error' });
+    }
 };
 
 // Fetch a single restaurant by its ID
@@ -42,14 +49,21 @@ exports.getRestaurantById = (req, res) => {
 exports.updateRestaurant = (req, res) => {
     // Authentication is handled by authMiddleware
 
-    // Pass the ID and the new data to the model
-    const updatedRestaurant = RestaurantModel.update(req.params.id, req.body);
+    try {
+        // Pass the ID and the new data to the model
+        const updatedRestaurant = RestaurantModel.update(req.params.id, req.body);
 
-    if (!updatedRestaurant) {
-        return res.status(404).json({ error: 'Restaurant not found' });
+        if (!updatedRestaurant) {
+            return res.status(404).json({ error: 'Restaurant not found' });
+        }
+
+        res.status(204).end();
+    } catch (error) {
+        if (error.message === 'DUPLICATE_RESTAURANT') {
+            return res.status(409).json({ error: 'A restaurant with this name and address already exists' });
+        }
+        return res.status(500).json({ error: 'Internal server error' });
     }
-
-    res.status(204).end();
 };
 
 // Delete a restaurant
