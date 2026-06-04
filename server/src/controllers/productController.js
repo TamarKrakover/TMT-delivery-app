@@ -1,7 +1,6 @@
 const Product = require('../models/ProductModel');
 const Restaurant = require('../models/RestaurantModel');
 const UserModel = require('../models/UserModel');
-const RecommendationServer = require('../services/recommendationServer');
 
 // retrieve all products for a specific restaurant
 exports.getRestaurantProducts = (req, res) => {
@@ -58,20 +57,11 @@ exports.getProductById = (req, res) => {
         return res.status(404).json({ error: 'Restaurant not found' });
     }
 
-    const product = Product.findById(id, pId);
+    const userId = req.headers['x-user-id'];
+    const product = Product.findById(id, pId, userId);
+    
     if (!product) {
         return res.status(404).json({ error: 'Product not found' });
-    }
-
-    // extract the user ID from the custom HTTP header 
-    // if a user ID exists, notify the EX2 C++ recommendation server via TCP
-    // that this specific user has viewed the product.
-    const userId = req.headers['x-user-id']
-    if (userId) {
-        const user = UserModel.findUserById(userId);
-        if (user) {
-            RecommendationServer.save(userId, pId);
-        }
     }
 
     res.status(200).json(product);

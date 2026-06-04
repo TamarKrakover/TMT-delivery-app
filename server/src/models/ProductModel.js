@@ -1,4 +1,6 @@
 const db = require('./InMemoryDB');
+const UserModel = require('./UserModel');
+const RecommendationServer = require('../services/recommendationServer');
 
 // generates a unique product ID based on timestamp and a random number
 const generateProductId = () => {
@@ -25,8 +27,18 @@ class ProductModel {
     }
 
     // finds and returns a specific product by its ID and restaurant ID
-    static findById(restaurantId, productId) {
-        return db.products.find(p => p.restaurantId === restaurantId && p.id === productId);
+    // if a userId is provided, logs the view to the recommendation server
+    static findById(restaurantId, productId, userId = null) {
+        const product = db.products.find(p => p.restaurantId === restaurantId && p.id === productId);
+        
+        if (product && userId) {
+            const user = UserModel.findUserById(userId);
+            if (user) {
+                RecommendationServer.save(userId, productId);
+            }
+        }
+        
+        return product;
     }
 
     // updates an existing product's fields while protecting its original IDs
