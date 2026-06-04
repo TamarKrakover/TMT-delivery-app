@@ -1,5 +1,6 @@
 const OrderModel = require('../models/OrderModel');
 const UserModel = require('../models/UserModel');
+const ProductModel = require('../models/ProductModel');
 
 // get all orders for the authenticated user
 exports.getUserOrders = (req, res) => {
@@ -13,8 +14,18 @@ exports.createOrder = (req, res) => {
     const userId = req.userId;
 
     // validate required fields
-    if (!req.body.restaurantId || !req.body.productIds || !Array.isArray(req.body.productIds)) {
-        return res.status(400).json({ error: 'restaurantId and an array of productIds are required' });
+    if (!req.body.restaurantId || !req.body.productIds || !Array.isArray(req.body.productIds) || req.body.productIds.length === 0) {
+        return res.status(400).json({ error: 'restaurantId and a non-empty array of productIds are required' });
+    }
+
+    // Verify all products belong to the restaurant
+    const allValid = req.body.productIds.every(pid => {
+        const product = ProductModel.findById(req.body.restaurantId, pid);
+        return product !== undefined;
+    });
+
+    if (!allValid) {
+        return res.status(400).json({ error: 'One or more products do not exist or do not belong to this restaurant' });
     }
 
     // combine user ID with request data and create order
@@ -58,10 +69,20 @@ exports.updateOrder = (req, res) => {
         return res.status(403).json({ error: 'Unauthorized to update this order' });
     }
 
-    // Since totalPrice and status are securely managed by the server, 
-    // productIds is the only valid field a user can update.
-    if (!req.body.productIds || !Array.isArray(req.body.productIds)) {
-        return res.status(400).json({ error: 'An array of productIds is required to update an order' });
+    // totalPrice and status are securely managed by the server, 
+    // productIds is the only valid field a user can update
+    if (!req.body.productIds || !Array.isArray(req.body.productIds) || req.body.productIds.length === 0) {
+        return res.status(400).json({ error: 'A non-empty array of productIds is required to update an order' });
+    }
+
+    // Verify all products belong to the restaurant
+    const allValid = req.body.productIds.every(pid => {
+        const product = ProductModel.findById(order.restaurantId, pid);
+        return product !== undefined;
+    });
+
+    if (!allValid) {
+        return res.status(400).json({ error: 'One or more products do not exist or do not belong to this restaurant' });
     }
 
     const updatedOrder = OrderModel.update(req.params.id, req.body);

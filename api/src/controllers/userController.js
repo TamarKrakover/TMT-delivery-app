@@ -18,6 +18,7 @@ exports.createUser = (req, res) =>{
 
         // Return 201 Created, set the Location header, and end with no body
         res.status(201).location(resourceLocation).end();
+        
     } catch (error) {
         if (error.message === 'Username already exists') {
             return res.status(409).json({ error: 'Username already exists' });

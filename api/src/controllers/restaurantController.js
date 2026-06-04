@@ -16,7 +16,7 @@ exports.createRestaurant = (req, res) => {
         return res.status(400).json({ error: 'Name and address are required' });
     }
 
-    // Pass data to the Model to do the heavy lifting
+    // Pass data to the Model
     const newRestaurant = RestaurantModel.create(req.body);
 
     // Set the Location header pointing to the newly created resource
