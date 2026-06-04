@@ -9,20 +9,21 @@ exports.createUser = (req, res) =>{
         return res.status(400).json({ error: 'All fields are required' });
     }
 
-    // Check if the username is already taken
-    const existingUser = UserModel.findByUsername(username);
-    if (existingUser) {
-        return res.status(409).json({ error: 'Username already exists' }); 
+    try {
+        // Create the new user via the Model
+        const newUser = UserModel.create(req.body);
+
+        // Set the Location header pointing to the newly created user
+        const resourceLocation = '/api/users/' + newUser.id;
+
+        // Return 201 Created, set the Location header, and end with no body
+        res.status(201).location(resourceLocation).end();
+    } catch (error) {
+        if (error.message === 'Username already exists') {
+            return res.status(409).json({ error: 'Username already exists' });
+        }
+        return res.status(500).json({ error: 'Internal server error' });
     }
-
-    // Create the new user via the Model
-    const newUser = UserModel.create(req.body);
-
-    // Set the Location header pointing to the newly created user
-    const resourceLocation = '/api/users/' + newUser.id;
-
-    // Return 201 Created, set the Location header, and end with no body
-    res.status(201).location(resourceLocation).end();
 };
 
 exports.getUserById = (req, res) => {
@@ -39,7 +40,7 @@ exports.getUserById = (req, res) => {
     if (req.params.id !== userId) {
         return res.status(403).json({ error: 'Unauthorized to view this profile' });
     }
-    
+
     res.status(200).json(user);
 };
 
