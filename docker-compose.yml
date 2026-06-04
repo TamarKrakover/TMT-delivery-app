@@ -19,8 +19,8 @@ services:
   # Node.js Express Web Server Service
   web-server:
     build:
-      context: ./server
-      dockerfile: Dockerfile.server
+      context: ./api
+      dockerfile: Dockerfile.api
     container_name: tmt-web-server
     ports:
       - "8080:8080"
@@ -32,19 +32,6 @@ services:
     networks:
       - tmt-net
 
-  # Python Client Service
-  client:
-    profiles:
-      - client
-    build:
-      context: ./client
-      dockerfile: Dockerfile.client
-    container_name: tmt-client
-    networks:
-      - tmt-net
-    stdin_open: true
-    tty: true
-    command: ["${IP:-server}", "${PORT:-8080}"]
 
   # Tests Service
   tests:

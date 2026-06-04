@@ -9,6 +9,11 @@ class UserModel {
 
     // Create a new user
     static create(data) {
+        // Check if the username is already taken
+        if (this.findByUsername(data.username)) {
+            throw new Error('Username already exists');
+        }
+
         const newUser = {
             id: generateUserId(),
             username: data.username,

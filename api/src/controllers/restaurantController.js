@@ -9,14 +9,7 @@ exports.getAllRestaurants = (req, res) => {
 
 // Create a new restaurant
 exports.createRestaurant = (req, res) => {
-    const userId = req.headers['x-user-id'];
-    if (!userId) {
-        return res.status(401).json({ error: 'Authentication required' });
-    }
-    const user = UserModel.findUserById(userId);
-    if (!user) {
-        return res.status(401).json({ error: 'User not found or invalid session' });
-    }
+    // Authentication is handled by authMiddleware
 
     // Validate request
     if (!req.body.name || !req.body.address) {
@@ -47,14 +40,7 @@ exports.getRestaurantById = (req, res) => {
 
 // Update a restaurant
 exports.updateRestaurant = (req, res) => {
-    const userId = req.headers['x-user-id'];
-    if (!userId) {
-        return res.status(401).json({ error: 'Authentication required' });
-    }
-    const user = UserModel.findUserById(userId);
-    if (!user) {
-        return res.status(401).json({ error: 'User not found or invalid session' });
-    }
+    // Authentication is handled by authMiddleware
 
     // Pass the ID and the new data to the model
     const updatedRestaurant = RestaurantModel.update(req.params.id, req.body);
@@ -68,14 +54,7 @@ exports.updateRestaurant = (req, res) => {
 
 // Delete a restaurant
 exports.deleteRestaurant = (req, res) => {
-    const userId = req.headers['x-user-id'];
-    if (!userId) {
-        return res.status(401).json({ error: 'Authentication required' });
-    }
-    const user = UserModel.findUserById(userId);
-    if (!user) {
-        return res.status(401).json({ error: 'User not found or invalid session' });
-    }
+    // Authentication is handled by authMiddleware
 
     // Attempt to delete via the model
     const isDeleted = RestaurantModel.delete(req.params.id);
