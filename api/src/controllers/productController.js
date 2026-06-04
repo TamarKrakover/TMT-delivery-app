@@ -32,6 +32,9 @@ exports.addProductToRestaurant = (req, res) => {
     if (!req.body.name || req.body.price === undefined) {
         return res.status(400).json({ error: 'Name and price are required' });
     }
+    if (typeof req.body.price !== 'number' || req.body.price < 0) {
+        return res.status(400).json({ error: 'Price must be a positive number' });
+    }
 
     const newProduct = Product.create(id, req.body);
     const resourceLocation = `/api/restaurants/${id}/products/${newProduct.id}`;
@@ -71,6 +74,10 @@ exports.updateProduct = (req, res) => {
     const restaurant = Restaurant.findById(id);
     if (!restaurant) {
         return res.status(404).json({ error: 'Restaurant not found' });
+    }
+
+    if (req.body.price !== undefined && (typeof req.body.price !== 'number' || req.body.price < 0)) {
+        return res.status(400).json({ error: 'Price must be a positive number' });
     }
 
     const updatedProduct = Product.update(id, pId, req.body);
