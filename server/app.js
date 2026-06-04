@@ -23,7 +23,7 @@ app.use('/api/search', searchRoutes);
 app.use('/api/tokens', tokenRoutes);
 
 // Catch-all route for undefined endpoints
-app.use('*', (req, res) => {
+app.use((req, res) => {
     res.status(404).json({ error: `Route not found: ${req.method} ${req.originalUrl}` });
 });
 
