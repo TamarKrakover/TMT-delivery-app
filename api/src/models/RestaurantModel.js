@@ -65,7 +65,7 @@ class RestaurantModel {
         return updatedRestaurant;
     }
 
-    // Delete a restaurant
+    // Delete a restaurant and all its associated products
     static delete(id) {
         const index = db.restaurants.findIndex(r => r.id === id);
         
@@ -74,6 +74,14 @@ class RestaurantModel {
 
         // Remove from array
         db.restaurants.splice(index, 1);
+
+        // Remove all products associated with this restaurant to prevent memory leaks (zombie products)
+        for (let i = db.products.length - 1; i >= 0; i--) {
+            if (db.products[i].restaurantId === id) {
+                db.products.splice(i, 1);
+            }
+        }
+
         return true;
     }
 }

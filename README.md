@@ -41,6 +41,10 @@ curl -i -X POST http://localhost:8080/api/users -H "Content-Type: application/js
 HTTP/1.1 201 Created
 X-Powered-By: Express
 Location: /api/users/<userID>
+Date: <date and hour>
+Connection: keep-alive
+Keep-Alive: timeout=5
+Content-Length: 0
 ```
 
 ### Creating a Restaurant (Restaurants)
@@ -52,6 +56,10 @@ curl -i -X POST http://localhost:8080/api/restaurants -H "Content-Type: applicat
 HTTP/1.1 201 Created
 X-Powered-By: Express
 Location: /api/restaurants/<restaurantID>
+Date: <date and hour>
+Connection: keep-alive
+Keep-Alive: timeout=5
+Content-Length: 0
 ```
 
 ### Adding a Product (Products)
@@ -63,6 +71,10 @@ curl -i -X POST http://localhost:8080/api/restaurants/<restaurantID>/products -H
 HTTP/1.1 201 Created
 X-Powered-By: Express
 Location: /api/restaurants/<restaurantID>/products/<productID>
+Date: <date and hour>
+Connection: keep-alive
+Keep-Alive: timeout=5
+Content-Length: 0
 ```
 
 ### Creating an Order (Orders)
@@ -74,6 +86,10 @@ curl -i -X POST http://localhost:8080/api/orders -H "Content-Type: application/j
 HTTP/1.1 201 Created
 X-Powered-By: Express
 Location: /api/orders/<orderID>
+Date: <date and hour>
+Connection: keep-alive
+Keep-Alive: timeout=5
+Content-Length: 0
 ```
 
 ### Search (Search)
@@ -85,16 +101,21 @@ curl -i http://localhost:8080/api/search/Mac
 HTTP/1.1 200 OK
 X-Powered-By: Express
 Content-Type: application/json; charset=utf-8
+Content-Length: 151
+ETag: <etag_value>
+Date: <date and hour>
+Connection: keep-alive
+Keep-Alive: timeout=5
 
 [
   {
     "id": "<productID>",
     "restaurantId": "<restaurantID>",
-    "name": "Big Mac",
-    "description": "",
-    "price": 5.99
+    "name": "<name>",
+    "description": "<description>",
+    "price": <price>
   }
-]
+]  
 ```
 
 ## Available RESTful API Endpoints
