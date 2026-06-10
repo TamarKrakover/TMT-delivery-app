@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useTheme } from '../contexts/ThemeContext';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
 import CategoryFilters from '../components/restaurant/CategoryFilters';
@@ -10,40 +10,18 @@ import mockRestaurants from '../data/restaurants.json'; // Static JSON fallback
 import './HomePage.css';
 
 const HomePage = () => {
-  const navigate = useNavigate();
-  const [darkMode, setDarkMode] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const { darkMode } = useTheme();
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [restaurants, setRestaurants] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch or search restaurants when searchQuery changes
+  // Fetch restaurants once on mount
   useEffect(() => {
     const loadRestaurants = async () => {
       try {
         setLoading(true);
-        if (searchQuery.trim() === '') {
-          // --- Option 1: Call API (Default) ---
-          const data = await restaurantService.getAll();
-          setRestaurants(data);
-          
-          // --- Option 2: Use Mock Data (Uncomment to use) ---
-          // setRestaurants(mockRestaurants);
-        } else {
-          // --- Option 1: Call API Search (Default) ---
-          const data = await restaurantService.search(searchQuery);
-          // Filter matching results to only show restaurants (exclude products from combined search endpoint)
-          const matchedRestaurants = data.filter(item => item.address !== undefined);
-          setRestaurants(matchedRestaurants);
-          
-          // --- Option 2: Local Mock Data Search ---
-          // const lowerQuery = searchQuery.toLowerCase();
-          // const matched = mockRestaurants.filter(r => 
-          //   r.name.toLowerCase().includes(lowerQuery) || 
-          //   (r.description && r.description.toLowerCase().includes(lowerQuery))
-          // );
-          // setRestaurants(matched);
-        }
+        const data = await restaurantService.getAll();
+        setRestaurants(data);
       } catch (err) {
         console.error("Failed to fetch restaurants:", err);
         // Fallback to mock data on server error to keep app running
@@ -54,28 +32,10 @@ const HomePage = () => {
     };
 
     loadRestaurants();
-  }, [searchQuery]);
-
-  const handleSearch = (query) => {
-    setSearchQuery(query);
-    console.log('Searching for:', query);
-  };
+  }, []);
 
   const handleCategoryClick = (categoryName) => {
     setSelectedCategory(categoryName);
-  };
-
-  const handleToggleDarkMode = () => {
-    setDarkMode(!darkMode);
-  };
-
-  const handleLogoClick = () => {
-    setSearchQuery('');
-    setSelectedCategory('All');
-  };
-
-  const handleLoginClick = () => {
-    navigate('/login');
   };
 
   // Filter restaurants by selected category locally
@@ -86,16 +46,10 @@ const HomePage = () => {
 
   return (
     <div className={`app-container ${darkMode ? 'dark-mode' : ''}`}>
-      <Navbar 
-        onSearch={handleSearch} 
-        darkMode={darkMode} 
-        onToggleDarkMode={handleToggleDarkMode} 
-        onLogoClick={handleLogoClick}
-        onLoginClick={handleLoginClick}
-      />
+      <Navbar />
       
       {/* Time-based dynamic hero banner */}
-      <HeroBanner darkMode={darkMode} />
+      <HeroBanner />
 
       {/* Categories Section */}
       <section className="category-section">
@@ -108,7 +62,7 @@ const HomePage = () => {
 
       <main className="home-main">
         <h2 className="section-title">
-          {selectedCategory} Restaurants {searchQuery && `matching "${searchQuery}"`}
+          {selectedCategory} Restaurants
         </h2>
         {loading ? (
           <div className="loading">Loading restaurants...</div>
