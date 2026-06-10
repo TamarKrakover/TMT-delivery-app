@@ -1,0 +1,21 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy dependency manifests
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy application source
+COPY . .
+
+# Replace localhost proxy with backend docker service name proxy
+RUN sed -i 's/"proxy": "http:\/\/localhost:8080"/"proxy": "http:\/\/tmt-web-server:8080"/g' package.json
+
+# Expose React dev server port
+EXPOSE 3000
+
+# Start React app in development mode
+CMD ["npm", "start"]

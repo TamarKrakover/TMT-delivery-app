@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
 import CategoryFilters from '../components/restaurant/CategoryFilters';
 import RestaurantList from '../components/restaurant/RestaurantList';
 import HeroBanner from '../components/layout/HeroBanner';
+import { restaurantService } from '../services/restaurantService';
+import mockRestaurants from '../data/restaurants.json'; // Static JSON fallback
 import './HomePage.css';
 
 const HomePage = () => {
@@ -12,6 +14,47 @@ const HomePage = () => {
   const [darkMode, setDarkMode] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [restaurants, setRestaurants] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch or search restaurants when searchQuery changes
+  useEffect(() => {
+    const loadRestaurants = async () => {
+      try {
+        setLoading(true);
+        if (searchQuery.trim() === '') {
+          // --- Option 1: Call API (Default) ---
+          const data = await restaurantService.getAll();
+          setRestaurants(data);
+          
+          // --- Option 2: Use Mock Data (Uncomment to use) ---
+          // setRestaurants(mockRestaurants);
+        } else {
+          // --- Option 1: Call API Search (Default) ---
+          const data = await restaurantService.search(searchQuery);
+          // Filter matching results to only show restaurants (exclude products from combined search endpoint)
+          const matchedRestaurants = data.filter(item => item.address !== undefined);
+          setRestaurants(matchedRestaurants);
+          
+          // --- Option 2: Local Mock Data Search ---
+          // const lowerQuery = searchQuery.toLowerCase();
+          // const matched = mockRestaurants.filter(r => 
+          //   r.name.toLowerCase().includes(lowerQuery) || 
+          //   (r.description && r.description.toLowerCase().includes(lowerQuery))
+          // );
+          // setRestaurants(matched);
+        }
+      } catch (err) {
+        console.error("Failed to fetch restaurants:", err);
+        // Fallback to mock data on server error to keep app running
+        setRestaurants(mockRestaurants);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadRestaurants();
+  }, [searchQuery]);
 
   const handleSearch = (query) => {
     setSearchQuery(query);
@@ -34,6 +77,12 @@ const HomePage = () => {
   const handleLoginClick = () => {
     navigate('/login');
   };
+
+  // Filter restaurants by selected category locally
+  const displayedRestaurants = restaurants.filter(r => 
+    selectedCategory === 'All' || 
+    (r.category && r.category.toLowerCase() === selectedCategory.toLowerCase())
+  );
 
   return (
     <div className={`app-container ${darkMode ? 'dark-mode' : ''}`}>
@@ -61,7 +110,11 @@ const HomePage = () => {
         <h2 className="section-title">
           {selectedCategory} Restaurants {searchQuery && `matching "${searchQuery}"`}
         </h2>
-        <RestaurantList />
+        {loading ? (
+          <div className="loading">Loading restaurants...</div>
+        ) : (
+          <RestaurantList restaurants={displayedRestaurants} />
+        )}
       </main>
 
       <Footer />
