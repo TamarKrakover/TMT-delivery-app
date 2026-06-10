@@ -1,13 +1,104 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+:root {
+  --primary: #00c2e8;
+  --primary-hover: #00b0d4;
+  --primary-light: rgba(0, 194, 232, 0.1);
+  --dark: #1f2937;
+  --dark-light: #4b5563;
+  --light: #f9fafb;
+  --white: #ffffff;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --danger: #ef4444;
+  --success: #10b981;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --radius: 12px;
+  --font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--light);
+  color: var(--dark);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+}
+
+button, input {
+  font-family: inherit;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* App container */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--light);
+  color: var(--dark);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Global Buttons */
+.btn-primary {
+  background-color: var(--primary);
+  color: var(--white);
+  padding: 10px 22px;
+  border-radius: 50px;
+  border: none;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 194, 232, 0.3);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--dark);
+  padding: 10px 22px;
+  border-radius: 50px;
+  border: 1.5px solid var(--gray-200);
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-outline:hover {
+  border-color: var(--dark);
+  background-color: var(--gray-100);
+}
+
+/* Dark Mode Theme Variables */
+.dark-mode {
+  --light: #0f172a;
+  --dark: #f8fafc;
+  --white: #1e293b;
+  --gray-100: #0f172a;
+  --gray-200: #334155;
+  --gray-300: #475569;
+  --dark-light: #94a3b8;
+  --navbar-bg: rgba(30, 41, 59, 0.85);
+  --hero-bg: linear-gradient(135deg, #083b4c 0%, #0f172a 100%);
+}
+
