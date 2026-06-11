@@ -28,6 +28,13 @@ exports.addProductToRestaurant = (req, res) => {
         return res.status(404).json({ error: 'Restaurant not found' });
     }
 
+    const user = UserModel.findUserById(userId);
+    const isAdmin = user && user.isAdmin;
+
+    if (restaurant.creatorId !== userId && !isAdmin) {
+        return res.status(403).json({ error: 'Forbidden: Only the creator or an admin can modify this restaurant' });
+    }
+
     // validate required fields
     if (!req.body.name || req.body.price === undefined) {
         return res.status(400).json({ error: 'Name and price are required' });
@@ -39,8 +46,8 @@ exports.addProductToRestaurant = (req, res) => {
     const newProduct = Product.create(id, req.body);
     const resourceLocation = `/api/restaurants/${id}/products/${newProduct.id}`;
 
-    // return 201 Created with the new resource location
-    res.status(201).location(resourceLocation).end();
+    // return 201 Created with the new resource location and product as JSON
+    res.status(201).location(resourceLocation).json(newProduct);
 };
 
 // fetch a single product by its ID and restaurant ID
@@ -56,7 +63,7 @@ exports.getProductById = (req, res) => {
     // get user ID from header for tracking (not authentication, as this is a public route)
     const userId = req.headers['x-user-id'];
     const product = Product.findById(id, pId, userId);
-    
+
     if (!product) {
         return res.status(404).json({ error: 'Product not found' });
     }
@@ -74,6 +81,13 @@ exports.updateProduct = (req, res) => {
     const restaurant = Restaurant.findById(id);
     if (!restaurant) {
         return res.status(404).json({ error: 'Restaurant not found' });
+    }
+
+    const user = UserModel.findUserById(userId);
+    const isAdmin = user && user.isAdmin;
+
+    if (restaurant.creatorId !== userId && !isAdmin) {
+        return res.status(403).json({ error: 'Forbidden: Only the creator or an admin can modify this restaurant' });
     }
 
     if (req.body.price !== undefined && (typeof req.body.price !== 'number' || req.body.price < 0)) {
@@ -98,6 +112,13 @@ exports.deleteProduct = (req, res) => {
     const restaurant = Restaurant.findById(id);
     if (!restaurant) {
         return res.status(404).json({ error: 'Restaurant not found' });
+    }
+
+    const user = UserModel.findUserById(userId);
+    const isAdmin = user && user.isAdmin;
+
+    if (restaurant.creatorId !== userId && !isAdmin) {
+        return res.status(403).json({ error: 'Forbidden: Only the creator or an admin can modify this restaurant' });
     }
 
     const isDeleted = Product.delete(id, pId);

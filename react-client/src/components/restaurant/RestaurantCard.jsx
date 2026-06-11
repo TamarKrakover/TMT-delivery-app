@@ -1,8 +1,8 @@
 import React from 'react';
 
-const RestaurantCard = ({ name, category, icon, image, rating, deliveryTime, address }) => {
+const RestaurantCard = ({ id, name, category, icon, image, rating, deliveryTime, address, onClick }) => {
   return (
-    <div className="restaurant-card">
+    <div className="restaurant-card" onClick={onClick}>
       <div className="restaurant-image-wrapper">
         {image ? (
           <img src={image} alt={name} className="restaurant-image" />

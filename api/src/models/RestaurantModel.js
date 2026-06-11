@@ -11,8 +11,8 @@ class RestaurantModel {
         return db.restaurants;
     }
 
-    // Create a new restaurant with default fallback values
-    static create(data) {
+    // Create a new restaurant with creatorId constraint
+    static create(data, creatorId) {
         // Enforce uniqueness of name + address
         const isDuplicate = db.restaurants.some(r => r.name === data.name && r.address === data.address);
         if (isDuplicate) {
@@ -24,7 +24,8 @@ class RestaurantModel {
             name: data.name,
             description: data.description || '',
             category: data.category || 'General',
-            address: data.address
+            address: data.address,
+            creatorId: creatorId
         };
         db.restaurants.push(newRestaurant);
         return newRestaurant;
@@ -38,7 +39,7 @@ class RestaurantModel {
     // Update an existing restaurant
     static update(id, data) {
         const index = db.restaurants.findIndex(r => r.id === id);
-        
+
         // Return null if restaurant doesn't exist
         if (index === -1) return null;
 
@@ -58,7 +59,7 @@ class RestaurantModel {
         const updatedRestaurant = {
             ...currentRest,
             ...data,
-            id: id 
+            id: id
         };
 
         db.restaurants[index] = updatedRestaurant;
@@ -68,7 +69,7 @@ class RestaurantModel {
     // Delete a restaurant and all its associated products
     static delete(id) {
         const index = db.restaurants.findIndex(r => r.id === id);
-        
+
         // Return false if the restaurant doesn't exist
         if (index === -1) return false;
 

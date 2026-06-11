@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import RestaurantCard from './RestaurantCard';
 import mockRestaurants from '../../data/restaurants.json';
 import './Restaurant.css';
@@ -10,6 +11,7 @@ import imageDessert from '../../images/restaurants/sweet-dreams.jpg';
 import imageSalad from '../../images/restaurants/salad.jpg';
 
 const RestaurantList = ({ restaurants = [] }) => {
+  const navigate = useNavigate();
   const imageMap = {
     burger: imageHamburger,
     pizza: imagePizza,
@@ -20,10 +22,11 @@ const RestaurantList = ({ restaurants = [] }) => {
   };
 
   return (
-    <div className="restaurant-grid">
+    <div className="restaurant-list">
       {restaurants.map((restaurant) => (
         <RestaurantCard
           key={restaurant.id}
+          id={restaurant.id}
           name={restaurant.name}
           category={restaurant.category}
           // Fallback to burger image if no matching imageKey is found or provided
@@ -31,6 +34,7 @@ const RestaurantList = ({ restaurants = [] }) => {
           rating={restaurant.rating || "5.0"}
           deliveryTime={restaurant.deliveryTime || "20-30"}
           address={restaurant.address}
+          onClick={() => navigate('/restaurant/' + restaurant.id)}
         />
       ))}
     </div>
