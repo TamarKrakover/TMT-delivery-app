@@ -1,11 +1,13 @@
 import React from 'react';
+import { useTheme } from '../../contexts/ThemeContext';
 import imgBreakfast from '../../images/banners/breakfast.jpg';
 import imgLunch from '../../images/banners/lunch.jpg';
 import imgDinner from '../../images/banners/dinner.jpg';
 import imgLateNight from '../../images/banners/late-night2.jpg';
 import './HeroBanner.css';
 
-const HeroBanner = ({ darkMode }) => {
+const HeroBanner = () => {
+  const { darkMode } = useTheme();
   // Helper function to select custom hero banner content based on the hour of the day
   const getGreetingSlide = () => {
     const hour = new Date().getHours();
