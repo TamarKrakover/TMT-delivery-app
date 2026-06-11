@@ -6,11 +6,13 @@ import './Restaurant.css';
 const RestaurantList = ({ restaurants = [] }) => {
   const navigate = useNavigate();
 
+
   return (
-    <div className="restaurant-grid">
+    <div className="restaurant-list">
       {restaurants.map((restaurant) => (
         <RestaurantCard
           key={restaurant.id}
+          id={restaurant.id}
           name={restaurant.name}
           category={restaurant.category}
           imageKey={restaurant.imageKey}

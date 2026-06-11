@@ -89,8 +89,8 @@ a {
   background-color: var(--gray-100);
 }
 
-/* Dark Mode Theme Variables */
-.dark-mode {
+/* Dark Mode Theme Variables (Global) */
+body.dark-mode {
   --light: #0f172a;
   --dark: #f8fafc;
   --white: #1e293b;

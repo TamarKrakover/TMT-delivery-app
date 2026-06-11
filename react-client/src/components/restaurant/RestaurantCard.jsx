@@ -21,6 +21,7 @@ const RestaurantCard = ({ name, category, icon, image, imageKey, rating, deliver
   // Fallback chain: explicit image prop -> mapped imageKey -> default fallback image
   const displayImage = image || (imageKey && imageMap[imageKey.toLowerCase()]) || DEFAULT_RESTAURANT_IMAGE;
 
+
   return (
     <div className="restaurant-card" onClick={onClick}>
       <div className="restaurant-image-wrapper">

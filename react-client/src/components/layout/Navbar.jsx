@@ -1,35 +1,48 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiSun, FiMoon } from 'react-icons/fi';
-import { useTheme } from '../../contexts/ThemeContext';
 import SearchBar from '../search/SearchBar';
 import logo from '../../logoTMT.svg';
+import { useAuth } from '../../contexts/AuthContext';
+import { useTheme } from '../../contexts/ThemeContext';
 import './Navbar.css';
 
-const Navbar = ({ user }) => {
+const Navbar = ({ onSearch }) => {
   const navigate = useNavigate();
-  const { darkMode, toggleDarkMode } = useTheme();
+  const { currentUser } = useAuth();
+  const { darkMode, toggleTheme } = useTheme();
+
+  const handleLogoClick = () => {
+    navigate('/');
+    if (onSearch) {
+      onSearch('');
+    }
+  };
+
+  const handleLoginClick = () => {
+    navigate('/login');
+  };
 
   return (
     <nav className="navbar">
-      <div className="navbar-brand" onClick={() => navigate('/')}>
+      <div className="navbar-brand" onClick={handleLogoClick}>
         <img src={logo} alt="Logo" className="logo" />
       </div>
       
       <div className="navbar-search">
-        <SearchBar />
+        {onSearch ? <SearchBar onSearch={onSearch} /> : <SearchBar />}
       </div>
       
       <div className="navbar-actions">
-        {user ? (
-          <button className="btn-outline">Hi, {user.name}</button>
+        {currentUser ? (
+          <button className="btn-outline">Hi, {currentUser.name}</button>
         ) : (
-          <button className="btn-outline" onClick={() => navigate('/login')}>Sign in</button>
+          <button className="btn-outline" onClick={handleLoginClick}>Sign in</button>
         )}
         
         <button 
           className="theme-toggle-btn" 
-          onClick={toggleDarkMode}
+          onClick={toggleTheme}
           title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
         >
           {darkMode ? <FiSun /> : <FiMoon />}
