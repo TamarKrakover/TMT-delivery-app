@@ -11,7 +11,7 @@ import ProductDetailModal from '../components/modals/ProductDetailModal';
 import RestaurantFormModal from '../components/modals/RestaurantFormModal';
 import ProductFormModal from '../components/modals/ProductFormModal';
 
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 import { useRestaurant } from '../hooks/useRestaurant';
 import { useModal } from '../hooks/useModal';
 
