@@ -1,0 +1,133 @@
+/* Search Page Styles */
+
+.search-main {
+  padding: 40px 40px;
+  min-height: 70vh;
+}
+
+.search-title {
+  font-size: 28px;
+  margin-bottom: 30px;
+  color: var(--dark);
+}
+
+.search-section {
+  margin-bottom: 50px;
+}
+
+.search-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.search-section-title {
+  font-size: 22px;
+  font-weight: bold;
+  color: var(--dark);
+}
+
+.search-loading {
+  font-size: 18px;
+  color: var(--dark-light);
+}
+
+.search-no-results {
+  color: var(--dark-light);
+}
+
+.search-restaurants-scroll {
+  display: flex;
+  overflow-x: auto;
+  gap: 20px;
+  padding-bottom: 15px;
+  scrollbar-width: thin;
+}
+
+.search-restaurant-card-wrapper {
+  min-width: 280px;
+  flex: 0 0 280px;
+}
+
+.search-related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+/* Related Product Card */
+.related-product-card {
+  display: flex;
+  padding: 16px;
+  border: 1.5px solid var(--gray-200);
+  border-radius: 16px;
+  background-color: var(--white);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.related-product-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--primary);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+.related-product-info {
+  flex: 1;
+  padding-right: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.related-product-price {
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--dark);
+}
+
+.related-product-name {
+  margin: 6px 0 4px 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--dark);
+}
+
+.related-product-restaurant {
+  margin: 0 0 8px 0;
+  font-size: 12px;
+  color: var(--dark-light);
+}
+
+.related-product-meta {
+  display: flex;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--primary);
+  font-weight: bold;
+}
+
+.related-product-image-wrapper {
+  width: 90px;
+  height: 90px;
+  border-radius: 12px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.related-product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Dark mode overrides for search page */
+.dark-mode .related-product-card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.dark-mode .related-product-card:hover {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+}

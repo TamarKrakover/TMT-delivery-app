@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { FiSun, FiMoon } from 'react-icons/fi';
 import SearchBar from '../search/SearchBar';
 import logo from '../../logoTMT.svg';
-import { useAuth } from '../../context/AuthContext';
-import { useTheme } from '../../context/ThemeContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { useTheme } from '../../contexts/ThemeContext';
 import './Navbar.css';
 
 const Navbar = ({ onSearch }) => {
@@ -30,7 +30,7 @@ const Navbar = ({ onSearch }) => {
       </div>
       
       <div className="navbar-search">
-        {onSearch && <SearchBar onSearch={onSearch} />}
+        {onSearch ? <SearchBar onSearch={onSearch} /> : <SearchBar />}
       </div>
       
       <div className="navbar-actions">

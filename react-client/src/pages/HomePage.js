@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTheme } from '../context/ThemeContext';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
 import CategoryFilters from '../components/restaurant/CategoryFilters';
@@ -8,12 +9,13 @@ import RestaurantFormModal from '../components/modals/RestaurantFormModal';
 import { restaurantService } from '../services/restaurantService';
 import mockRestaurants from '../data/restaurants.json';
 import { FiPlus } from 'react-icons/fi';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 import { useModal } from '../hooks/useModal';
 import './HomePage.css';
 
 const HomePage = () => {
   const { currentUser } = useAuth();
+  const { darkMode } = useTheme();
   
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -67,8 +69,10 @@ const HomePage = () => {
   );
 
   return (
-    <div className="app-container">
+    <div className={`app-container ${darkMode ? 'dark-mode' : ''}`}>
       <Navbar onSearch={setSearchQuery} />
+      
+      {/* Time-based dynamic hero banner */}
       <HeroBanner />
 
       <section className="category-section">

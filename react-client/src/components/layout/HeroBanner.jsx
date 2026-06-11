@@ -6,7 +6,6 @@ import imgLateNight from '../../images/banners/late-night2.jpg';
 import './HeroBanner.css';
 
 import { useTheme } from '../../context/ThemeContext';
-
 const HeroBanner = () => {
   const { darkMode } = useTheme();
   // Helper function to select custom hero banner content based on the hour of the day
