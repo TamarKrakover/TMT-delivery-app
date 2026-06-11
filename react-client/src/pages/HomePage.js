@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useTheme } from '../context/ThemeContext';
+import { useTheme } from '../contexts/ThemeContext';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
 import CategoryFilters from '../components/restaurant/CategoryFilters';
