@@ -88,7 +88,7 @@ const HomePage = () => {
           <h2 className="section-title" style={{ marginBottom: 0 }}>
             {selectedCategory} Restaurants {searchQuery && `matching "${searchQuery}"`}
           </h2>
-          {currentUser && (
+          {currentUser && currentUser.role === 'owner' && (
             <button className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }} onClick={() => addRestModal.openModal()}>
               <FiPlus /> Add Restaurant
             </button>

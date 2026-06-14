@@ -18,11 +18,12 @@ const request = async (url, options = {}) => {
     throw new Error(errorData.error || 'Something went wrong');
   }
 
-  if (response.status === 204) {
+  if (response.status === 204 || response.status === 201) {
     return null;
   }
 
-  return response.json();
+  const text = await response.text();
+  return text ? JSON.parse(text) : null;
 };
 
 export default request;

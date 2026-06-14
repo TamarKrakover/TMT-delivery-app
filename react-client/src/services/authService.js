@@ -13,6 +13,8 @@ export const authService = {
     body: JSON.stringify({ username, password })
   }),
 
-  // Get specific user details
-  getUserDetails: (userId) => request(`/api/users/${userId}`)
+  // Get specific user details, allowing custom headers (used during login)
+  getUserDetails: (userId, customHeaders = {}) => request(`/api/users/${userId}`, {
+    headers: customHeaders
+  })
 };
