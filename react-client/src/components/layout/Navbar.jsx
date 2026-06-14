@@ -9,7 +9,7 @@ import './Navbar.css';
 
 const Navbar = ({ onSearch }) => {
   const navigate = useNavigate();
-  const { currentUser } = useAuth();
+  const { currentUser, logout } = useAuth();
   const { darkMode, toggleTheme } = useTheme();
 
   const handleLogoClick = () => {
@@ -21,6 +21,11 @@ const Navbar = ({ onSearch }) => {
 
   const handleLoginClick = () => {
     navigate('/login');
+  };
+
+  const handleLogoutClick = () => {
+    logout();
+    navigate('/');
   };
 
   return (
@@ -35,7 +40,10 @@ const Navbar = ({ onSearch }) => {
       
       <div className="navbar-actions">
         {currentUser ? (
-          <button className="btn-outline">Hi, {currentUser.name}</button>
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+            <span style={{ fontWeight: 600 }}>Hi, {currentUser.name}</span>
+            <button className="btn-outline" onClick={handleLogoutClick} style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}>Sign out</button>
+          </div>
         ) : (
           <button className="btn-outline" onClick={handleLoginClick}>Sign in</button>
         )}

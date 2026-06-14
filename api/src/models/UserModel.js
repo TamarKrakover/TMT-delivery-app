@@ -19,6 +19,7 @@ class UserModel {
             username: data.username,
             password: data.password,
             name: data.name,
+            role: data.role || 'customer',
             phone: data.phone,
             address: data.address
         };

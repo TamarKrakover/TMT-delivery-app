@@ -1,96 +1,90 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { authService } from '../services/authService';
 import { useAuth } from '../contexts/AuthContext';
+import AuthLayout from '../components/layout/AuthLayout';
+import InputField from '../components/ui/InputField';
+import Button from '../components/ui/Button';
+import ErrorMessage from '../components/ui/ErrorMessage';
+import './Auth.css';
 
 const LoginPage = () => {
-  // state management for user input and error handling
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  // hooks for routing and global state management
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  // validation for login 
   const validateInput = () => {
     setError('');
-    
-    // verify that the fields are not empty 
-    if (!username || !password) {
-      setError('All fields are required.');
+    if (!username.trim() || !password.trim()) {
+      setError('Username and password are required.');
       return false;
     }
-    
     return true; 
   };
 
-  // form submission handler
   const handleLogin = async (e) => {
-    // prevent the default form submission behavior (page refresh)
     e.preventDefault();
-    
-    // stop execution if validation fails
-    if (!validateInput()) {
-      return; 
-    }
+    if (!validateInput()) return; 
 
+    setIsLoading(true);
     try {
-      // send the login credentials to the backend server
-      const response = await authService.login(username, password);
+      const tokenData = await authService.login(username.trim(), password);
       
-      // update the global application state to indicate the user is authenticated
-      login(response);
+      // The token endpoint only returns the ID, so we need to fetch the full user details
+      const fullUserData = await authService.getUserDetails(tokenData.id, {
+        'x-user-id': tokenData.id
+      });
       
-      // navigate the user to the home page upon successful login
+      login(fullUserData);
       navigate('/'); 
-      
     } catch (err) {
-      // handle server errors 
-      console.error("Login failed:", err);
-      setError('Invalid username or password. Please try again.');
+      console.error("Login Error:", err);
+      setError("Invalid username or password. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div style={{ padding: '50px', maxWidth: '400px', margin: '0 auto' }}>
-      <h2>Sign In</h2>
-      <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+    <AuthLayout title="Sign In" subtitle="Sign in to order your favorite food">
+      <form onSubmit={handleLogin} className="auth-form">
+        <ErrorMessage message={error} />
         
-        {/* Username Input Field */}
-        <div>
-          <label style={{ display: 'block', marginBottom: '5px' }}>Username:</label>
-          <input
-            type="text"
-            autoComplete="off"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            style={{ width: '100%', padding: '10px', boxSizing: 'border-box' }}
-          />
-        </div>
+        <InputField
+          id="username"
+          label="Username"
+          placeholder="Enter your username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          autoComplete="username"
+          error={error && !username ? 'Required field' : ''}
+        />
         
-        {/* Password Input Field */}
-        <div>
-          <label style={{ display: 'block', marginBottom: '5px' }}>Password:</label>
-          <input
-            type="password"
-            autoComplete="off"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            style={{ width: '100%', padding: '10px', boxSizing: 'border-box' }}
-          />
-        </div>
+        <InputField
+          id="password"
+          type="password"
+          label="Password"
+          placeholder="Enter your password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          autoComplete="current-password"
+          error={error && !password ? 'Required field' : ''}
+        />
         
-        {/* Conditional rendering for error messages */}
-        {error && <div style={{ color: 'red', fontWeight: 'bold' }}>{error}</div>}
-        
-        {/* Submit Button */}
-        <button type="submit" style={{ padding: '10px', backgroundColor: '#007bff', color: 'white', border: 'none', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold', borderRadius: '5px' }}>
-          Login
-        </button>
+        <Button type="submit" disabled={isLoading}>
+          {isLoading ? 'Signing in...' : 'Sign In'}
+        </Button>
       </form>
-    </div>
+
+      <div className="auth-links">
+        Don't have an account? 
+        <Link to="/register">Sign up</Link>
+      </div>
+    </AuthLayout>
   );
 };
 

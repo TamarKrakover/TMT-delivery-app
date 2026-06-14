@@ -1,9 +1,11 @@
 import React from 'react';
 
-const ErrorMessage = () => {
+const ErrorMessage = ({ message }) => {
+  if (!message) return null;
+  
   return (
-    <div className="errormessage">
-      ErrorMessage Component
+    <div className="global-error">
+      {message}
     </div>
   );
 };
