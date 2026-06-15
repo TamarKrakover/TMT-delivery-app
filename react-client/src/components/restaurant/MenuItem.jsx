@@ -1,7 +1,10 @@
 import React from 'react';
 import { FiEdit, FiTrash2 } from 'react-icons/fi';
+import { useCart } from '../../contexts/CartContext';
 
-const MenuItem = ({ product, canModify, onClick, onEdit, onDelete }) => {
+const MenuItem = ({ product, restaurant, canModify, onClick, onEdit, onDelete }) => {
+  const { addToCart } = useCart();
+
   return (
     <div className="menu-item-card" onClick={() => onClick(product)}>
       <div className="menu-item-info">
@@ -13,7 +16,15 @@ const MenuItem = ({ product, canModify, onClick, onEdit, onDelete }) => {
       </div>
 
       <div className="menu-item-actions-row">
-        <button className="btn-add-menu">Add to Cart</button>
+        <button 
+          className="btn-add-menu" 
+          onClick={(e) => {
+            e.stopPropagation();
+            addToCart(product, restaurant);
+          }}
+        >
+          Add to Cart
+        </button>
 
         {canModify && (
           <div className="item-action-btns">

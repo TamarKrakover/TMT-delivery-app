@@ -2,7 +2,7 @@ import React from 'react';
 import { FiInfo } from 'react-icons/fi';
 import MenuItem from './MenuItem';
 
-const MenuList = ({ products, canModify, onProductClick, onEditProduct, onDeleteProduct }) => {
+const MenuList = ({ products, restaurant, canModify, onProductClick, onEditProduct, onDeleteProduct }) => {
   if (products.length === 0) {
     return (
       <div className="empty-menu">
@@ -20,6 +20,7 @@ const MenuList = ({ products, canModify, onProductClick, onEditProduct, onDelete
         <MenuItem
           key={product.id}
           product={product}
+          restaurant={restaurant}
           canModify={canModify}
           onClick={onProductClick}
           onEdit={onEditProduct}

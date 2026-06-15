@@ -116,6 +116,7 @@ const RestaurantPage = () => {
 
         <MenuList
           products={products}
+          restaurant={restaurant}
           canModify={canModify}
           onProductClick={(product) => productDetailModal.openModal(product)}
           onEditProduct={(product, e) => { e.stopPropagation(); productFormModal.openModal(product, 'edit'); }}
@@ -128,6 +129,7 @@ const RestaurantPage = () => {
       {productDetailModal.isOpen && (
         <ProductDetailModal
           product={productDetailModal.data}
+          restaurant={restaurant}
           onClose={productDetailModal.closeModal}
         />
       )}

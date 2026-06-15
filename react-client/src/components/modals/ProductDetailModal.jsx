@@ -1,7 +1,10 @@
 import React from 'react';
 import { FiX } from 'react-icons/fi';
+import { useCart } from '../../contexts/CartContext';
 
-const ProductDetailModal = ({ product, onClose }) => {
+const ProductDetailModal = ({ product, restaurant, onClose }) => {
+  const { addToCart } = useCart();
+
   if (!product) return null;
 
   return (
@@ -14,7 +17,7 @@ const ProductDetailModal = ({ product, onClose }) => {
         <button
           className="btn-primary btn-block"
           onClick={() => {
-            alert('Added to cart!');
+            addToCart(product, restaurant);
             onClose();
           }}
         >
