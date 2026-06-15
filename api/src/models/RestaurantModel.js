@@ -25,6 +25,7 @@ class RestaurantModel {
             description: data.description || '',
             category: data.category || 'General',
             address: data.address,
+            location: data.location,
             creatorId: creatorId
         };
         db.restaurants.push(newRestaurant);
@@ -59,6 +60,7 @@ class RestaurantModel {
         const updatedRestaurant = {
             ...currentRest,
             ...data,
+            location: data.location !== undefined ? data.location : currentRest.location,
             id: id
         };
 

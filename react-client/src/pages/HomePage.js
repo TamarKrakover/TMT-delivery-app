@@ -8,6 +8,7 @@ import HeroBanner from '../components/layout/HeroBanner';
 import RestaurantFormModal from '../components/modals/RestaurantFormModal';
 import { restaurantService } from '../services/restaurantService';
 import mockRestaurants from '../data/restaurants.json';
+import { calculateDistance } from '../utils/distance';
 import { FiPlus } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
 import { useModal } from '../hooks/useModal';
@@ -66,7 +67,12 @@ const HomePage = () => {
   const displayedRestaurants = restaurants.filter(r => 
     selectedCategory === 'All' || 
     (r.category && r.category.toLowerCase() === selectedCategory.toLowerCase())
-  );
+  ).sort((a, b) => {
+    if (!currentUser?.location) return 0;
+    const distA = a.location ? calculateDistance(currentUser.location, a.location) : Infinity;
+    const distB = b.location ? calculateDistance(currentUser.location, b.location) : Infinity;
+    return distA - distB;
+  });
 
   return (
     <div className={`app-container ${darkMode ? 'dark-mode' : ''}`}>

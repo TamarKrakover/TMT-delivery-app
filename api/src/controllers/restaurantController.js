@@ -12,6 +12,11 @@ exports.createRestaurant = (req, res) => {
     // Authentication is handled by authMiddleware
     const userId = req.userId; // Provided by authMiddleware
 
+    const user = UserModel.findUserById(userId);
+    if (!user || (user.role !== 'owner' && !user.isAdmin)) {
+        return res.status(403).json({ error: 'Forbidden: Only restaurant owners can create restaurants' });
+    }
+
     // Validate request
     if (!req.body.name || !req.body.address) {
         return res.status(400).json({ error: 'Name and address are required' });
