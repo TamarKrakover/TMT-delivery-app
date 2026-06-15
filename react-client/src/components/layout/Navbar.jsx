@@ -1,16 +1,20 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiSun, FiMoon } from 'react-icons/fi';
+import { FiSun, FiMoon, FiShoppingCart } from 'react-icons/fi';
 import SearchBar from '../search/SearchBar';
 import logo from '../../logoTMT.svg';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
+import { useCart } from '../../contexts/CartContext';
 import './Navbar.css';
 
 const Navbar = ({ onSearch }) => {
   const navigate = useNavigate();
   const { currentUser, logout } = useAuth();
   const { darkMode, toggleTheme } = useTheme();
+  const { cartItems, toggleCart } = useCart();
+
+  const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
 
   const handleLogoClick = () => {
     navigate('/');
@@ -40,14 +44,23 @@ const Navbar = ({ onSearch }) => {
       
       <div className="navbar-actions">
         {currentUser ? (
-          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-            <span style={{ fontWeight: 600 }}>Hi, {currentUser.name}</span>
-            <button className="btn-outline" onClick={handleLogoutClick} style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}>Sign out</button>
+          <div className="navbar-user-info">
+            <span className="navbar-user-name">Hi, {currentUser.name}</span>
+            <button className="btn-outline navbar-signout-btn" onClick={handleLogoutClick}>Sign out</button>
           </div>
         ) : (
           <button className="btn-outline" onClick={handleLoginClick}>Sign in</button>
         )}
         
+        <button 
+          className="cart-toggle-btn"
+          onClick={toggleCart}
+          title="Open Cart"
+        >
+          <FiShoppingCart />
+          {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
+        </button>
+
         <button 
           className="theme-toggle-btn" 
           onClick={toggleTheme}

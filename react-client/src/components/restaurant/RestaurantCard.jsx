@@ -1,20 +1,13 @@
 import React from 'react';
-import imagePizza from '../../images/restaurants/pizza.jpg';
-import imageHamburger from '../../images/restaurants/hamburger.jpg';
-import imageSushi from '../../images/restaurants/sushi.jpg';
-import imageAsian from '../../images/restaurants/wok.jpg';
-import imageDessert from '../../images/restaurants/sweet-dreams.jpg';
-import imageSalad from '../../images/restaurants/salad.jpg';
-
 const DEFAULT_RESTAURANT_IMAGE = "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500&auto=format&fit=crop&q=60";
 
 const imageMap = {
-  burger: imageHamburger,
-  pizza: imagePizza,
-  sushi: imageSushi,
-  asian: imageAsian,
-  dessert: imageDessert,
-  salad: imageSalad
+  burger: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=80",
+  pizza: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600&auto=format&fit=crop&q=80",
+  sushi: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=600&auto=format&fit=crop&q=80",
+  asian: "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=600&auto=format&fit=crop&q=80",
+  dessert: "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=600&auto=format&fit=crop&q=80",
+  salad: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&auto=format&fit=crop&q=80"
 };
 
 const RestaurantCard = ({ name, category, icon, image, imageKey, rating, deliveryTime, address, distance, onClick }) => {

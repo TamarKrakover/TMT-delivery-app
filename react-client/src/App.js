@@ -9,20 +9,25 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider } from './contexts/AuthContext';
+import { CartProvider } from './contexts/CartContext';
+import SidebarCart from './components/layout/SidebarCart';
 
 function App() {
   return (
     <AuthProvider>
       <ThemeProvider>
-        <Router>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/search" element={<SearchPage />} />
-            <Route path="/restaurant/:id" element={<RestaurantPage />} />
-          </Routes>
-        </Router>
+        <CartProvider>
+          <Router>
+            <SidebarCart />
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+              <Route path="/search" element={<SearchPage />} />
+              <Route path="/restaurant/:id" element={<RestaurantPage />} />
+            </Routes>
+          </Router>
+        </CartProvider>
       </ThemeProvider>
     </AuthProvider>
   );
