@@ -5,6 +5,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import RestaurantPage from './pages/RestaurantPage';
 import SearchPage from './pages/SearchPage';
+import UserProfilePage from './pages/UserProfilePage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
 import { ThemeProvider } from './contexts/ThemeContext';
@@ -25,6 +26,14 @@ function App() {
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/search" element={<SearchPage />} />
               <Route path="/restaurant/:id" element={<RestaurantPage />} />
+              <Route 
+                path="/profile" 
+                element={
+                  <ProtectedRoute>
+                    <UserProfilePage />
+                  </ProtectedRoute>
+                } 
+              />
             </Routes>
           </Router>
         </CartProvider>

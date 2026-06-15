@@ -2,10 +2,10 @@ const UserModel = require('../models/UserModel');
 
 exports.createUser = (req, res) =>{
     // Extract all expected fields from the request body
-    const { username, password, name, phone, address } = req.body;
+    const { username, password, name } = req.body;
 
     // Validate that all required fields were provided
-    if (!username || !password || !name || !phone || !address) {
+    if (!username || !password || !name) {
         return res.status(400).json({ error: 'All fields are required' });
     }
 

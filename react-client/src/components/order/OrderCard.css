@@ -1,0 +1,120 @@
+.order-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--gray-200);
+  margin-bottom: 1rem;
+  transition: var(--transition);
+}
+
+.order-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary-light);
+}
+
+.order-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.order-restaurant-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--dark);
+  margin: 0;
+}
+
+.order-date {
+  font-size: 0.9rem;
+  color: var(--dark-light);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.order-status {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.order-status.delivered {
+  background-color: rgba(34, 197, 94, 0.1);
+  color: #16a34a;
+}
+
+.order-status.pending {
+  background-color: rgba(234, 179, 8, 0.1);
+  color: #ca8a04;
+}
+
+.order-status.preparing {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: #2563eb;
+}
+
+.order-status.cancelled {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+}
+
+.order-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.order-item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.95rem;
+  color: var(--dark);
+}
+
+.order-item-name {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.order-item-qty {
+  color: var(--dark-light);
+  font-weight: 600;
+}
+
+.order-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--gray-200);
+}
+
+.order-total-label {
+  font-weight: 600;
+  color: var(--dark-light);
+}
+
+.order-total-price {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+body.dark-mode .order-card {
+  background: var(--light);
+  border-color: var(--gray-200);
+}
+
+body.dark-mode .order-restaurant-name,
+body.dark-mode .order-item-row {
+  color: var(--dark);
+}
