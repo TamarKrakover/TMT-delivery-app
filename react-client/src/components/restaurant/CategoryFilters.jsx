@@ -1,22 +1,14 @@
 import React from 'react';
 import './CategoryFilters.css';
-import imgAll from '../../images/categories/all.jpg';
-import imgBurgers from '../../images/categories/burgers.jpg';
-import imgPizza from '../../images/categories/pizza.jpg';
-import imgAsian from '../../images/categories/asian.jpg';
-import imgDesserts from '../../images/categories/dessert.jpg';
-import imgSushi from '../../images/categories/sushi.jpg';
-import imgSalads from '../../images/categories/salad.jpg';
-
 const CategoryFilters = ({ selectedCategory, onCategorySelect }) => {
   const categories = [
-    { name: 'All', image: imgAll, count: 142 },
-    { name: 'Burgers', image: imgBurgers, count: 28 },
-    { name: 'Pizza', image: imgPizza, count: 35 },
-    { name: 'Asian', image: imgAsian, count: 18 },
-    { name: 'Desserts', image: imgDesserts, count: 22 },
-    { name: 'Sushi', image: imgSushi, count: 14 },
-    { name: 'Salads', image: imgSalads, count: 25 },
+    { name: 'All', image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150&auto=format&fit=crop&q=80", count: 142 },
+    { name: 'Burgers', image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=150&auto=format&fit=crop&q=80", count: 28 },
+    { name: 'Pizza', image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=150&auto=format&fit=crop&q=80", count: 35 },
+    { name: 'Asian', image: "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=150&auto=format&fit=crop&q=80", count: 18 },
+    { name: 'Desserts', image: "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=150&auto=format&fit=crop&q=80", count: 22 },
+    { name: 'Sushi', image: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=150&auto=format&fit=crop&q=80", count: 14 },
+    { name: 'Salads', image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=150&auto=format&fit=crop&q=80", count: 25 },
   ];
 
   return (
