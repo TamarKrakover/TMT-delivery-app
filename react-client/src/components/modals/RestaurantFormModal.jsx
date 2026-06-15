@@ -7,7 +7,8 @@ const RestaurantFormModal = ({ title, initialData, onSubmit, onClose, error }) =
     description: '',
     category: 'Burgers',
     address: '',
-    imageKey: 'burger'
+    imageKey: 'burger',
+    location: initialData?.location || { lat: 32.0853, lng: 34.7818 }
   });
 
   const handleSubmit = (e) => {
@@ -72,6 +73,31 @@ const RestaurantFormModal = ({ title, initialData, onSubmit, onClose, error }) =
               placeholder="e.g. 128 Main St"
               required
             />
+          </div>
+
+          <div className="form-group" style={{ display: 'flex', gap: '10px' }}>
+            <div style={{ flex: 1 }}>
+              <label className="form-label">Latitude</label>
+              <input
+                type="number"
+                step="any"
+                className="form-input"
+                value={form.location.lat}
+                onChange={(e) => setForm({ ...form, location: { ...form.location, lat: parseFloat(e.target.value) } })}
+                required
+              />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label className="form-label">Longitude</label>
+              <input
+                type="number"
+                step="any"
+                className="form-input"
+                value={form.location.lng}
+                onChange={(e) => setForm({ ...form, location: { ...form.location, lng: parseFloat(e.target.value) } })}
+                required
+              />
+            </div>
           </div>
 
           <div className="form-group">

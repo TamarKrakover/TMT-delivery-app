@@ -15,6 +15,8 @@ const RegisterPage = () => {
   const [verifyPassword, setVerifyPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [role, setRole] = useState('customer');
+  const [lat, setLat] = useState('');
+  const [lng, setLng] = useState('');
   
   // Image state
   const [profilePic, setProfilePic] = useState(null);
@@ -47,6 +49,7 @@ const RegisterPage = () => {
     if (!username.trim()) errors.username = 'Username is required';
     if (!displayName.trim()) errors.displayName = 'Display name is required';
     if (!profilePic) errors.profilePic = 'Profile picture is required';
+    if (!lat || !lng) errors.location = 'Latitude and Longitude are required';
     
     // Password validation
     if (!password) {
@@ -92,7 +95,8 @@ const RegisterPage = () => {
         name: displayName,
         role: role,
         phone: '0500000000',
-        address: 'User Address'
+        address: 'User Address',
+        location: { lat: parseFloat(lat), lng: parseFloat(lng) }
       };
       
       await authService.register(userData);
@@ -187,6 +191,29 @@ const RegisterPage = () => {
             </div>
           </div>
           {fieldErrors.profilePic && <span className="error-message">{fieldErrors.profilePic}</span>}
+        </div>
+        
+        <div className="form-group" style={{ marginBottom: '20px' }}>
+          <label className="form-label">Your Location (Coordinates)</label>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <InputField
+              id="lat"
+              type="number"
+              placeholder="Latitude (e.g. 32.08)"
+              value={lat}
+              onChange={(e) => setLat(e.target.value)}
+              step="any"
+            />
+            <InputField
+              id="lng"
+              type="number"
+              placeholder="Longitude (e.g. 34.78)"
+              value={lng}
+              onChange={(e) => setLng(e.target.value)}
+              step="any"
+            />
+          </div>
+          {fieldErrors.location && <span className="error-message" style={{ display: 'block', marginTop: '-10px', marginBottom: '10px' }}>{fieldErrors.location}</span>}
         </div>
         
         <Button type="submit" disabled={isLoading}>
