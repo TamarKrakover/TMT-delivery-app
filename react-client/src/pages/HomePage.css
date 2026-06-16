@@ -68,6 +68,8 @@
   box-shadow: var(--shadow-lg);
   position: relative;
   animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .modal-close {

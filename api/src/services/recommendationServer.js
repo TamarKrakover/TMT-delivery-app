@@ -4,7 +4,7 @@ class RecommendationServer {
     constructor() {
         // set the host and port for the EX2 C++ recommendation server
         this.host = process.env.RECOMMENDATION_SERVER_HOST || 'localhost';
-        this.port = process.env.RECOMMENDATION_SERVER_PORT || 5555;
+        this.port = parseInt(process.env.RECOMMENDATION_SERVER_PORT || 5555, 10);
         // Keep track of user IDs that have had their first interaction during this session
         this.initializedUsers = new Set();
     }
@@ -86,6 +86,8 @@ class RecommendationServer {
                     if (this._isSuccess(patchResponse)) {
                         return patchResponse;
                     }
+                    // Evict from cache if PATCH was not successful (e.g. user was manually deleted)
+                    this.initializedUsers.delete(userId);
                 } catch (err) {
                     // Do not attempt fallback if it was a connection/timeout error (since POST would also fail)
                     throw err;
@@ -119,6 +121,7 @@ class RecommendationServer {
             }
         } catch (error) {
             // Silently catch error to avoid crashing the Express thread
+            console.error('Error in RecommendationServer.save:', error);
         }
     }
 }

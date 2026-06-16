@@ -2,7 +2,10 @@ import request from './api';
 
 export const restaurantService = {
   // Get all restaurants
-  getAll: () => request('/api/restaurants'),
+  getAll: (lat, lng) => {
+    const url = (lat !== undefined && lng !== undefined) ? `/api/restaurants?lat=${lat}&lng=${lng}` : '/api/restaurants';
+    return request(url);
+  },
 
   // Get specific restaurant by ID
   getById: (id) => request(`/api/restaurants/${id}`),

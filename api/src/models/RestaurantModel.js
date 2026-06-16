@@ -13,8 +13,8 @@ class RestaurantModel {
 
     // Create a new restaurant with creatorId constraint
     static create(data, creatorId) {
-        // Enforce uniqueness of name + address
-        const isDuplicate = db.restaurants.some(r => r.name === data.name && r.address === data.address);
+        // Enforce uniqueness of name
+        const isDuplicate = db.restaurants.some(r => r.name === data.name);
         if (isDuplicate) {
             throw new Error('DUPLICATE_RESTAURANT');
         }
@@ -24,7 +24,7 @@ class RestaurantModel {
             name: data.name,
             description: data.description || '',
             category: data.category || 'General',
-            address: data.address,
+            imageKey: data.imageKey || (data.category ? data.category.toLowerCase() : 'general'),
             location: data.location,
             creatorId: creatorId
         };
@@ -46,11 +46,10 @@ class RestaurantModel {
 
         const currentRest = db.restaurants[index];
         const newName = data.name !== undefined ? data.name : currentRest.name;
-        const newAddress = data.address !== undefined ? data.address : currentRest.address;
 
-        // Check for duplicates if name or address are being updated
-        if (data.name !== undefined || data.address !== undefined) {
-            const isDuplicate = db.restaurants.some(r => r.id !== id && r.name === newName && r.address === newAddress);
+        // Check for duplicates if name is being updated
+        if (data.name !== undefined) {
+            const isDuplicate = db.restaurants.some(r => r.id !== id && r.name === newName);
             if (isDuplicate) {
                 throw new Error('DUPLICATE_RESTAURANT');
             }

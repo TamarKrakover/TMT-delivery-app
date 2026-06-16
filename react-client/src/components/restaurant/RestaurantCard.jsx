@@ -7,10 +7,11 @@ const imageMap = {
   sushi: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=600&auto=format&fit=crop&q=80",
   asian: "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=600&auto=format&fit=crop&q=80",
   dessert: "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=600&auto=format&fit=crop&q=80",
-  salad: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&auto=format&fit=crop&q=80"
+  salad: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&auto=format&fit=crop&q=80",
+  general: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500&auto=format&fit=crop&q=60"
 };
 
-const RestaurantCard = ({ name, category, icon, image, imageKey, rating, deliveryTime, address, distance, onClick }) => {
+const RestaurantCard = ({ name, category, icon, image, imageKey, rating, deliveryTime, distance, onClick }) => {
   // Fallback chain: explicit image prop -> mapped imageKey -> default fallback image
   const displayImage = image || (imageKey && imageMap[imageKey.toLowerCase()]) || DEFAULT_RESTAURANT_IMAGE;
 
@@ -33,7 +34,6 @@ const RestaurantCard = ({ name, category, icon, image, imageKey, rating, deliver
           <span>{deliveryTime} mins</span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <p className="restaurant-address">{address}</p>
           {distance !== null && distance !== undefined && (
             <span style={{ fontSize: '0.85em', color: 'var(--primary)', fontWeight: 'bold' }}>
               📍 {distance.toFixed(1)} km

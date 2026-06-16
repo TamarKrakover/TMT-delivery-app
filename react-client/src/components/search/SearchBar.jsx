@@ -34,13 +34,15 @@ const SearchBar = ({ placeholder = "Search for restaurants or dishes..." }) => {
     const delayDebounceFn = setTimeout(async () => {
       try {
         const data = await restaurantService.search(query);
-        setResults(data);
+        const restaurants = (data.restaurants || []).map(r => ({ ...r, type: 'restaurant' }));
+        const products = (data.products || []).map(p => ({ ...p, type: 'product' }));
+        setResults([...restaurants, ...products]);
         setIsOpen(true);
       } catch (err) {
         console.error("Search preview failed:", err);
         // Fallback to local mock filtering on error to prevent breaking app
         const lower = query.toLowerCase();
-        const fallback = mockRestaurants.filter(r => r.name.toLowerCase().includes(lower));
+        const fallback = mockRestaurants.filter(r => r.name.toLowerCase().includes(lower)).map(r => ({ ...r, type: 'restaurant' }));
         setResults(fallback);
         setIsOpen(true);
       }
@@ -70,8 +72,7 @@ const SearchBar = ({ placeholder = "Search for restaurants or dishes..." }) => {
 
   const handleItemClick = (item) => {
     setIsOpen(false);
-    // If it has an address field, it is a restaurant. Otherwise it is a product.
-    if (item.address !== undefined) {
+    if (item.type === 'restaurant') {
       navigate(`/restaurant/${item.id}`);
     } else {
       navigate(`/restaurant/${item.restaurantId}`);
@@ -104,7 +105,7 @@ const SearchBar = ({ placeholder = "Search for restaurants or dishes..." }) => {
             >
               <span className="search-dropdown-name">{item.name}</span>
               <span className="search-dropdown-type">
-                {item.address !== undefined ? 'Restaurant' : 'Dish'}
+                {item.type === 'restaurant' ? 'Restaurant' : 'Dish'}
               </span>
             </div>
           ))}

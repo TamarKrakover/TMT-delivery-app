@@ -8,7 +8,6 @@ import HeroBanner from '../components/layout/HeroBanner';
 import RestaurantFormModal from '../components/modals/RestaurantFormModal';
 import { restaurantService } from '../services/restaurantService';
 import mockRestaurants from '../data/restaurants.json';
-import { calculateDistance } from '../utils/distance';
 import { FiPlus } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
 import { useModal } from '../hooks/useModal';
@@ -30,12 +29,11 @@ const HomePage = () => {
       try {
         setLoading(true);
         if (searchQuery.trim() === '') {
-          const data = await restaurantService.getAll();
+          const data = await restaurantService.getAll(currentUser?.location?.lat, currentUser?.location?.lng);
           setRestaurants(data);
         } else {
           const data = await restaurantService.search(searchQuery);
-          const matchedRestaurants = data.filter(item => item.address !== undefined);
-          setRestaurants(matchedRestaurants);
+          setRestaurants(data.restaurants || []);
         }
       } catch (err) {
         console.error("Failed to fetch restaurants:", err);
@@ -46,18 +44,18 @@ const HomePage = () => {
     };
 
     loadRestaurants();
-  }, [searchQuery]);
+  }, [searchQuery, currentUser?.location?.lat, currentUser?.location?.lng]);
 
   const handleAddRestaurantSubmit = async (form) => {
-    if (!form.name || !form.address) {
-      addRestModal.setError('Name and Address are required.');
+    if (!form.name) {
+      addRestModal.setError('Name is required.');
       return;
     }
     try {
       await restaurantService.create(form);
       addRestModal.closeModal();
       
-      const data = await restaurantService.getAll();
+      const data = await restaurantService.getAll(currentUser?.location?.lat, currentUser?.location?.lng);
       setRestaurants(data);
     } catch (err) {
       addRestModal.setError(err.message || 'Failed to create restaurant.');
@@ -67,12 +65,7 @@ const HomePage = () => {
   const displayedRestaurants = restaurants.filter(r => 
     selectedCategory === 'All' || 
     (r.category && r.category.toLowerCase() === selectedCategory.toLowerCase())
-  ).sort((a, b) => {
-    if (!currentUser?.location) return 0;
-    const distA = a.location ? calculateDistance(currentUser.location, a.location) : Infinity;
-    const distB = b.location ? calculateDistance(currentUser.location, b.location) : Infinity;
-    return distA - distB;
-  });
+  );
 
   return (
     <div className={`app-container ${darkMode ? 'dark-mode' : ''}`}>
@@ -94,7 +87,7 @@ const HomePage = () => {
           <h2 className="section-title" style={{ marginBottom: 0 }}>
             {selectedCategory} Restaurants {searchQuery && `matching "${searchQuery}"`}
           </h2>
-          {currentUser && currentUser.role === 'owner' && (
+          {currentUser && (currentUser.role === 'owner' || currentUser.isAdmin) && (
             <button className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }} onClick={() => addRestModal.openModal()}>
               <FiPlus /> Add Restaurant
             </button>

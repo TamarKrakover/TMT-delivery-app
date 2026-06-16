@@ -1,10 +1,11 @@
 const db = require('./InMemoryDB');
 const UserModel = require('./UserModel');
 const RecommendationServer = require('../services/recommendationServer');
+const crypto = require('crypto');
 
-// generates a unique product ID based on timestamp and a random number
+// generates a standard UUID for products
 const generateProductId = () => {
-    return 'p_' + Date.now().toString() + '_' + Math.floor(Math.random() * 1000);
+    return crypto.randomUUID();
 };
 
 class ProductModel {
@@ -13,14 +14,18 @@ class ProductModel {
         return db.products.filter(p => p.restaurantId === restaurantId);
     }
 
-    // creates a new product, assigns a unique ID, and stores it in the database
     static create(restaurantId, data) {
+        const RestaurantModel = require('./RestaurantModel');
+        const restaurant = RestaurantModel.findById(restaurantId);
+        const category = restaurant ? restaurant.category.toLowerCase() : 'general';
+        
         const newProduct = {
             id: generateProductId(),
             restaurantId: restaurantId,
             name: data.name,
             description: data.description || '',
-            price: data.price
+            price: data.price,
+            imageKey: data.imageKey || category
         };
         db.products.push(newProduct);
         return newProduct;
@@ -32,10 +37,7 @@ class ProductModel {
         const product = db.products.find(p => p.restaurantId === restaurantId && p.id === productId);
         
         if (product && userId) {
-            const user = UserModel.findUserById(userId);
-            if (user) {
-                RecommendationServer.save(userId, productId);
-            }
+            RecommendationServer.save(userId, productId).catch(() => {});
         }
         
         return product;

@@ -27,6 +27,10 @@ services:
     environment:
       - RECOMMENDATION_SERVER_HOST=tmt-server
       - RECOMMENDATION_SERVER_PORT=5555
+    volumes:
+      - ./api/src:/app/src
+      - ./api/app.js:/app/app.js
+      - /app/node_modules
     depends_on:
       - server
     networks:

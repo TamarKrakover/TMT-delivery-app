@@ -6,7 +6,8 @@ const ProductModel = require('../models/ProductModel');
 exports.getUserOrders = (req, res) => {
     const userId = req.userId;
     const userOrders = OrderModel.findByUserId(userId);
-    res.status(200).json(userOrders);
+    const sortedOrders = userOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    res.status(200).json(sortedOrders);
 };
 
 // create a new order for the authenticated user
@@ -115,4 +116,29 @@ exports.deleteOrder = (req, res) => {
 
     // 204 No Content on success
     res.status(204).end();
+};
+
+// calculate order totals based on an array of productIds
+exports.calculateOrder = (req, res) => {
+    // validate required fields
+    if (!req.body.restaurantId || !req.body.productIds || !Array.isArray(req.body.productIds)) {
+        return res.status(400).json({ error: 'restaurantId and an array of productIds are required' });
+    }
+
+    let calculatedTotal = 0;
+    const items = [];
+
+    // Map each productId to the actual product and calculate price
+    req.body.productIds.forEach(pid => {
+        const product = ProductModel.findById(req.body.restaurantId, pid);
+        if (product) {
+            calculatedTotal += product.price || 0;
+            items.push(product);
+        }
+    });
+
+    res.status(200).json({
+        totalPrice: calculatedTotal,
+        items: items
+    });
 };
