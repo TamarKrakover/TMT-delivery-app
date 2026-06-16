@@ -5,8 +5,9 @@ const port = 8080;
 // Organize the print format
 app.set('json spaces', 2);
 
-// Allows the server to read JSON data
-app.use(express.json());
+// Allows the server to read JSON data (increased limit for base64 images)
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Import all routes
 const userRoutes = require('./src/routes/userRoutes');

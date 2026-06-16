@@ -29,7 +29,7 @@ const Navbar = ({ onSearch }) => {
 
   const handleLogoutClick = () => {
     logout();
-    navigate('/');
+    navigate('/login');
   };
 
   return (
@@ -45,7 +45,9 @@ const Navbar = ({ onSearch }) => {
       <div className="navbar-actions">
         {currentUser ? (
           <div className="navbar-user-info">
-            <span className="navbar-user-name">Hi, {currentUser.name}</span>
+            <span className="navbar-user-name" onClick={() => navigate('/profile')} style={{ cursor: 'pointer' }} title="View Order History">
+              Hi, {currentUser.name}
+            </span>
             <button className="btn-outline navbar-signout-btn" onClick={handleLogoutClick}>Sign out</button>
           </div>
         ) : (

@@ -17,16 +17,16 @@ const RegisterPage = () => {
   const [role, setRole] = useState('customer');
   const [lat, setLat] = useState('');
   const [lng, setLng] = useState('');
-  
+
   // Image state
   const [profilePic, setProfilePic] = useState(null);
   const [previewUrl, setPreviewUrl] = useState('');
-  
+
   // UI state
   const [error, setError] = useState('');
   const [fieldErrors, setFieldErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
 
@@ -44,13 +44,12 @@ const RegisterPage = () => {
   const validateInput = () => {
     const errors = {};
     let isValid = true;
-    
+
     // Check required fields
     if (!username.trim()) errors.username = 'Username is required';
     if (!displayName.trim()) errors.displayName = 'Display name is required';
-    if (!profilePic) errors.profilePic = 'Profile picture is required';
     if (!lat || !lng) errors.location = 'Latitude and Longitude are required';
-    
+
     // Password validation
     if (!password) {
       errors.password = 'Password is required';
@@ -58,12 +57,12 @@ const RegisterPage = () => {
       const isLengthValid = password.length >= 8;
       const hasLetter = /[a-zA-Z]/.test(password);
       const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-      
+
       if (!isLengthValid || !hasLetter || !hasSpecialChar) {
         errors.password = 'Password must be 8+ chars, include a letter and a special character';
       }
     }
-    
+
     if (password !== verifyPassword) {
       errors.verifyPassword = 'Passwords do not match';
     }
@@ -82,151 +81,159 @@ const RegisterPage = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    if (!validateInput()) return; 
+      if (!validateInput()) return;
 
-    setIsLoading(true);
-    try {
-      // The backend from Ex3 expects username, password, name, phone, address
-      // Since we only collect username, password, and displayName (name),
-      // we provide dummy values for phone and address to satisfy the API.
-      const userData = {
-        username: username.trim(),
-        password,
-        name: displayName,
-        role: role,
-        phone: '0500000000',
-        address: 'User Address',
-        location: { lat: parseFloat(lat), lng: parseFloat(lng) }
-      };
-      
-      await authService.register(userData);
-      
-      // Navigate to login after successful registration
-      navigate('/login'); 
-    } catch (err) {
-      console.error("Registration failed:", err);
-      if (err.message === 'Username already exists') {
-        setError('This username is already taken. Please choose another one.');
-        setFieldErrors(prev => ({ ...prev, username: 'Username already exists' }));
-      } else {
-        setError('Registration failed. Please try again later.');
+      setIsLoading(true);
+      try {
+        let finalPic = '';
+        if (profilePic) {
+          const reader = new FileReader();
+          finalPic = await new Promise((resolve) => {
+            reader.onloadend = () => resolve(reader.result);
+            reader.readAsDataURL(profilePic);
+          });
+        }
+
+        const userData = {
+          username: username.trim(),
+          password,
+          name: displayName,
+          role: role,
+          location: { lat: parseFloat(lat), lng: parseFloat(lng) },
+          profilePic: finalPic
+        };
+
+        await authService.register(userData);
+
+        // Navigate to login after successful registration
+        navigate('/login');
+      } catch (err) {
+        console.error("Registration failed:", err);
+        if (err.message === 'Username already exists') {
+          setError('This username is already taken. Please choose another one.');
+          setFieldErrors(prev => ({ ...prev, username: 'Username already exists' }));
+        } else {
+          setError('Registration failed. Please try again later.');
+        }
+      } finally {
+        setIsLoading(false);
       }
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    };
 
-  return (
-    <AuthLayout title="Create an Account" subtitle="Join us to start ordering">
-      <form onSubmit={handleRegister} className="auth-form">
-        <ErrorMessage message={error} />
-        
-        <InputField
-          id="username"
-          label="Username"
-          placeholder="Choose a username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          error={fieldErrors.username}
-        />
+    return (
+      <AuthLayout title="Create an Account" subtitle="Join us to start ordering">
+        <form onSubmit={handleRegister} className="auth-form">
+          <ErrorMessage message={error} />
 
-        <InputField
-          id="displayName"
-          label="Display Name"
-          placeholder="What should we call you?"
-          value={displayName}
-          onChange={(e) => setDisplayName(e.target.value)}
-          error={fieldErrors.displayName}
-        />
-        
-        <SelectField
-          id="role"
-          label="Account Type"
-          value={role}
-          onChange={(e) => setRole(e.target.value)}
-          options={[
-            { value: 'customer', label: 'Regular User' },
-            { value: 'owner', label: 'Restaurant Owner' }
-          ]}
-        />
-        
-        <InputField
-          id="password"
-          type="password"
-          label="Password"
-          placeholder="Create a strong password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          error={fieldErrors.password}
-          hint={!fieldErrors.password ? "Min 8 characters, 1 letter, 1 special character" : null}
-        />
+          <InputField
+            id="username"
+            label="Username"
+            placeholder="Choose a username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            error={fieldErrors.username}
+          />
 
-        <InputField
-          id="verifyPassword"
-          type="password"
-          label="Verify Password"
-          placeholder="Confirm your password"
-          value={verifyPassword}
-          onChange={(e) => setVerifyPassword(e.target.value)}
-          error={fieldErrors.verifyPassword}
-        />
+          <InputField
+            id="displayName"
+            label="Display Name"
+            placeholder="What should we call you?"
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
+            error={fieldErrors.displayName}
+          />
 
-        <div className="form-group">
-          <label>Profile Picture</label>
-          <div className="image-upload-container">
-            {previewUrl ? (
-              <img src={previewUrl} alt="Preview" className="image-preview" />
-            ) : (
-              <div className="image-placeholder">📷</div>
-            )}
-            
-            <div className="upload-btn-wrapper">
-              <Button type="button" className="btn-outline">Choose Image</Button>
-              <input
-                type="file"
-                accept="image/*"
-                ref={fileInputRef}
-                onChange={handleImageChange}
+          <SelectField
+            id="role"
+            label="Account Type"
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            options={[
+              { value: 'customer', label: 'Regular User' },
+              { value: 'owner', label: 'Restaurant Owner' }
+            ]}
+          />
+
+          <InputField
+            id="password"
+            type="password"
+            label="Password"
+            placeholder="Create a strong password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            error={fieldErrors.password}
+            hint={!fieldErrors.password ? "Min 8 characters, 1 letter, 1 special character" : null}
+          />
+
+          <InputField
+            id="verifyPassword"
+            type="password"
+            label="Verify Password"
+            placeholder="Confirm your password"
+            value={verifyPassword}
+            onChange={(e) => setVerifyPassword(e.target.value)}
+            error={fieldErrors.verifyPassword}
+          />
+
+          <div className="form-group">
+            <label>Profile Picture (Optional)</label>
+            <div className="image-upload-container">
+              {previewUrl ? (
+                <img src={previewUrl} alt="Preview" className="image-preview" />
+              ) : (
+                <div className="profile-avatar-placeholder" style={{ width: '80px', height: '80px', fontSize: '2rem' }}>
+                  {(displayName || 'U').charAt(0).toUpperCase()}
+                </div>
+              )}
+
+              <div className="upload-btn-wrapper">
+                <Button type="button" className="btn-outline">Choose Image</Button>
+                <input
+                  type="file"
+                  accept="image/*"
+                  ref={fileInputRef}
+                  onChange={handleImageChange}
+                />
+              </div>
+            </div>
+
+            {fieldErrors.profilePic && <span className="error-message">{fieldErrors.profilePic}</span>}
+          </div>
+
+          <div className="form-group" style={{ marginBottom: '20px' }}>
+            <label className="form-label">Your Location (Coordinates)</label>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <InputField
+                id="lat"
+                type="number"
+                placeholder="Latitude (e.g. 32.08)"
+                value={lat}
+                onChange={(e) => setLat(e.target.value)}
+                step="any"
+              />
+              <InputField
+                id="lng"
+                type="number"
+                placeholder="Longitude (e.g. 34.78)"
+                value={lng}
+                onChange={(e) => setLng(e.target.value)}
+                step="any"
               />
             </div>
+            {fieldErrors.location && <span className="error-message" style={{ display: 'block', marginTop: '-10px', marginBottom: '10px' }}>{fieldErrors.location}</span>}
           </div>
-          {fieldErrors.profilePic && <span className="error-message">{fieldErrors.profilePic}</span>}
-        </div>
-        
-        <div className="form-group" style={{ marginBottom: '20px' }}>
-          <label className="form-label">Your Location (Coordinates)</label>
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <InputField
-              id="lat"
-              type="number"
-              placeholder="Latitude (e.g. 32.08)"
-              value={lat}
-              onChange={(e) => setLat(e.target.value)}
-              step="any"
-            />
-            <InputField
-              id="lng"
-              type="number"
-              placeholder="Longitude (e.g. 34.78)"
-              value={lng}
-              onChange={(e) => setLng(e.target.value)}
-              step="any"
-            />
-          </div>
-          {fieldErrors.location && <span className="error-message" style={{ display: 'block', marginTop: '-10px', marginBottom: '10px' }}>{fieldErrors.location}</span>}
-        </div>
-        
-        <Button type="submit" disabled={isLoading}>
-          {isLoading ? 'Creating Account...' : 'Sign Up'}
-        </Button>
-      </form>
 
-      <div className="auth-links">
-        Already have an account? 
-        <Link to="/login">Sign in</Link>
-      </div>
-    </AuthLayout>
-  );
-};
+          <Button type="submit" disabled={isLoading}>
+            {isLoading ? 'Creating Account...' : 'Sign Up'}
+          </Button>
+        </form>
 
-export default RegisterPage;
+        <div className="auth-links">
+          Already have an account?
+          <Link to="/login">Sign in</Link>
+        </div>
+      </AuthLayout>
+    );
+  };
+
+  export default RegisterPage;
