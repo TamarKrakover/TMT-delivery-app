@@ -17,7 +17,6 @@ const UserProfilePage = () => {
   const [restaurants, setRestaurants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [productsCache, setProductsCache] = useState({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -30,20 +29,6 @@ const UserProfilePage = () => {
           orderService.getAll(),
           restaurantService.getAll()
         ]);
-
-        // Fetch products for each unique restaurant in the orders so we can display item names
-        const uniqueRestIds = [...new Set(ordersData.map(o => o.restaurantId))];
-        
-        // In order to avoid a dependency cycle, import productService here or at top
-        const { productService } = await import('../services/productService');
-        const productsPromises = uniqueRestIds.map(id => productService.getByRestaurantId(id).catch(() => []));
-        const productsResults = await Promise.all(productsPromises);
-        
-        const newProductsCache = {};
-        uniqueRestIds.forEach((id, index) => {
-          newProductsCache[id] = productsResults[index];
-        });
-        setProductsCache(newProductsCache);
 
         // Sort orders newest first
         const sortedOrders = ordersData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -98,25 +83,10 @@ const UserProfilePage = () => {
         </div>
 
         <section className="order-history-section">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-            <h2 className="section-title" style={{ marginBottom: 0 }}>
-              <FiClock style={{ marginRight: '8px' }} /> 
-              Order History
-            </h2>
-            {!loading && orders.length > 0 && (
-              <div style={{ 
-                fontSize: '1.05rem', 
-                fontWeight: 'bold', 
-                color: 'var(--primary)', 
-                backgroundColor: 'var(--primary-light, #eef2ff)', 
-                padding: '8px 16px', 
-                borderRadius: '20px',
-                border: '1px solid var(--primary)'
-              }}>
-                Total Spent: ${orders.reduce((sum, order) => sum + (order.totalPrice || 0), 0).toFixed(2)}
-              </div>
-            )}
-          </div>
+          <h2 className="section-title">
+            <FiClock style={{ marginRight: '8px' }} /> 
+            Order History
+          </h2>
 
           {loading ? (
             <div className="loading">Loading your orders...</div>
@@ -135,7 +105,6 @@ const UserProfilePage = () => {
                   key={order.id} 
                   order={order} 
                   restaurant={getRestaurantForOrder(order.restaurantId)} 
-                  restaurantProducts={productsCache[order.restaurantId] || []}
                 />
               ))}
             </div>

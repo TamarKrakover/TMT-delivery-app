@@ -8,6 +8,7 @@ import HeroBanner from '../components/layout/HeroBanner';
 import RestaurantFormModal from '../components/modals/RestaurantFormModal';
 import { restaurantService } from '../services/restaurantService';
 import mockRestaurants from '../data/restaurants.json';
+import { calculateDistance } from '../utils/distance';
 import { FiPlus } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
 import { useModal } from '../hooks/useModal';
@@ -29,11 +30,12 @@ const HomePage = () => {
       try {
         setLoading(true);
         if (searchQuery.trim() === '') {
-          const data = await restaurantService.getAll(currentUser?.location?.lat, currentUser?.location?.lng);
+          const data = await restaurantService.getAll();
           setRestaurants(data);
         } else {
           const data = await restaurantService.search(searchQuery);
-          setRestaurants(data.restaurants || []);
+          const matchedRestaurants = data.filter(item => item.location !== undefined || item.address !== undefined);
+          setRestaurants(matchedRestaurants);
         }
       } catch (err) {
         console.error("Failed to fetch restaurants:", err);
@@ -44,7 +46,7 @@ const HomePage = () => {
     };
 
     loadRestaurants();
-  }, [searchQuery, currentUser?.location?.lat, currentUser?.location?.lng]);
+  }, [searchQuery]);
 
   const handleAddRestaurantSubmit = async (form) => {
     if (!form.name) {
@@ -55,7 +57,7 @@ const HomePage = () => {
       await restaurantService.create(form);
       addRestModal.closeModal();
       
-      const data = await restaurantService.getAll(currentUser?.location?.lat, currentUser?.location?.lng);
+      const data = await restaurantService.getAll();
       setRestaurants(data);
     } catch (err) {
       addRestModal.setError(err.message || 'Failed to create restaurant.');
@@ -65,7 +67,12 @@ const HomePage = () => {
   const displayedRestaurants = restaurants.filter(r => 
     selectedCategory === 'All' || 
     (r.category && r.category.toLowerCase() === selectedCategory.toLowerCase())
-  );
+  ).sort((a, b) => {
+    if (!currentUser?.location) return 0;
+    const distA = a.location ? calculateDistance(currentUser.location, a.location) : Infinity;
+    const distB = b.location ? calculateDistance(currentUser.location, b.location) : Infinity;
+    return distA - distB;
+  });
 
   return (
     <div className={`app-container ${darkMode ? 'dark-mode' : ''}`}>
