@@ -9,6 +9,7 @@ FileDataRepository::FileDataRepository(string path) : filePath(move(path)) {}
 
 // Appends new products to a user's history and instantly saves to the file
 void FileDataRepository::saveUserViews(const string& userId, const vector<string>& productIds) {
+    loadAllData();
     auto& userProds = userInteractions[userId];
     bool hasChanges = false;
 
@@ -48,12 +49,14 @@ bool FileDataRepository::loadAllData() {
 }
 
 map<string, vector<string>> FileDataRepository::getAllData() const {
+    const_cast<FileDataRepository*>(this)->loadAllData();
     // copy the naturally sorted map into a standard map for the interface return type
     map<string, vector<string>> standardMap(userInteractions.begin(), userInteractions.end());
     return standardMap;
 }
 
 vector<string> FileDataRepository::getUserViews(const string& userId) const {
+    const_cast<FileDataRepository*>(this)->loadAllData();
     auto it = userInteractions.find(userId);
     if (it != userInteractions.end()) {
         return it->second;
@@ -78,11 +81,13 @@ void FileDataRepository::persistToFile() const {
 
 // Checks if the user exists by searching the map
 bool FileDataRepository::userExists(const string& userId) const {  
+    const_cast<FileDataRepository*>(this)->loadAllData();
     return userInteractions.find(userId) != userInteractions.end();
 }
 
 // Removes specific products from a user's history and saves to file if changed
 void FileDataRepository::removeUserViews(const string& userId, const vector<string>& productIds) {
+    loadAllData();
     auto it = userInteractions.find(userId);
 
     // If the user does not exist, there is nothing to remove

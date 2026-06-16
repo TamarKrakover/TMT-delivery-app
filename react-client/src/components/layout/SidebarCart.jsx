@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../contexts/CartContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { orderService } from '../../services/orderService';
+import request from '../../services/api';
 import { FiX, FiShoppingCart, FiMinus, FiPlus, FiTrash2, FiCheckCircle, FiAlertTriangle } from 'react-icons/fi';
 import './SidebarCart.css';
 
@@ -25,6 +26,46 @@ const SidebarCart = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (isCartOpen || conflictItem) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => { document.body.style.overflow = 'unset'; };
+  }, [isCartOpen, conflictItem]);
+
+  const [cartCalculation, setCartCalculation] = useState({ totalPrice: 0, items: [] });
+  const [isCalculating, setIsCalculating] = useState(false);
+
+  useEffect(() => {
+    if (cartItems.length === 0 || !cartRestaurant) {
+      setCartCalculation({ totalPrice: 0, items: [] });
+      return;
+    }
+
+    const productIds = cartItems.reduce((acc, item) => {
+      for (let i = 0; i < item.quantity; i++) {
+        acc.push(item.id);
+      }
+      return acc;
+    }, []);
+
+    setIsCalculating(true);
+    request('/api/orders/calculate', {
+      method: 'POST',
+      body: JSON.stringify({ restaurantId: cartRestaurant.id, productIds })
+    })
+    .then(data => {
+      if (data) setCartCalculation(data);
+      setIsCalculating(false);
+    })
+    .catch(err => {
+      console.error('Calculation error:', err);
+      setIsCalculating(false);
+    });
+  }, [cartItems, cartRestaurant]);
 
   const handleCheckout = async () => {
     if (!currentUser) {
@@ -63,7 +104,9 @@ const SidebarCart = () => {
     setCartOpen(false);
   };
 
-  const subtotal = cartItems.reduce((sum, item) => sum + parseFloat(item.price) * item.quantity, 0);
+  const getItemPrice = (itemId) => {
+    return cartCalculation.items.filter(i => i.id === itemId).reduce((sum, i) => sum + (i.price || 0), 0);
+  };
 
   return (
     <>
@@ -128,7 +171,7 @@ const SidebarCart = () => {
                   <div className="cart-item-details">
                     <h4 className="cart-item-name">{item.name}</h4>
                     <span className="cart-item-price">
-                      ${(parseFloat(item.price) * item.quantity).toFixed(2)}
+                      ${getItemPrice(item.id).toFixed(2)}
                     </span>
                   </div>
                   <div className="cart-item-actions">
@@ -167,7 +210,7 @@ const SidebarCart = () => {
             <div className="cart-footer">
               <div className="cart-summary-row">
                 <span className="cart-summary-label">Total Sum</span>
-                <span className="cart-summary-value">${subtotal.toFixed(2)}</span>
+                <span className="cart-summary-value">${(cartCalculation.totalPrice || 0).toFixed(2)}</span>
               </div>
               <button 
                 className={`btn-primary btn-checkout ${loading ? 'disabled' : ''}`}

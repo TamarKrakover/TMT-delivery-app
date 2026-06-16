@@ -143,8 +143,14 @@
 /* Menu Grid */
 .menu-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  grid-template-columns: 1fr;
   gap: 24px;
+}
+
+@media (min-width: 800px) {
+  .menu-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 .menu-item-card {
@@ -156,8 +162,10 @@
   transition: var(--transition);
   box-shadow: var(--shadow-sm);
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 16px;
+  justify-content: flex-start;
   position: relative;
 }
 
@@ -288,6 +296,8 @@
   box-shadow: var(--shadow-lg);
   position: relative;
   animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .modal-close {

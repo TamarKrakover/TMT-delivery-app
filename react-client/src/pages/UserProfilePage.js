@@ -30,10 +30,7 @@ const UserProfilePage = () => {
           restaurantService.getAll()
         ]);
 
-        // Sort orders newest first
-        const sortedOrders = ordersData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        
-        setOrders(sortedOrders);
+        setOrders(ordersData);
         setRestaurants(restaurantsData);
       } catch (err) {
         console.error('Failed to fetch data:', err);

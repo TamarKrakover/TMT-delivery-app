@@ -87,7 +87,7 @@ const RestaurantPage = () => {
     );
   }
 
-  const bgImage = imageMap[restaurant.imageKey] || imageMap.burger;
+  const bgImage = restaurant.image || imageMap[restaurant.imageKey] || imageMap.burger;
 
   return (
     <div className="app-container restaurant-page-container">
@@ -141,7 +141,6 @@ const RestaurantPage = () => {
             name: restaurant.name || '',
             description: restaurant.description || '',
             category: restaurant.category || 'Burgers',
-            address: restaurant.address || '',
             imageKey: restaurant.imageKey || 'burger'
           }}
           onSubmit={handleEditRestaurantSubmit}

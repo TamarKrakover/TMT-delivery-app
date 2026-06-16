@@ -19,9 +19,6 @@ const RestaurantHero = ({ restaurant, bgImage }) => {
           <span className="restaurant-meta-item">
             <FiClock /> {restaurant.deliveryTime || '20-30'} mins
           </span>
-          <span className="restaurant-meta-item">
-            <FiMapPin /> {restaurant.address}
-          </span>
         </div>
       </div>
     </section>

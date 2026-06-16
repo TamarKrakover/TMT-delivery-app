@@ -36,8 +36,8 @@ export const useRestaurant = (id, currentUser) => {
   }, [currentUser, restaurant]);
 
   const updateRestaurant = async (form) => {
-    if (!form.name || !form.address) {
-      throw new Error('Name and Address are required fields.');
+    if (!form.name) {
+      throw new Error('Name is a required field.');
     }
     await restaurantService.update(id, form);
     await loadRestaurantData();
@@ -55,8 +55,8 @@ export const useRestaurant = (id, currentUser) => {
       throw new Error('Name and Price are required.');
     }
     const priceNum = parseFloat(form.price);
-    if (isNaN(priceNum) || priceNum < 0) {
-      throw new Error('Price must be a positive number.');
+    if (isNaN(priceNum) || priceNum <= 0) {
+      throw new Error('Price must be strictly positive (greater than 0).');
     }
 
     if (productFormMode === 'add') {
@@ -68,10 +68,8 @@ export const useRestaurant = (id, currentUser) => {
   };
 
   const deleteProduct = async (productId) => {
-    if (window.confirm('Are you sure you want to delete this menu item?')) {
-      await productService.delete(id, productId);
-      await loadRestaurantData();
-    }
+    await productService.delete(id, productId);
+    await loadRestaurantData();
   };
 
   return {

@@ -6,6 +6,7 @@ import Footer from '../components/layout/Footer';
 import RestaurantCard from '../components/restaurant/RestaurantCard';
 import { restaurantService } from '../services/restaurantService';
 import mockRestaurants from '../data/restaurants.json';
+import request from '../services/api';
 import './SearchPage.css';
 const imageHamburger = "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=80";
 
@@ -24,11 +25,8 @@ const SearchPage = () => {
       try {
         setLoading(true);
         const data = await restaurantService.search(query);
-        // Separate combined search results by presence of fields (address for restaurants, price for products)
-        const matchedRestaurants = data.filter(item => item.address !== undefined);
-        const matchedProducts = data.filter(item => item.price !== undefined);
-        setRestaurants(matchedRestaurants);
-        setProducts(matchedProducts);
+        setRestaurants(data.restaurants || []);
+        setProducts(data.products || []);
       } catch (err) {
         console.error("Search failed:", err);
         // Fallback search locally in mockRestaurants on error
@@ -103,7 +101,10 @@ const SearchPage = () => {
                     <div 
                       key={p.id} 
                       className="related-product-card" 
-                      onClick={() => navigate(`/restaurant/${p.restaurantId}`)}
+                      onClick={() => {
+                        request(`/api/restaurants/${p.restaurantId}/products/${p.id}`).catch(() => {});
+                        navigate(`/restaurant/${p.restaurantId}`);
+                      }}
                     >
                       <div className="related-product-info">
                         <div>

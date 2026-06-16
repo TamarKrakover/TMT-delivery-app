@@ -1,9 +1,25 @@
 const RestaurantModel = require('../models/RestaurantModel');
 const UserModel = require('../models/UserModel');
+const { calculateDistance } = require('../utils/distance');
 
 // Fetch all restaurants
 exports.getAllRestaurants = (req, res) => {
-    const restaurants = RestaurantModel.getAll();
+    let restaurants = RestaurantModel.getAll();
+    const { lat, lng } = req.query;
+
+    if (lat !== undefined && lng !== undefined) {
+        const userLoc = { lat: parseFloat(lat), lng: parseFloat(lng) };
+        restaurants = restaurants.map(r => {
+            const distance = r.location ? calculateDistance(userLoc, r.location) : null;
+            return { ...r, distance };
+        });
+        restaurants.sort((a, b) => {
+            if (a.distance === null && b.distance === null) return 0;
+            if (a.distance === null) return 1;
+            if (b.distance === null) return -1;
+            return a.distance - b.distance;
+        });
+    }
     res.status(200).json(restaurants);
 };
 
@@ -18,8 +34,8 @@ exports.createRestaurant = (req, res) => {
     }
 
     // Validate request
-    if (!req.body.name || !req.body.address) {
-        return res.status(400).json({ error: 'Name and address are required' });
+    if (!req.body.name) {
+        return res.status(400).json({ error: 'Name is required' });
     }
 
     // Pass data to the Model

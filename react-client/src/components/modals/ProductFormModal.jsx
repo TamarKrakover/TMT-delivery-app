@@ -1,15 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FiX } from 'react-icons/fi';
 
 const ProductFormModal = ({ title, initialData, onSubmit, onClose, error }) => {
-  const [form, setForm] = useState(initialData || {
-    name: '',
-    description: '',
-    price: ''
+  const [formError, setFormError] = useState('');
+  const [form, setForm] = useState({
+    name: initialData?.name || '',
+    description: initialData?.description || '',
+    price: initialData?.price || '',
+    image: initialData?.image || ''
   });
+
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = 'unset'; };
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!form.name || form.price === '') {
+      setFormError('Dish Name and Price are required.');
+      return;
+    }
+    const priceNum = parseFloat(form.price);
+    if (isNaN(priceNum) || priceNum <= 0) {
+      setFormError('Price must be strictly positive (greater than 0).');
+      return;
+    }
+    setFormError('');
     onSubmit(form);
   };
 
@@ -19,7 +36,7 @@ const ProductFormModal = ({ title, initialData, onSubmit, onClose, error }) => {
         <button className="modal-close" onClick={onClose}><FiX /></button>
         <h2 className="modal-title">{title || 'Menu Item'}</h2>
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} noValidate>
           <div className="form-group">
             <label className="form-label">Dish Name</label>
             <input
@@ -57,7 +74,18 @@ const ProductFormModal = ({ title, initialData, onSubmit, onClose, error }) => {
             />
           </div>
 
-          {error && <div className="form-error">{error}</div>}
+          <div className="form-group">
+            <label className="form-label">Custom Image URL</label>
+            <input
+              type="text"
+              className="form-input"
+              value={form.image || ''}
+              onChange={(e) => setForm({ ...form, image: e.target.value })}
+              placeholder="e.g. https://example.com/product.jpg"
+            />
+          </div>
+
+          {(error || formError) && <div className="form-error">{error || formError}</div>}
 
           <div className="form-actions">
             <button type="button" className="btn-outline" onClick={onClose}>Cancel</button>

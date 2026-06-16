@@ -1,9 +1,21 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FiX } from 'react-icons/fi';
 import { useCart } from '../../contexts/CartContext';
+import request from '../../services/api';
 
 const ProductDetailModal = ({ product, restaurant, onClose }) => {
   const { addToCart } = useCart();
+
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    
+    // Trigger product view to log interaction on the backend
+    if (product && restaurant) {
+      request(`/api/restaurants/${restaurant.id}/products/${product.id}`).catch(() => {});
+    }
+    
+    return () => { document.body.style.overflow = 'unset'; };
+  }, [product, restaurant]);
 
   if (!product) return null;
 
