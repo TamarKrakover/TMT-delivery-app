@@ -134,7 +134,6 @@ const RestaurantPage = () => {
             name: restaurant.name || '',
             description: restaurant.description || '',
             category: restaurant.category || 'Burgers',
-            address: restaurant.address || '',
             image: restaurant.image || DEFAULT_RESTAURANT_IMAGE
           }}
           onSubmit={handleEditRestaurantSubmit}

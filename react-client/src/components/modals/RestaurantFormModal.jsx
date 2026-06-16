@@ -6,7 +6,6 @@ const RestaurantFormModal = ({ title, initialData, onSubmit, onClose, error }) =
     name: '',
     description: '',
     category: 'Burgers',
-    address: '',
     image: initialData?.image || '/images/restaurants/default.webp',
     location: initialData?.location || { lat: 32.0853, lng: 34.7818 }
   });
@@ -63,17 +62,6 @@ const RestaurantFormModal = ({ title, initialData, onSubmit, onClose, error }) =
             </select>
           </div>
 
-          <div className="form-group">
-            <label className="form-label">Address</label>
-            <input
-              type="text"
-              className="form-input"
-              value={form.address}
-              onChange={(e) => setForm({ ...form, address: e.target.value })}
-              placeholder="e.g. 128 Main St"
-              required
-            />
-          </div>
 
           <div className="form-group" style={{ display: 'flex', gap: '10px' }}>
             <div style={{ flex: 1 }}>

@@ -70,8 +70,8 @@ const SearchBar = ({ placeholder = "Search for restaurants or dishes..." }) => {
 
   const handleItemClick = (item) => {
     setIsOpen(false);
-    // If it has an address field, it is a restaurant. Otherwise it is a product.
-    if (item.address !== undefined) {
+    // If it has a location or address field, it is a restaurant. Otherwise it is a product.
+    if (item.location !== undefined || item.address !== undefined) {
       navigate(`/restaurant/${item.id}`);
     } else {
       navigate(`/restaurant/${item.restaurantId}`);
@@ -104,7 +104,7 @@ const SearchBar = ({ placeholder = "Search for restaurants or dishes..." }) => {
             >
               <span className="search-dropdown-name">{item.name}</span>
               <span className="search-dropdown-type">
-                {item.address !== undefined ? 'Restaurant' : 'Dish'}
+                {(item.location !== undefined || item.address !== undefined) ? 'Restaurant' : 'Dish'}
               </span>
             </div>
           ))}

@@ -9,6 +9,9 @@ router.route('/')
     .get(authMiddleware, orderController.getUserOrders)  // Get all orders for the authenticated user
     .post(authMiddleware, orderController.createOrder);  // Create a new order
 
+// Calculation route
+router.post('/calculate', orderController.calculateOrder);
+
 // grouping actions for the dynamic order path '/:id'
 router.route('/:id')
     .get(authMiddleware, orderController.getOrderById)   // Get a specific order by its ID

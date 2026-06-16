@@ -18,8 +18,8 @@ exports.createRestaurant = (req, res) => {
     }
 
     // Validate request
-    if (!req.body.name || !req.body.address) {
-        return res.status(400).json({ error: 'Name and address are required' });
+    if (!req.body.name) {
+        return res.status(400).json({ error: 'Name is required' });
     }
 
     // Pass data to the Model

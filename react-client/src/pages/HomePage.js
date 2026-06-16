@@ -40,7 +40,7 @@ const HomePage = () => {
           setCategories(catData);
         } else {
           const data = await restaurantService.search(searchQuery);
-          const matchedRestaurants = data.filter(item => item.address !== undefined);
+          const matchedRestaurants = data.filter(item => item.location !== undefined || item.address !== undefined);
           setRestaurants(matchedRestaurants);
         }
       } catch (err) {
@@ -55,8 +55,8 @@ const HomePage = () => {
   }, [searchQuery]);
 
   const handleAddRestaurantSubmit = async (form) => {
-    if (!form.name || !form.address) {
-      addRestModal.setError('Name and Address are required.');
+    if (!form.name) {
+      addRestModal.setError('Name is required.');
       return;
     }
     try {
@@ -101,7 +101,7 @@ const HomePage = () => {
           <h2 className="section-title" style={{ marginBottom: 0 }}>
             {selectedCategory} Restaurants {searchQuery && `matching "${searchQuery}"`}
           </h2>
-          {currentUser && currentUser.role === 'owner' && (
+          {currentUser && (currentUser.role === 'owner' || currentUser.isAdmin) && (
             <button className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }} onClick={() => addRestModal.openModal()}>
               <FiPlus /> Add Restaurant
             </button>
