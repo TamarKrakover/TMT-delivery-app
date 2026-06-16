@@ -14,7 +14,7 @@ export const authService = {
   }),
 
   // Get specific user details, allowing custom headers (used during login)
-  getUserDetails: (userId, customHeaders = {}) => request(`/api/users/${userId}`, {
-    headers: customHeaders
+  getUserDetails: (userId, headers) => request(`/api/users/${userId}`, {
+    headers: headers
   })
 };
