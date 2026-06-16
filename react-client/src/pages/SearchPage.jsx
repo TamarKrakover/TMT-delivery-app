@@ -4,8 +4,10 @@ import { useTheme } from '../contexts/ThemeContext';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
 import RestaurantCard from '../components/restaurant/RestaurantCard';
+import MenuItem from '../components/restaurant/MenuItem';
 import { restaurantService } from '../services/restaurantService';
 import mockRestaurants from '../data/restaurants.json';
+import ProductDetailModal from '../components/modals/ProductDetailModal';
 import './SearchPage.css';
 const imageHamburger = "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=80";
 
@@ -16,6 +18,7 @@ const SearchPage = () => {
   const [restaurants, setRestaurants] = useState([]);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const { darkMode } = useTheme();
 
   useEffect(() => {
@@ -24,11 +27,9 @@ const SearchPage = () => {
       try {
         setLoading(true);
         const data = await restaurantService.search(query);
-        // Separate combined search results by presence of fields (address for restaurants, price for products)
-        const matchedRestaurants = data.filter(item => item.address !== undefined);
-        const matchedProducts = data.filter(item => item.price !== undefined);
-        setRestaurants(matchedRestaurants);
-        setProducts(matchedProducts);
+        // The backend now returns a structured object { restaurants, products }
+        setRestaurants(data.restaurants || []);
+        setProducts(data.products || []);
       } catch (err) {
         console.error("Search failed:", err);
         // Fallback search locally in mockRestaurants on error
@@ -46,11 +47,7 @@ const SearchPage = () => {
     fetchResults();
   }, [query]);
 
-  // Helper to find restaurant name by ID for dishes list
-  const getRestaurantName = (rId) => {
-    const found = mockRestaurants.find(r => r.id === rId);
-    return found ? found.name : 'Restaurant';
-  };
+  // getRestaurantName removed as the backend now provides the restaurant object
 
   return (
     <div className={`app-container ${darkMode ? 'dark-mode' : ''}`}>
@@ -100,32 +97,13 @@ const SearchPage = () => {
               ) : (
                 <div className="search-related-grid">
                   {products.map(p => (
-                    <div 
-                      key={p.id} 
-                      className="related-product-card" 
-                      onClick={() => navigate(`/restaurant/${p.restaurantId}`)}
-                    >
-                      <div className="related-product-info">
-                        <div>
-                          <span className="related-product-price">₪{p.price}.00</span>
-                          <h4 className="related-product-name">{p.name}</h4>
-                          <p className="related-product-restaurant">
-                            {getRestaurantName(p.restaurantId)}
-                          </p>
-                        </div>
-                        <div className="related-product-meta">
-                          <span>🚴 ₪0.00</span>
-                          <span>•</span>
-                          <span>30-40 min</span>
-                        </div>
-                      </div>
-                      <div className="related-product-image-wrapper">
-                        <img 
-                          src={imageHamburger} 
-                          alt={p.name} 
-                          className="related-product-image" 
-                        />
-                      </div>
+                    <div key={p.id} className="search-restaurant-card-wrapper" style={{ margin: '10px 0' }}>
+                      <MenuItem 
+                        product={p} 
+                        restaurant={p.restaurant}
+                        canModify={false}
+                        onClick={() => setSelectedProduct(p)} 
+                      />
                     </div>
                   ))}
                 </div>
@@ -135,6 +113,13 @@ const SearchPage = () => {
         )}
       </main>
       <Footer />
+      {selectedProduct && (
+        <ProductDetailModal
+          product={selectedProduct}
+          restaurant={selectedProduct.restaurant}
+          onClose={() => setSelectedProduct(null)}
+        />
+      )}
     </div>
   );
 };

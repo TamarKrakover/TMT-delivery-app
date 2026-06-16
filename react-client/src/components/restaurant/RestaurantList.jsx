@@ -11,7 +11,7 @@ const RestaurantList = ({ restaurants = [] }) => {
 
 
   return (
-    <div className="restaurant-list">
+    <div className="restaurant-grid">
       {restaurants.map((restaurant) => {
         const dist = currentUser?.location && restaurant.location
           ? calculateDistance(currentUser.location, restaurant.location)
