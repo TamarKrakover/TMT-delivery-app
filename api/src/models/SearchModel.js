@@ -20,16 +20,16 @@ class SearchModel {
         const matchedRestaurants = db.restaurants.filter(r => 
             (r.name && r.name.toLowerCase().includes(lowerCaseQuery)) || 
             (r.description && r.description.toLowerCase().includes(lowerCaseQuery))
-        ).map(r => ({ ...r, type: 'restaurant' }));
+        );
 
         // Filter products where the name or description contains the search query
         const matchedProducts = db.products.filter(p => 
             (p.name && p.name.toLowerCase().includes(lowerCaseQuery)) || 
             (p.description && p.description.toLowerCase().includes(lowerCaseQuery))
-        ).map(p => ({ ...p, type: 'product' }));
+        );
 
-        // Return structured object containing matching restaurants and products
-        return { restaurants: matchedRestaurants, products: matchedProducts };
+        // Combine and return the matching restaurants and products
+        return [...matchedRestaurants, ...matchedProducts];
     }
 }
 

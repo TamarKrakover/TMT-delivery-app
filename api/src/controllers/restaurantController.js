@@ -1,25 +1,9 @@
 const RestaurantModel = require('../models/RestaurantModel');
 const UserModel = require('../models/UserModel');
-const { calculateDistance } = require('../utils/distance');
 
 // Fetch all restaurants
 exports.getAllRestaurants = (req, res) => {
-    let restaurants = RestaurantModel.getAll();
-    const { lat, lng } = req.query;
-
-    if (lat !== undefined && lng !== undefined) {
-        const userLoc = { lat: parseFloat(lat), lng: parseFloat(lng) };
-        restaurants = restaurants.map(r => {
-            const distance = r.location ? calculateDistance(userLoc, r.location) : null;
-            return { ...r, distance };
-        });
-        restaurants.sort((a, b) => {
-            if (a.distance === null && b.distance === null) return 0;
-            if (a.distance === null) return 1;
-            if (b.distance === null) return -1;
-            return a.distance - b.distance;
-        });
-    }
+    const restaurants = RestaurantModel.getAll();
     res.status(200).json(restaurants);
 };
 

@@ -6,8 +6,7 @@ const ProductModel = require('../models/ProductModel');
 exports.getUserOrders = (req, res) => {
     const userId = req.userId;
     const userOrders = OrderModel.findByUserId(userId);
-    const sortedOrders = userOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    res.status(200).json(sortedOrders);
+    res.status(200).json(userOrders);
 };
 
 // create a new order for the authenticated user

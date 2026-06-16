@@ -25,8 +25,11 @@ const SearchPage = () => {
       try {
         setLoading(true);
         const data = await restaurantService.search(query);
-        setRestaurants(data.restaurants || []);
-        setProducts(data.products || []);
+        // Separate combined search results by presence of fields (location/address for restaurants, price for products)
+        const matchedRestaurants = data.filter(item => item.location !== undefined || item.address !== undefined);
+        const matchedProducts = data.filter(item => item.price !== undefined);
+        setRestaurants(matchedRestaurants);
+        setProducts(matchedProducts);
       } catch (err) {
         console.error("Search failed:", err);
         // Fallback search locally in mockRestaurants on error

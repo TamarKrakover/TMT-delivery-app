@@ -1,15 +1,21 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import RestaurantCard from './RestaurantCard';
+import { useAuth } from '../../contexts/AuthContext';
+import { calculateDistance } from '../../utils/distance';
 import './Restaurant.css';
 
 const RestaurantList = ({ restaurants = [] }) => {
   const navigate = useNavigate();
+  const { currentUser } = useAuth();
+
 
   return (
     <div className="restaurant-list">
       {restaurants.map((restaurant) => {
-        const dist = restaurant.distance !== undefined ? restaurant.distance : null;
+        const dist = currentUser?.location && restaurant.location
+          ? calculateDistance(currentUser.location, restaurant.location)
+          : null;
         
         return (
           <RestaurantCard
