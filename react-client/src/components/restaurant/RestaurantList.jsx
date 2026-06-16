@@ -12,9 +12,11 @@ const RestaurantList = ({ restaurants = [] }) => {
   return (
     <div className="restaurant-grid">
       {restaurants.map((restaurant) => {
-        const dist = currentUser?.location && restaurant.location
-          ? calculateDistance(currentUser.location, restaurant.location)
+        const userLoc = currentUser?.location || { lat: 32.0853, lng: 34.7818 }; // fallback to default location if missing
+        const dist = userLoc && restaurant.location
+          ? calculateDistance(userLoc, restaurant.location)
           : null;
+        console.log("Restaurant:", restaurant.name, "UserLoc:", userLoc, "RestLoc:", restaurant.location, "Calculated Dist:", dist);
         
         return (
           <RestaurantCard
@@ -24,7 +26,7 @@ const RestaurantList = ({ restaurants = [] }) => {
             category={restaurant.category}
             image={restaurant.image}
             description={restaurant.description}
-            distance={dist}
+            distance={dist} 
             onClick={() => navigate(`/restaurant/${restaurant.id}`)}
           />
         );

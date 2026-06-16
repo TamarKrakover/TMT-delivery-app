@@ -1,7 +1,7 @@
 import React from 'react';
 const DEFAULT_RESTAURANT_IMAGE = "/images/restaurants/default.webp";
 
-const RestaurantCard = ({ name, category, icon, image, imageKey, distance, description, onClick }) => {
+const RestaurantCard = ({ name, category, icon, image, distance, description, onClick }) => {
   // Fallback chain: explicit image prop -> default fallback image
   const displayImage = image || DEFAULT_RESTAURANT_IMAGE;
 

@@ -8,7 +8,8 @@ const CATEGORY_IMAGES = {
   'Desserts': '/images/categories/dessert.webp',
   'Sushi': '/images/categories/sushi.webp',
   'Salads': '/images/categories/salad.webp',
-  'Grill': '/images/categories/burgers.webp', // Using burgers as fallback for Grill
+  'Italian' : "/images/categories/italian.webp",
+  'Grill': '/images/categories/grill.webp',
   'Default': '/images/categories/all.webp'
 };
 
