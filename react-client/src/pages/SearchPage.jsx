@@ -75,9 +75,9 @@ const SearchPage = () => {
                         name={r.name}
                         category={r.category}
                         address={r.address}
+                        image={r.image}
                         rating={r.rating || "5.0"}
                         deliveryTime={r.deliveryTime || "20-30"}
-                        imageKey={r.imageKey}
                         onClick={() => navigate(`/restaurant/${r.id}`)}
                       />
                     </div>

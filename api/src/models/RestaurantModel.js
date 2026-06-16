@@ -25,6 +25,7 @@ class RestaurantModel {
             description: data.description || '',
             category: data.category || 'General',
             address: data.address,
+            image: data.image || '/images/restaurants/default.webp',
             location: data.location,
             creatorId: creatorId
         };

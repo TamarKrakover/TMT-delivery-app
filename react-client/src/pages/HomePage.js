@@ -7,6 +7,7 @@ import RestaurantList from '../components/restaurant/RestaurantList';
 import HeroBanner from '../components/layout/HeroBanner';
 import RestaurantFormModal from '../components/modals/RestaurantFormModal';
 import { restaurantService } from '../services/restaurantService';
+import { categoryService } from '../services/categoryService';
 import mockRestaurants from '../data/restaurants.json';
 import { calculateDistance } from '../utils/distance';
 import { FiPlus } from 'react-icons/fi';
@@ -21,6 +22,7 @@ const HomePage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [restaurants, setRestaurants] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const addRestModal = useModal();
@@ -30,8 +32,12 @@ const HomePage = () => {
       try {
         setLoading(true);
         if (searchQuery.trim() === '') {
-          const data = await restaurantService.getAll();
-          setRestaurants(data);
+          const [restData, catData] = await Promise.all([
+            restaurantService.getAll(),
+            categoryService.getAll()
+          ]);
+          setRestaurants(restData);
+          setCategories(catData);
         } else {
           const data = await restaurantService.search(searchQuery);
           const matchedRestaurants = data.filter(item => item.address !== undefined);
@@ -84,6 +90,7 @@ const HomePage = () => {
       <section className="category-section">
         <h2 className="category-section-title">Categories</h2>
         <CategoryFilters 
+          categories={categories}
           selectedCategory={selectedCategory} 
           onCategorySelect={setSelectedCategory} 
         />

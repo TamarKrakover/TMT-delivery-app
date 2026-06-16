@@ -7,7 +7,7 @@ const RestaurantFormModal = ({ title, initialData, onSubmit, onClose, error }) =
     description: '',
     category: 'Burgers',
     address: '',
-    imageKey: 'burger',
+    image: initialData?.image || '/images/restaurants/default.webp',
     location: initialData?.location || { lat: 32.0853, lng: 34.7818 }
   });
 
@@ -104,15 +104,16 @@ const RestaurantFormModal = ({ title, initialData, onSubmit, onClose, error }) =
             <label className="form-label">Banner Image Theme</label>
             <select
               className="form-input"
-              value={form.imageKey}
-              onChange={(e) => setForm({ ...form, imageKey: e.target.value })}
+              value={form.image}
+              onChange={(e) => setForm({ ...form, image: e.target.value })}
             >
-              <option value="burger">Burgers / Grill</option>
-              <option value="pizza">Pizza</option>
-              <option value="sushi">Sushi</option>
-              <option value="asian">Asian</option>
-              <option value="dessert">Desserts</option>
-              <option value="salad">Salads</option>
+              <option value="/images/restaurants/default.webp">Default Restaurant</option>
+              <option value="/images/restaurants/hamburger.webp">Burgers / Grill</option>
+              <option value="/images/restaurants/pizza.webp">Pizza</option>
+              <option value="/images/restaurants/sushi.webp">Sushi</option>
+              <option value="/images/restaurants/wok.webp">Asian</option>
+              <option value="/images/restaurants/sweet-dreams.webp">Desserts</option>
+              <option value="/images/restaurants/salad.webp">Salads</option>
             </select>
           </div>
 
