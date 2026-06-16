@@ -10,7 +10,7 @@ const imageMap = {
   salad: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&auto=format&fit=crop&q=80"
 };
 
-const RestaurantCard = ({ name, category, icon, image, imageKey, rating, deliveryTime, address, distance, onClick }) => {
+const RestaurantCard = ({ name, category, icon, image, imageKey, distance, description, onClick }) => {
   // Fallback chain: explicit image prop -> mapped imageKey -> default fallback image
   const displayImage = image || (imageKey && imageMap[imageKey.toLowerCase()]) || DEFAULT_RESTAURANT_IMAGE;
 
@@ -27,15 +27,12 @@ const RestaurantCard = ({ name, category, icon, image, imageKey, rating, deliver
       </div>
       <div className="restaurant-info">
         <h3 className="restaurant-name">{name}</h3>
-        <div className="restaurant-meta">
-          <span className="restaurant-rating">⭐ {rating}</span>
-          <span>•</span>
-          <span>{deliveryTime} mins</span>
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <p className="restaurant-address">{address}</p>
+        {description && (
+          <p className="restaurant-description">{description}</p>
+        )}
+        <div className="restaurant-footer">
           {distance !== null && distance !== undefined && (
-            <span style={{ fontSize: '0.85em', color: 'var(--primary)', fontWeight: 'bold' }}>
+            <span className="restaurant-distance">
               📍 {distance.toFixed(1)} km
             </span>
           )}

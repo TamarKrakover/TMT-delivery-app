@@ -24,9 +24,7 @@ const RestaurantList = ({ restaurants = [] }) => {
             name={restaurant.name}
             category={restaurant.category}
             imageKey={restaurant.imageKey}
-            rating={restaurant.rating || "5.0"}
-            deliveryTime={restaurant.deliveryTime || "20-30"}
-            address={restaurant.address}
+            description={restaurant.description}
             distance={dist}
             onClick={() => navigate(`/restaurant/${restaurant.id}`)}
           />
