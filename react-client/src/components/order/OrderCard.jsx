@@ -2,7 +2,7 @@ import React from 'react';
 import { FiClock, FiShoppingBag } from 'react-icons/fi';
 import './OrderCard.css';
 
-const OrderCard = ({ order, restaurant }) => {
+const OrderCard = ({ order, restaurant, restaurantProducts = [] }) => {
   const date = new Date(order.createdAt).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',
@@ -13,6 +13,21 @@ const OrderCard = ({ order, restaurant }) => {
 
   const itemCount = order.productIds ? order.productIds.length : 0;
   const restaurantName = restaurant ? restaurant.name : 'Unknown Restaurant';
+
+  // Group products by ID to count quantities
+  const groupedProducts = order.productIds?.reduce((acc, id) => {
+    acc[id] = (acc[id] || 0) + 1;
+    return acc;
+  }, {});
+
+  // Map to human-readable item names using the fetched products
+  const itemNames = groupedProducts 
+    ? Object.entries(groupedProducts).map(([id, count]) => {
+        const product = restaurantProducts.find(p => p.id === id);
+        const name = product ? product.name : 'Unknown Item';
+        return `${count}x ${name}`;
+      })
+    : [];
 
   return (
     <div className="order-card">
@@ -33,6 +48,13 @@ const OrderCard = ({ order, restaurant }) => {
             {itemCount} {itemCount === 1 ? 'item' : 'items'}
           </span>
         </div>
+        {itemNames.length > 0 && (
+          <div style={{ fontSize: '0.85rem', color: 'var(--gray-500)', marginTop: '8px', paddingLeft: '24px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            {itemNames.map((item, idx) => (
+              <span key={idx}>• {item}</span>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="order-card-footer">
