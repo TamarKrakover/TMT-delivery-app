@@ -1,19 +1,24 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useAuth } from './AuthContext';
 
 const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
-  const [darkMode, setDarkMode] = useState(() => {
-    // Check localStorage or default to false
-    const saved = localStorage.getItem('theme');
-    return saved === 'dark';
-  });
+  const { currentUser } = useAuth();
+  const [darkMode, setDarkMode] = useState(false);
 
+  // Load user-specific theme when they log in
   useEffect(() => {
-    // Save to localStorage
-    localStorage.setItem('theme', darkMode ? 'dark' : 'light');
-    
-    // Apply globally to body for global CSS usage
+    if (currentUser) {
+      const saved = localStorage.getItem(`theme_${currentUser.id}`);
+      setDarkMode(saved === 'dark');
+    } else {
+      setDarkMode(false);
+    }
+  }, [currentUser]);
+
+  // Apply to body globally
+  useEffect(() => {
     if (darkMode) {
       document.body.classList.add('dark-mode');
     } else {
@@ -21,12 +26,19 @@ export const ThemeProvider = ({ children }) => {
     }
   }, [darkMode]);
 
-  // Keep both names for backwards compatibility during merge
-  const toggleDarkMode = () => setDarkMode(prev => !prev);
+  const toggleDarkMode = () => {
+    setDarkMode(prev => {
+      const newVal = !prev;
+      if (currentUser) {
+        localStorage.setItem(`theme_${currentUser.id}`, newVal ? 'dark' : 'light');
+      }
+      return newVal;
+    });
+  };
   const toggleTheme = toggleDarkMode;
 
   return (
-    <ThemeContext.Provider value={{ darkMode, toggleDarkMode, toggleTheme }}>
+    <ThemeContext.Provider value={{ darkMode, toggleDarkMode, toggleTheme, setDarkMode }}>
       {children}
     </ThemeContext.Provider>
   );
