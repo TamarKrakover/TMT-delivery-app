@@ -33,7 +33,7 @@ const HomePage = () => {
         setLoading(true);
         if (searchQuery.trim() === '') {
           const [restData, catData] = await Promise.all([
-            restaurantService.getAll(),
+            restaurantService.getAll(currentUser?.location?.lat, currentUser?.location?.lng),
             categoryService.getAll()
           ]);
           setRestaurants(restData);
@@ -52,7 +52,7 @@ const HomePage = () => {
     };
 
     loadRestaurants();
-  }, [searchQuery]);
+  }, [searchQuery, currentUser?.location?.lat, currentUser?.location?.lng]);
 
   const handleAddRestaurantSubmit = async (form) => {
     if (!form.name) {
@@ -63,7 +63,7 @@ const HomePage = () => {
       await restaurantService.create(form);
       addRestModal.closeModal();
       
-      const data = await restaurantService.getAll();
+      const data = await restaurantService.getAll(currentUser?.location?.lat, currentUser?.location?.lng);
       setRestaurants(data);
     } catch (err) {
       addRestModal.setError(err.message || 'Failed to create restaurant.');
