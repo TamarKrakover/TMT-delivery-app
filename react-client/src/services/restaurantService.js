@@ -2,7 +2,13 @@ import request from './api';
 
 export const restaurantService = {
   // Get all restaurants
-  getAll: () => request('/api/restaurants'),
+  getAll: (lat, lng) => {
+    let url = '/api/restaurants';
+    if (lat !== undefined && lng !== undefined) {
+      url += `?lat=${lat}&lng=${lng}`;
+    }
+    return request(url);
+  },
 
   // Get specific restaurant by ID
   getById: (id) => request(`/api/restaurants/${id}`),

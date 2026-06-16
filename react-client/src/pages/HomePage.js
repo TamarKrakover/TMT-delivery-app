@@ -7,6 +7,7 @@ import RestaurantList from '../components/restaurant/RestaurantList';
 import HeroBanner from '../components/layout/HeroBanner';
 import RestaurantFormModal from '../components/modals/RestaurantFormModal';
 import { restaurantService } from '../services/restaurantService';
+import { categoryService } from '../services/categoryService';
 import mockRestaurants from '../data/restaurants.json';
 import { calculateDistance } from '../utils/distance';
 import { FiPlus } from 'react-icons/fi';
@@ -21,6 +22,7 @@ const HomePage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [restaurants, setRestaurants] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const addRestModal = useModal();
@@ -30,8 +32,12 @@ const HomePage = () => {
       try {
         setLoading(true);
         if (searchQuery.trim() === '') {
-          const data = await restaurantService.getAll();
-          setRestaurants(data);
+          const [restData, catData] = await Promise.all([
+            restaurantService.getAll(currentUser?.location?.lat, currentUser?.location?.lng),
+            categoryService.getAll()
+          ]);
+          setRestaurants(restData);
+          setCategories(catData);
         } else {
           const data = await restaurantService.search(searchQuery);
           const matchedRestaurants = data.filter(item => item.location !== undefined || item.address !== undefined);
@@ -46,7 +52,7 @@ const HomePage = () => {
     };
 
     loadRestaurants();
-  }, [searchQuery]);
+  }, [searchQuery, currentUser?.location?.lat, currentUser?.location?.lng]);
 
   const handleAddRestaurantSubmit = async (form) => {
     if (!form.name) {
@@ -57,7 +63,7 @@ const HomePage = () => {
       await restaurantService.create(form);
       addRestModal.closeModal();
       
-      const data = await restaurantService.getAll();
+      const data = await restaurantService.getAll(currentUser?.location?.lat, currentUser?.location?.lng);
       setRestaurants(data);
     } catch (err) {
       addRestModal.setError(err.message || 'Failed to create restaurant.');
@@ -84,6 +90,7 @@ const HomePage = () => {
       <section className="category-section">
         <h2 className="category-section-title">Categories</h2>
         <CategoryFilters 
+          categories={categories}
           selectedCategory={selectedCategory} 
           onCategorySelect={setSelectedCategory} 
         />

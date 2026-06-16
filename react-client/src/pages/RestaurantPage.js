@@ -1,5 +1,5 @@
 import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
 import { FiEdit, FiTrash2, FiPlus } from 'react-icons/fi';
@@ -15,14 +15,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useRestaurant } from '../hooks/useRestaurant';
 import { useModal } from '../hooks/useModal';
 
-const imageMap = {
-  burger: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=80",
-  pizza: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600&auto=format&fit=crop&q=80",
-  sushi: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=600&auto=format&fit=crop&q=80",
-  asian: "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=600&auto=format&fit=crop&q=80",
-  dessert: "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=600&auto=format&fit=crop&q=80",
-  salad: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&auto=format&fit=crop&q=80"
-};
+const DEFAULT_RESTAURANT_IMAGE = "/images/restaurants/default.webp";
 
 const RestaurantPage = () => {
   const { id } = useParams();
@@ -87,7 +80,7 @@ const RestaurantPage = () => {
     );
   }
 
-  const bgImage = restaurant.image || imageMap[restaurant.imageKey] || imageMap.burger;
+  const bgImage = restaurant.image || DEFAULT_RESTAURANT_IMAGE;
 
   return (
     <div className="app-container restaurant-page-container">
@@ -141,7 +134,7 @@ const RestaurantPage = () => {
             name: restaurant.name || '',
             description: restaurant.description || '',
             category: restaurant.category || 'Burgers',
-            imageKey: restaurant.imageKey || 'burger'
+            image: restaurant.image || DEFAULT_RESTAURANT_IMAGE
           }}
           onSubmit={handleEditRestaurantSubmit}
           onClose={editRestModal.closeModal}

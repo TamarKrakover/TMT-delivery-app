@@ -3,7 +3,7 @@
     "id": "r1",
     "name": "Burger Palace",
     "category": "Burgers",
-    "imageKey": "burger",
+    "image": "/images/restaurants/hamburger.webp",
     "rating": "4.8",
     "deliveryTime": "15-25",
     "address": "128 Main St"
@@ -12,7 +12,7 @@
     "id": "r2",
     "name": "Pizza Di Mama",
     "category": "Pizza",
-    "imageKey": "pizza",
+    "image": "/images/restaurants/pizza.webp",
     "rating": "4.7",
     "deliveryTime": "20-30",
     "address": "456 Italian Way"
@@ -21,7 +21,7 @@
     "id": "r3",
     "name": "Sushi Zen",
     "category": "Sushi",
-    "imageKey": "sushi",
+    "image": "/images/restaurants/sushi.webp",
     "rating": "4.9",
     "deliveryTime": "25-35",
     "address": "88 Tokyo St"
@@ -30,7 +30,7 @@
     "id": "r4",
     "name": "Wok Star",
     "category": "Asian",
-    "imageKey": "asian",
+    "image": "/images/restaurants/wok.webp",
     "rating": "4.5",
     "deliveryTime": "30-40",
     "address": "77 Dragon Blvd"
@@ -39,7 +39,7 @@
     "id": "r5",
     "name": "Sweet Dreams",
     "category": "Desserts",
-    "imageKey": "dessert",
+    "image": "/images/restaurants/sweet-dreams.webp",
     "rating": "4.6",
     "deliveryTime": "10-20",
     "address": "12 Chocolate Rd"
@@ -48,7 +48,7 @@
     "id": "r6",
     "name": "Green & Fresh",
     "category": "Salads",
-    "imageKey": "salad",
+    "image": "/images/restaurants/salad.webp",
     "rating": "4.4",
     "deliveryTime": "15-20",
     "address": "34 Garden Ave"
