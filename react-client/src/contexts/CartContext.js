@@ -1,129 +1,245 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { useAuth } from './AuthContext';
+import { orderService } from '../services/orderService';
+import { restaurantService } from '../services/restaurantService';
+import { productService } from '../services/productService';
 
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-  const [cartItems, setCartItems] = useState(() => {
-    try {
-      const saved = localStorage.getItem('cart');
-      return saved ? JSON.parse(saved) : [];
-    } catch (e) {
-      console.error('Failed to load cart from localStorage', e);
-      return [];
-    }
-  });
-
-  const [cartRestaurant, setCartRestaurant] = useState(() => {
-    try {
-      const saved = localStorage.getItem('cart_restaurant');
-      return saved ? JSON.parse(saved) : null;
-    } catch (e) {
-      console.error('Failed to load cart restaurant from localStorage', e);
-      return null;
-    }
-  });
-
+  const { currentUser } = useAuth();
+  
+  const [cartItems, setCartItems] = useState([]);
+  const [cartRestaurant, setCartRestaurant] = useState(null);
+  const [activeOrderId, setActiveOrderId] = useState(null);
   const [isCartOpen, setCartOpen] = useState(false);
   const [conflictItem, setConflictItem] = useState(null);
+  const [checkoutTrigger, setCheckoutTrigger] = useState(0);
 
-  // Sync cart to local storage
-  useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cartItems));
-  }, [cartItems]);
-
-  useEffect(() => {
-    if (cartRestaurant) {
-      localStorage.setItem('cart_restaurant', JSON.stringify(cartRestaurant));
-    } else {
-      localStorage.removeItem('cart_restaurant');
-    }
-  }, [cartRestaurant]);
-
-  const toggleCart = () => setCartOpen(prev => !prev);
-
-  const addToCart = (product, restaurant) => {
-    // If cart is empty, set the active restaurant and add item
-    if (cartItems.length === 0 || !cartRestaurant) {
-      const newRestaurant = { id: restaurant.id, name: restaurant.name };
-      setCartRestaurant(newRestaurant);
-      setCartItems([{ ...product, quantity: 1 }]);
-      setCartOpen(true);
+  const fetchCart = useCallback(async () => {
+    if (!currentUser) {
+      setCartItems([]);
+      setCartRestaurant(null);
+      setActiveOrderId(null);
       return;
     }
 
-    // Check if the item belongs to the same restaurant
+    try {
+      const orders = await orderService.getAll();
+      const pendingOrder = orders.find(o => o.status === 'Pending');
+
+      if (pendingOrder && pendingOrder.productIds && pendingOrder.productIds.length > 0) {
+        setActiveOrderId(pendingOrder.id);
+        
+        // Fetch restaurant
+        const restaurants = await restaurantService.getAll();
+        const restaurant = restaurants.find(r => r.id === pendingOrder.restaurantId);
+        if (restaurant) {
+          setCartRestaurant({ id: restaurant.id, name: restaurant.name });
+        } else {
+          setCartRestaurant({ id: pendingOrder.restaurantId, name: 'Unknown' });
+        }
+
+        // Fetch products
+        let products = [];
+        try {
+          products = await productService.getByRestaurantId(pendingOrder.restaurantId);
+        } catch (e) {
+          console.error("Could not fetch products", e);
+        }
+        
+        // Count frequencies
+        const counts = {};
+        pendingOrder.productIds.forEach(id => {
+          counts[id] = (counts[id] || 0) + 1;
+        });
+
+        const items = [];
+        for (const [pid, qty] of Object.entries(counts)) {
+          let product = products.find(p => p.id === pid);
+          if (!product) product = { id: pid, name: 'Unknown Product', price: 0 };
+          items.push({ ...product, quantity: qty });
+        }
+        setCartItems(items);
+      } else {
+        if (pendingOrder) {
+          // Empty pending order found
+          setActiveOrderId(pendingOrder.id);
+        } else {
+          setActiveOrderId(null);
+        }
+        setCartItems([]);
+        setCartRestaurant(null);
+      }
+    } catch (err) {
+      console.error("Failed to fetch cart", err);
+      setCartItems([]);
+      setCartRestaurant(null);
+      setActiveOrderId(null);
+    }
+  }, [currentUser]);
+
+  useEffect(() => {
+    fetchCart();
+  }, [fetchCart]);
+
+  const toggleCart = () => setCartOpen(prev => !prev);
+
+  const syncCartToServer = async (restaurantId, items) => {
+    if (!currentUser) return;
+    
+    const productIds = [];
+    items.forEach(item => {
+      for (let i = 0; i < item.quantity; i++) {
+        productIds.push(item.id);
+      }
+    });
+
+    try {
+      if (productIds.length === 0) {
+        if (activeOrderId) {
+          await orderService.delete(activeOrderId);
+          setActiveOrderId(null);
+        }
+      } else {
+        if (activeOrderId) {
+          await orderService.update(activeOrderId, { productIds });
+        } else {
+          const newOrder = await orderService.create(restaurantId, productIds);
+          // fetchCart to get the new order ID reliably
+          fetchCart();
+        }
+      }
+    } catch (err) {
+      console.error("Failed to sync cart", err);
+      fetchCart(); // rollback on error
+    }
+  };
+
+  const addToCart = async (product, restaurant) => {
+    if (!currentUser) {
+      alert("Please sign in to add items to your cart.");
+      return;
+    }
+
+    if (cartItems.length === 0 || !cartRestaurant) {
+      const newItems = [{ ...product, quantity: 1 }];
+      setCartRestaurant({ id: restaurant.id, name: restaurant.name });
+      setCartItems(newItems);
+      setCartOpen(true);
+      await syncCartToServer(restaurant.id, newItems);
+      return;
+    }
+
     if (restaurant.id !== cartRestaurant.id) {
       setConflictItem({ product, restaurant });
       return;
     }
 
-    // Add or increment the item
-    setCartItems(prevItems => {
-      const existingItem = prevItems.find(item => item.id === product.id);
-      if (existingItem) {
-        return prevItems.map(item =>
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-        );
-      }
-      return [...prevItems, { ...product, quantity: 1 }];
-    });
+    const newItems = [...cartItems];
+    const existingIndex = newItems.findIndex(item => item.id === product.id);
+    if (existingIndex >= 0) {
+      newItems[existingIndex] = { ...newItems[existingIndex], quantity: newItems[existingIndex].quantity + 1 };
+    } else {
+      newItems.push({ ...product, quantity: 1 });
+    }
+    setCartItems(newItems);
     setCartOpen(true);
+    await syncCartToServer(cartRestaurant.id, newItems);
   };
 
-  const removeFromCart = (productId) => {
-    setCartItems(prevItems => {
-      const existingItem = prevItems.find(item => item.id === productId);
-      if (!existingItem) return prevItems;
+  const removeFromCart = async (productId) => {
+    let newItems = [...cartItems];
+    const existingIndex = newItems.findIndex(item => item.id === productId);
+    if (existingIndex < 0) return;
 
-      let updatedItems;
-      if (existingItem.quantity <= 1) {
-        updatedItems = prevItems.filter(item => item.id !== productId);
-      } else {
-        updatedItems = prevItems.map(item =>
-          item.id === productId ? { ...item, quantity: item.quantity - 1 } : item
-        );
-      }
-
-      if (updatedItems.length === 0) {
-        setCartRestaurant(null);
-      }
-      return updatedItems;
-    });
-  };
-
-  const updateQuantity = (productId, quantity) => {
-    if (quantity <= 0) {
-      setCartItems(prevItems => {
-        const updated = prevItems.filter(item => item.id !== productId);
-        if (updated.length === 0) {
-          setCartRestaurant(null);
-        }
-        return updated;
-      });
-      return;
+    if (newItems[existingIndex].quantity <= 1) {
+      newItems = newItems.filter(item => item.id !== productId);
+    } else {
+      newItems[existingIndex] = { ...newItems[existingIndex], quantity: newItems[existingIndex].quantity - 1 };
     }
 
-    setCartItems(prevItems =>
-      prevItems.map(item =>
-        item.id === productId ? { ...item, quantity } : item
-      )
-    );
+    setCartItems(newItems);
+    if (newItems.length === 0) {
+      setCartRestaurant(null);
+    }
+    
+    if (cartRestaurant) {
+      await syncCartToServer(cartRestaurant.id, newItems);
+    }
   };
 
-  const clearCart = () => {
+  const updateQuantity = async (productId, quantity) => {
+    let newItems = [...cartItems];
+    
+    if (quantity <= 0) {
+      newItems = newItems.filter(item => item.id !== productId);
+    } else {
+      const existingIndex = newItems.findIndex(item => item.id === productId);
+      if (existingIndex >= 0) {
+        newItems[existingIndex] = { ...newItems[existingIndex], quantity };
+      }
+    }
+
+    setCartItems(newItems);
+    if (newItems.length === 0) {
+      setCartRestaurant(null);
+    }
+    
+    if (cartRestaurant) {
+      await syncCartToServer(cartRestaurant.id, newItems);
+    }
+  };
+
+  const clearCart = async () => {
     setCartItems([]);
     setCartRestaurant(null);
     setConflictItem(null);
+    if (activeOrderId) {
+      try {
+        await orderService.delete(activeOrderId);
+        setActiveOrderId(null);
+      } catch (e) {
+        console.error("Failed to clear cart", e);
+      }
+    }
   };
 
-  const confirmConflict = () => {
+  const checkout = async () => {
+    if (!currentUser || !activeOrderId) return;
+    try {
+      await orderService.update(activeOrderId, { status: 'Processing' });
+      setCartItems([]);
+      setCartRestaurant(null);
+      setActiveOrderId(null);
+      setCheckoutTrigger(prev => prev + 1); // Trigger a refresh for other components
+    } catch (e) {
+      console.error("Failed to checkout", e);
+      throw e;
+    }
+  };
+
+  const confirmConflict = async () => {
     if (conflictItem) {
       const { product, restaurant } = conflictItem;
-      const newRestaurant = { id: restaurant.id, name: restaurant.name };
-      setCartRestaurant(newRestaurant);
-      setCartItems([{ ...product, quantity: 1 }]);
+      const newItems = [{ ...product, quantity: 1 }];
+      
+      setCartRestaurant({ id: restaurant.id, name: restaurant.name });
+      setCartItems(newItems);
       setConflictItem(null);
       setCartOpen(true);
+      
+      try {
+        // Since we are changing the restaurant, we must delete the old order and create a new one
+        if (activeOrderId) {
+          await orderService.delete(activeOrderId);
+        }
+        const newOrder = await orderService.create(restaurant.id, [product.id]);
+        setActiveOrderId(newOrder.id);
+      } catch (e) {
+        console.error("Failed to switch cart", e);
+        fetchCart(); // Re-fetch on error
+      }
     }
   };
 
@@ -144,8 +260,10 @@ export const CartProvider = ({ children }) => {
         removeFromCart,
         updateQuantity,
         clearCart,
+        checkout,
         confirmConflict,
-        cancelConflict
+        cancelConflict,
+        checkoutTrigger
       }}
     >
       {children}

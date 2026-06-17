@@ -44,10 +44,8 @@ export const useRestaurant = (id, currentUser) => {
   };
 
   const deleteRestaurant = async () => {
-    if (window.confirm(`Are you sure you want to delete ${restaurant.name}? This will remove all its menu items.`)) {
-      await restaurantService.delete(id);
-      navigate('/');
-    }
+    await restaurantService.delete(id);
+    navigate('/');
   };
 
   const submitProduct = async (productFormMode, selectedProdId, form) => {
