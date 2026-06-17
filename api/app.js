@@ -15,6 +15,7 @@ const restaurantRoutes = require('./src/routes/restaurantRoutes');
 const orderRoutes = require('./src/routes/orderRoutes');
 const searchRoutes = require('./src/routes/searchRoutes');
 const tokenRoutes = require('./src/routes/tokenRoutes');
+const categoryRoutes = require('./src/routes/categoryRoutes');
 
 // Mount routes to their respective paths
 app.use('/api/users', userRoutes);
@@ -22,6 +23,7 @@ app.use('/api/restaurants', restaurantRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/search', searchRoutes);
 app.use('/api/tokens', tokenRoutes);
+app.use('/api/categories', categoryRoutes);
 
 // Catch-all route for undefined endpoints
 app.use((req, res) => {

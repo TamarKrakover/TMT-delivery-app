@@ -20,7 +20,16 @@ const db = {
         { id: "123e4567-e89b-12d3-a456-426614174003", restaurantId: "r8", name: "Tamar Tart", description: "Delicious fruit tart", price: 5.99, imageKey: "dessert" },
         { id: "123e4567-e89b-12d3-a456-426614174004", restaurantId: "r9", name: "Grilled Ribeye", description: "12oz Ribeye steak", price: 24.99, imageKey: "burger" }
     ],
-    orders: []
+    orders: [],
+    categories: [
+        { name: 'Burgers', image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=150&auto=format&fit=crop&q=80" },
+        { name: 'Pizza', image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=150&auto=format&fit=crop&q=80" },
+        { name: 'Asian', image: "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=150&auto=format&fit=crop&q=80" },
+        { name: 'Desserts', image: "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=150&auto=format&fit=crop&q=80" },
+        { name: 'Sushi', image: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=150&auto=format&fit=crop&q=80" },
+        { name: 'Salads', image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=150&auto=format&fit=crop&q=80" },
+        { name: 'General', image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150&auto=format&fit=crop&q=80" }
+    ]
 };
 
 // Export the db object to be required by any controller that needs data access

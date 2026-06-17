@@ -6,7 +6,9 @@ import CategoryFilters from '../components/restaurant/CategoryFilters';
 import RestaurantList from '../components/restaurant/RestaurantList';
 import HeroBanner from '../components/layout/HeroBanner';
 import RestaurantFormModal from '../components/modals/RestaurantFormModal';
+import CategoryFormModal from '../components/modals/CategoryFormModal';
 import { restaurantService } from '../services/restaurantService';
+import { categoryService } from '../services/categoryService';
 import mockRestaurants from '../data/restaurants.json';
 import { calculateDistance } from '../utils/distance';
 import { FiPlus } from 'react-icons/fi';
@@ -21,9 +23,24 @@ const HomePage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [restaurants, setRestaurants] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const addRestModal = useModal();
+  const addCatModal = useModal();
+
+  const fetchCategories = async () => {
+    try {
+      const cats = await categoryService.getAll();
+      setCategories(cats);
+    } catch (err) {
+      console.error("Failed to fetch categories:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     const loadRestaurants = async () => {
@@ -59,8 +76,23 @@ const HomePage = () => {
       
       const data = await restaurantService.getAll();
       setRestaurants(data);
+      fetchCategories(); // Refresh category counts
     } catch (err) {
       addRestModal.setError(err.message || 'Failed to create restaurant.');
+    }
+  };
+
+  const handleAddCategorySubmit = async (form) => {
+    if (!form.name) {
+      addCatModal.setError('Name is required.');
+      return;
+    }
+    try {
+      await categoryService.create(form);
+      addCatModal.closeModal();
+      fetchCategories();
+    } catch (err) {
+      addCatModal.setError(err.response?.data?.message || err.message || 'Failed to create category.');
     }
   };
 
@@ -89,6 +121,13 @@ const HomePage = () => {
     const distB = b.location ? calculateDistance(currentUser.location, b.location) : Infinity;
     return distA - distB;
   });
+
+  const allCategory = {
+    name: 'All',
+    image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150&auto=format&fit=crop&q=80",
+    count: restaurants.length
+  };
+  const displayCategories = [allCategory, ...categories];
 
   return (
     <div className={`app-container ${darkMode ? 'dark-mode' : ''}`}>
@@ -128,8 +167,16 @@ const HomePage = () => {
           </div>
         )}
 
-        <h2 className="category-section-title" style={{marginTop: '40px'}}>Categories</h2>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '40px' }}>
+          <h2 className="category-section-title" style={{ marginTop: 0, marginBottom: 0 }}>Categories</h2>
+          {currentUser?.isAdmin && (
+            <button className="btn-primary add-restaurant-btn" onClick={() => addCatModal.openModal()}>
+              <FiPlus /> Add Category
+            </button>
+          )}
+        </div>
         <CategoryFilters 
+          categories={displayCategories}
           selectedCategory={selectedCategory} 
           onCategorySelect={setSelectedCategory} 
         />
@@ -157,6 +204,14 @@ const HomePage = () => {
           onSubmit={handleAddRestaurantSubmit}
           onClose={addRestModal.closeModal}
           error={addRestModal.error}
+        />
+      )}
+
+      {addCatModal.isOpen && (
+        <CategoryFormModal
+          onSubmit={handleAddCategorySubmit}
+          onClose={addCatModal.closeModal}
+          error={addCatModal.error}
         />
       )}
     </div>
