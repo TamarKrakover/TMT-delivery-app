@@ -64,6 +64,22 @@ const HomePage = () => {
     }
   };
 
+  const myRestaurants = currentUser && (currentUser.role === 'owner' || currentUser.isAdmin)
+    ? restaurants.filter(r => r.creatorId === currentUser.id).reverse()
+    : [];
+
+  const nearbyRestaurants = currentUser?.location
+    ? restaurants.filter(r => {
+        if (!r.location) return false;
+        const dist = calculateDistance(currentUser.location, r.location);
+        return dist !== null && dist <= 5;
+      }).sort((a, b) => {
+        const distA = calculateDistance(currentUser.location, a.location);
+        const distB = calculateDistance(currentUser.location, b.location);
+        return distA - distB;
+      })
+    : [];
+
   const displayedRestaurants = restaurants.filter(r => 
     selectedCategory === 'All' || 
     (r.category && r.category.toLowerCase() === selectedCategory.toLowerCase())
@@ -82,7 +98,37 @@ const HomePage = () => {
       <HeroBanner />
 
       <section className="category-section">
-        <h2 className="category-section-title">Categories</h2>
+        {currentUser && (currentUser.role === 'owner' || currentUser.isAdmin) && (
+          <div className="admin-actions-bar">
+            <button className="btn-primary add-restaurant-btn" onClick={() => addRestModal.openModal()}>
+              <FiPlus /> Add Restaurant
+            </button>
+          </div>
+        )}
+
+        {currentUser && (currentUser.role === 'owner' || currentUser.isAdmin) && (
+          <div className="special-list-container">
+            <h2 className="section-title">My Restaurants</h2>
+            {myRestaurants.length > 0 ? (
+              <RestaurantList restaurants={myRestaurants} />
+            ) : (
+              <p className="empty-message">You haven't added any restaurants yet.</p>
+            )}
+          </div>
+        )}
+
+        {currentUser?.location && (
+          <div className="special-list-container">
+            <h2 className="section-title">What's there to eat nearby?</h2>
+            {nearbyRestaurants.length > 0 ? (
+              <RestaurantList restaurants={nearbyRestaurants} />
+            ) : (
+              <p className="empty-message">We couldn't find any restaurants within 5km of your location.</p>
+            )}
+          </div>
+        )}
+
+        <h2 className="category-section-title" style={{marginTop: '40px'}}>Categories</h2>
         <CategoryFilters 
           selectedCategory={selectedCategory} 
           onCategorySelect={setSelectedCategory} 
@@ -90,15 +136,10 @@ const HomePage = () => {
       </section>
 
       <main className="home-main">
-        <div className="home-header-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-          <h2 className="section-title" style={{ marginBottom: 0 }}>
+        <div className="home-header-row">
+          <h2 className="section-title">
             {selectedCategory} Restaurants {searchQuery && `matching "${searchQuery}"`}
           </h2>
-          {currentUser && (currentUser.role === 'owner' || currentUser.isAdmin) && (
-            <button className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }} onClick={() => addRestModal.openModal()}>
-              <FiPlus /> Add Restaurant
-            </button>
-          )}
         </div>
 
         {loading ? (

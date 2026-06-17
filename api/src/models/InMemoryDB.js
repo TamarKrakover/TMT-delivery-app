@@ -1,7 +1,6 @@
 const db = {
     users: [
-        { id: "admin", username: "admin", password: "password", isAdmin: true, location: { lat: 32.0853, lng: 34.7818 } },
-        { id: "user1", username: "user1", password: "password", isAdmin: false, location: { lat: 32.0800, lng: 34.7800 } }
+        { id: "admin", name: "admin",username: "admin", password: "admin123!", isAdmin: true, location: { lat: 32.0853, lng: 34.7818 }}
     ],
     restaurants: [
         { id: "r1", name: "Burger Palace", description: "Best burgers in town", category: "Burgers", creatorId: "admin", imageKey: "burger", location: { lat: 32.0833, lng: 34.7850 } },

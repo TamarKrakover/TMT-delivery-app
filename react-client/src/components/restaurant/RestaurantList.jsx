@@ -11,7 +11,7 @@ const RestaurantList = ({ restaurants = [] }) => {
 
 
   return (
-    <div className="restaurant-list">
+    <div className="restaurant-grid">
       {restaurants.map((restaurant) => {
         const dist = currentUser?.location && restaurant.location
           ? calculateDistance(currentUser.location, restaurant.location)
@@ -28,6 +28,7 @@ const RestaurantList = ({ restaurants = [] }) => {
             rating={restaurant.rating || "5.0"}
             deliveryTime={restaurant.deliveryTime || "20-30"}
             distance={dist}
+            description={restaurant.description}
             onClick={() => navigate(`/restaurant/${restaurant.id}`)}
           />
         );

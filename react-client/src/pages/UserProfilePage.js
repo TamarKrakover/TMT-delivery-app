@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
 import OrderCard from '../components/order/OrderCard';
 import { orderService } from '../services/orderService';
 import { restaurantService } from '../services/restaurantService';
+import RestaurantList from '../components/restaurant/RestaurantList';
 import { productService } from '../services/productService';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
@@ -12,6 +14,7 @@ import { FiClock, FiShoppingBag, FiList } from 'react-icons/fi';
 import './UserProfilePage.css';
 
 const UserProfilePage = () => {
+  const navigate = useNavigate();
   const { currentUser } = useAuth();
   const { checkoutTrigger } = useCart();
   const { darkMode } = useTheme();
@@ -143,16 +146,46 @@ const UserProfilePage = () => {
                 <p>You haven't added any restaurants yet.</p>
               </div>
             ) : (
-              <div className="orders-list" style={{ gap: '16px' }}>
-                {restaurants.filter(r => r.creatorId === currentUser.id).map(rest => (
-                  <div key={rest.id} className="order-card" style={{ padding: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                      <h3 style={{ margin: '0 0 8px 0', fontSize: '1.2rem', color: 'var(--text-color)' }}>{rest.name}</h3>
-                      <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--gray-500)' }}>{rest.address}</p>
+              <div className="restaurant-list-container">
+                {restaurants.filter(r => r.creatorId === currentUser.id).map(rest => {
+                  const DEFAULT_IMAGE = "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500&auto=format&fit=crop&q=60";
+                  const imageMap = {
+                    burger: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=80",
+                    pizza: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600&auto=format&fit=crop&q=80",
+                    sushi: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=600&auto=format&fit=crop&q=80",
+                    asian: "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=600&auto=format&fit=crop&q=80",
+                    dessert: "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=600&auto=format&fit=crop&q=80",
+                    salad: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&auto=format&fit=crop&q=80"
+                  };
+                  const displayImage = rest.image || (rest.imageKey && imageMap[rest.imageKey.toLowerCase()]) || DEFAULT_IMAGE;
+                  
+                  return (
+                    <div 
+                      key={rest.id} 
+                      className="restaurant-list-card" 
+                      onClick={() => navigate(`/restaurant/${rest.id}`)}
+                    >
+                      <img 
+                        src={displayImage} 
+                        alt={rest.name} 
+                        className="restaurant-list-image"
+                      />
+                      <div className="restaurant-list-info">
+                        <div className="restaurant-list-header">
+                          <h3 className="restaurant-list-title">{rest.name}</h3>
+                          <span className="restaurant-list-badge">{rest.category}</span>
+                        </div>
+                        <p className="restaurant-list-desc">{rest.address || rest.description}</p>
+                        <div className="restaurant-list-meta">
+                          <span className="restaurant-meta-bold">⭐ {rest.rating || '5.0'}</span>
+                          <span className="restaurant-meta-bullet">•</span>
+                          <span className="restaurant-meta-normal">{rest.deliveryTime || '20-30'} mins</span>
+                        </div>
+                      </div>
+                      <span className="order-status processing restaurant-list-status">Active</span>
                     </div>
-                    <span className="order-status processing" style={{ backgroundColor: 'var(--primary-color)', color: 'white', border: 'none' }}>Active</span>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </section>
