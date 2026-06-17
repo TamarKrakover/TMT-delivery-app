@@ -148,16 +148,8 @@ const UserProfilePage = () => {
             ) : (
               <div className="restaurant-list-container">
                 {restaurants.filter(r => r.creatorId === currentUser.id).map(rest => {
-                  const DEFAULT_IMAGE = "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500&auto=format&fit=crop&q=60";
-                  const imageMap = {
-                    burger: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=80",
-                    pizza: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600&auto=format&fit=crop&q=80",
-                    sushi: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=600&auto=format&fit=crop&q=80",
-                    asian: "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=600&auto=format&fit=crop&q=80",
-                    dessert: "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=600&auto=format&fit=crop&q=80",
-                    salad: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&auto=format&fit=crop&q=80"
-                  };
-                  const displayImage = rest.image || (rest.imageKey && imageMap[rest.imageKey.toLowerCase()]) || DEFAULT_IMAGE;
+                  const DEFAULT_IMAGE = "/api/uploads/restaurants/default.webp";
+                  const displayImage = rest.image || DEFAULT_IMAGE;
                   
                   return (
                     <div 

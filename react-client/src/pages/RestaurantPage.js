@@ -17,12 +17,12 @@ import { useRestaurant } from '../hooks/useRestaurant';
 import { useModal } from '../hooks/useModal';
 
 const imageMap = {
-  burger: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=80",
-  pizza: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600&auto=format&fit=crop&q=80",
-  sushi: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=600&auto=format&fit=crop&q=80",
-  asian: "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=600&auto=format&fit=crop&q=80",
-  dessert: "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=600&auto=format&fit=crop&q=80",
-  salad: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&auto=format&fit=crop&q=80"
+  burger: "/api/uploads/categories/burgers.webp",
+  pizza: "/api/uploads/categories/pizza.webp",
+  sushi: "/api/uploads/categories/sushi.webp",
+  asian: "/api/uploads/categories/asian.webp",
+  dessert: "/api/uploads/categories/dessert.webp",
+  salad: "/api/uploads/categories/salad.webp"
 };
 
 const RestaurantPage = () => {

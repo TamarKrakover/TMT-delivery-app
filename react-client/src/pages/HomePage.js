@@ -122,9 +122,9 @@ const HomePage = () => {
     return distA - distB;
   });
 
-  const allCategory = {
-    name: 'All',
-    image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150&auto=format&fit=crop&q=80",
+  const allCategory = { 
+    name: 'All', 
+    image: "/api/uploads/categories/all.webp",
     count: restaurants.length
   };
   const displayCategories = [allCategory, ...categories];

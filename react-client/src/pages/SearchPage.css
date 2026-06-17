@@ -41,7 +41,6 @@
   display: flex;
   overflow-x: auto;
   gap: 20px;
-  padding-top: 10px;
   padding-bottom: 15px;
   scrollbar-width: thin;
 }

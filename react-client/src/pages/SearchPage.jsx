@@ -10,7 +10,6 @@ import { restaurantService } from '../services/restaurantService';
 import mockRestaurants from '../data/restaurants.json';
 import request from '../services/api';
 import './SearchPage.css';
-const imageHamburger = "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=80";
 
 const SearchPage = () => {
   const [searchParams] = useSearchParams();

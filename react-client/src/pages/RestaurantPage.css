@@ -1,12 +1,5 @@
 /* Restaurant Page Styling */
 
-.restaurant-page-container {
-  padding-bottom: 60px;
-  min-height: 100vh;
-  background-color: var(--light);
-  color: var(--dark);
-}
-
 /* Hero Section */
 .restaurant-hero {
   position: relative;
@@ -85,9 +78,11 @@
 
 /* Page Body & Menu Layout */
 .restaurant-body {
+  flex: 1;
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 20px 60px 20px;
 }
 
 .menu-header-section {

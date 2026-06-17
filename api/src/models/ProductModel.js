@@ -25,7 +25,7 @@ class ProductModel {
             name: data.name,
             description: data.description || '',
             price: data.price,
-            imageKey: data.imageKey || category
+            image: data.image || ''
         };
         db.products.push(newProduct);
         return newProduct;

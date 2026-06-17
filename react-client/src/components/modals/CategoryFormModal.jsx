@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { FiX } from 'react-icons/fi';
+import { FiX, FiUploadCloud } from 'react-icons/fi';
+import uploadService from '../../services/uploadService';
 
 const CategoryFormModal = ({ onSubmit, onClose, error }) => {
   const [formData, setFormData] = useState({
@@ -7,6 +8,8 @@ const CategoryFormModal = ({ onSubmit, onClose, error }) => {
     image: ''
   });
   const [formError, setFormError] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -16,14 +19,32 @@ const CategoryFormModal = ({ onSubmit, onClose, error }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setSelectedFile(e.target.files[0]);
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.name) {
       setFormError('Category Name is required.');
       return;
     }
     setFormError('');
-    onSubmit(formData);
+    setIsUploading(true);
+
+    try {
+      let imageUrl = formData.image;
+      if (selectedFile) {
+        imageUrl = await uploadService.uploadImage(selectedFile);
+      }
+      onSubmit({ ...formData, image: imageUrl });
+    } catch (err) {
+      setFormError('Failed to upload image. Please try again.');
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   return (
@@ -48,16 +69,23 @@ const CategoryFormModal = ({ onSubmit, onClose, error }) => {
           </div>
           
           <div className="form-group">
-            <label className="form-label" htmlFor="image">Image URL</label>
-            <input
-              type="url"
-              id="image"
-              name="image"
-              className="form-input"
-              value={formData.image}
-              onChange={handleChange}
-              placeholder="e.g. https://images.unsplash.com/photo-..."
-            />
+            <label className="form-label" htmlFor="image">Upload Image</label>
+            <div className="file-upload-dropzone">
+              <input
+                type="file"
+                id="image"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="file-upload-input"
+              />
+              <FiUploadCloud size={24} className="file-upload-icon" />
+              <div className="file-upload-text">
+                {selectedFile ? selectedFile.name : 'Click to upload image'}
+              </div>
+            </div>
+            {formData.image && !selectedFile && (
+               <small className="file-upload-current">Current: {formData.image}</small>
+            )}
           </div>
           
           {(error || formError) && <div className="form-error">{error || formError}</div>}
@@ -66,8 +94,8 @@ const CategoryFormModal = ({ onSubmit, onClose, error }) => {
             <button type="button" className="btn-outline" onClick={onClose}>
               Cancel
             </button>
-            <button type="submit" className="btn-primary">
-              Add Category
+            <button type="submit" className="btn-primary" disabled={isUploading}>
+              {isUploading ? 'Uploading...' : 'Add Category'}
             </button>
           </div>
         </form>

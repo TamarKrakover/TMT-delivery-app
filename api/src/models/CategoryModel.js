@@ -22,7 +22,7 @@ class CategoryModel {
 
         const newCategory = {
             name: data.name,
-            image: data.image || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150&auto=format&fit=crop&q=80"
+            image: data.image || "/api/uploads/categories/all.webp"
         };
         db.categories.push(newCategory);
         return { ...newCategory, count: 0 };

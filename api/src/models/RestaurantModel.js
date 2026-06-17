@@ -24,7 +24,7 @@ class RestaurantModel {
             name: data.name,
             description: data.description || '',
             category: data.category || 'General',
-            imageKey: data.imageKey || (data.category ? data.category.toLowerCase() : 'general'),
+            image: data.image || '/api/uploads/restaurants/default.webp',
             location: data.location,
             creatorId: creatorId
         };
