@@ -1,5 +1,5 @@
 import React from 'react';
-import { FiStar, FiClock, FiMapPin } from 'react-icons/fi';
+import { FiMapPin } from 'react-icons/fi';
 
 const RestaurantHero = ({ restaurant, bgImage }) => {
   if (!restaurant) return null;
@@ -12,14 +12,6 @@ const RestaurantHero = ({ restaurant, bgImage }) => {
         <h1 className="restaurant-hero-title">{restaurant.name}</h1>
         <p className="restaurant-hero-desc">{restaurant.description || 'No description available.'}</p>
 
-        <div className="restaurant-hero-meta">
-          <span className="restaurant-meta-item">
-            <FiStar style={{ color: '#fbbf24' }} /> {restaurant.rating || '5.0'}
-          </span>
-          <span className="restaurant-meta-item">
-            <FiClock /> {restaurant.deliveryTime || '20-30'} mins
-          </span>
-        </div>
       </div>
     </section>
   );

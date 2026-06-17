@@ -35,7 +35,7 @@ const RestaurantFormModal = ({ title, initialData, onSubmit, onClose, error }) =
       setFormError('Restaurant Name is required.');
       return;
     }
-    if (form.location.lat === '' || form.location.lng === '' || isNaN(parseFloat(form.location.lat)) || isNaN(parseFloat(form.location.lng))) {
+    if (!form.location.lat || !form.location.lng || isNaN(parseFloat(form.location.lat)) || isNaN(parseFloat(form.location.lng))) {
       setFormError('Valid Latitude and Longitude are required.');
       return;
     }
@@ -77,7 +77,6 @@ const RestaurantFormModal = ({ title, initialData, onSubmit, onClose, error }) =
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
               placeholder="e.g. Burger Palace"
-              required
             />
           </div>
 
@@ -125,7 +124,6 @@ const RestaurantFormModal = ({ title, initialData, onSubmit, onClose, error }) =
                 className="form-input"
                 value={form.location.lat}
                 onChange={(e) => setForm({ ...form, location: { ...form.location, lat: e.target.value } })}
-                required
               />
             </div>
             <div style={{ flex: 1 }}>
@@ -136,7 +134,6 @@ const RestaurantFormModal = ({ title, initialData, onSubmit, onClose, error }) =
                 className="form-input"
                 value={form.location.lng}
                 onChange={(e) => setForm({ ...form, location: { ...form.location, lng: e.target.value } })}
-                required
               />
             </div>
           </div>

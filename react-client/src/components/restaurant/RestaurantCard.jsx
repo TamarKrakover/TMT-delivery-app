@@ -1,7 +1,7 @@
 import React from 'react';
 const DEFAULT_RESTAURANT_IMAGE = "/api/uploads/restaurants/default.webp";
 
-const RestaurantCard = ({ name, category, icon, image, rating, deliveryTime, distance, description, onClick }) => {
+const RestaurantCard = ({ name, category, icon, image, distance, description, onClick }) => {
   // Fallback chain: explicit image prop -> default fallback image
   const displayImage = image || DEFAULT_RESTAURANT_IMAGE;
 
@@ -19,12 +19,8 @@ const RestaurantCard = ({ name, category, icon, image, rating, deliveryTime, dis
       <div className="restaurant-info">
         <h3 className="restaurant-name">{name}</h3>
         {description && <p className="restaurant-description">{description}</p>}
-        <div className="restaurant-meta">
-          <span className="restaurant-rating">⭐ {rating}</span>
-          <span>•</span>
-          <span>{deliveryTime} mins</span>
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+
+        <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
           {distance !== null && distance !== undefined && (
             <span style={{ fontSize: '0.85em', color: 'var(--primary)', fontWeight: 'bold' }}>
               📍 {distance.toFixed(1)} km

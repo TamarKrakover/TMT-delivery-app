@@ -66,7 +66,6 @@ const ProductFormModal = ({ title, initialData, onSubmit, onClose, error }) => {
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
               placeholder="e.g. Crispy French Fries"
-              required
             />
           </div>
 
@@ -80,7 +79,6 @@ const ProductFormModal = ({ title, initialData, onSubmit, onClose, error }) => {
               value={form.price}
               onChange={(e) => setForm({ ...form, price: e.target.value })}
               placeholder="e.g. 5.99"
-              required
             />
           </div>
 

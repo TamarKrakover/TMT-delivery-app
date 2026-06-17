@@ -168,11 +168,6 @@ const UserProfilePage = () => {
                           <span className="restaurant-list-badge">{rest.category}</span>
                         </div>
                         <p className="restaurant-list-desc">{rest.address || rest.description}</p>
-                        <div className="restaurant-list-meta">
-                          <span className="restaurant-meta-bold">⭐ {rest.rating || '5.0'}</span>
-                          <span className="restaurant-meta-bullet">•</span>
-                          <span className="restaurant-meta-normal">{rest.deliveryTime || '20-30'} mins</span>
-                        </div>
                       </div>
                       <span className="order-status processing restaurant-list-status">Active</span>
                     </div>

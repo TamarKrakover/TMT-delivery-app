@@ -64,7 +64,6 @@ const CategoryFormModal = ({ onSubmit, onClose, error }) => {
               value={formData.name}
               onChange={handleChange}
               placeholder="e.g. Italian, Vegan..."
-              required
             />
           </div>
           
