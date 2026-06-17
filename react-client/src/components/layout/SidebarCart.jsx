@@ -151,9 +151,9 @@ const SidebarCart = () => {
                 <button 
                   className="btn-primary" 
                   onClick={() => {
-                    setCartOpen(false);
-                    navigate('/');
-                  }}
+                  setCartOpen(false);
+                  navigate('/');
+                }}
                 >
                   Browse Restaurants
                 </button>
