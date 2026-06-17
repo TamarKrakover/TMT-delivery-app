@@ -128,10 +128,9 @@
 
 .modal-title {
   font-size: 24px;
-  font-weight: 800;
+  font-weight: 700;
   margin-bottom: 20px;
   color: var(--dark);
-  font-family: var(--font-family);
 }
 
 .form-group {
