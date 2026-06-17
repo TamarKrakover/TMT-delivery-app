@@ -90,7 +90,7 @@ class OrderModel {
             id: oldOrder.id,
             userId: oldOrder.userId,
             restaurantId: oldOrder.restaurantId,
-            status: oldOrder.status,
+            status: data.status ? data.status : oldOrder.status,
             createdAt: oldOrder.createdAt,
             // Allow productIds to be updated if provided
             productIds: (newProductIds && Array.isArray(newProductIds)) ? newProductIds : oldProductIds,

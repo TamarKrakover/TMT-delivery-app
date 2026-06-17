@@ -69,20 +69,23 @@ exports.updateOrder = (req, res) => {
         return res.status(403).json({ error: 'Unauthorized to update this order' });
     }
 
-    // totalPrice and status are securely managed by the server, 
-    // productIds is the only valid field a user can update
-    if (!req.body.productIds || !Array.isArray(req.body.productIds) || req.body.productIds.length === 0) {
+    // status and productIds are the valid fields a user can update
+    const isStatusUpdateOnly = req.body.status && !req.body.productIds;
+
+    if (!isStatusUpdateOnly && (!req.body.productIds || !Array.isArray(req.body.productIds) || req.body.productIds.length === 0)) {
         return res.status(400).json({ error: 'A non-empty array of productIds is required to update an order' });
     }
 
-    // Verify all products belong to the restaurant
-    const allValid = req.body.productIds.every(pid => {
-        const product = ProductModel.findById(order.restaurantId, pid);
-        return product !== undefined;
-    });
+    if (!isStatusUpdateOnly) {
+        // Verify all products belong to the restaurant
+        const allValid = req.body.productIds.every(pid => {
+            const product = ProductModel.findById(order.restaurantId, pid);
+            return product !== undefined;
+        });
 
-    if (!allValid) {
-        return res.status(400).json({ error: 'One or more products do not exist or do not belong to this restaurant' });
+        if (!allValid) {
+            return res.status(400).json({ error: 'One or more products do not exist or do not belong to this restaurant' });
+        }
     }
 
     const updatedOrder = OrderModel.update(req.params.id, req.body);

@@ -20,7 +20,8 @@ const SidebarCart = () => {
     removeFromCart,
     clearCart,
     confirmConflict,
-    cancelConflict
+    cancelConflict,
+    checkout
   } = useCart();
 
   const [loading, setLoading] = useState(false);
@@ -80,15 +81,7 @@ const SidebarCart = () => {
       setLoading(true);
       setError('');
 
-      // Flatten items into array of product IDs corresponding to quantity
-      const productIds = cartItems.reduce((acc, item) => {
-        for (let i = 0; i < item.quantity; i++) {
-          acc.push(item.id);
-        }
-        return acc;
-      }, []);
-
-      await orderService.create(cartRestaurant.id, productIds);
+      await checkout();
       setSuccess(true);
     } catch (err) {
       console.error('Checkout failed:', err);

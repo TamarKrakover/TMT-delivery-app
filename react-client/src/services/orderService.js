@@ -13,14 +13,20 @@ export const orderService = {
   // Get specific order details
   getById: (id) => request(`/api/orders/${id}`),
 
-  // Update order products
-  update: (id, productIds) => request(`/api/orders/${id}`, {
+  // Update order (can pass productIds or status)
+  update: (id, data) => request(`/api/orders/${id}`, {
     method: 'PATCH',
-    body: JSON.stringify({ productIds })
+    body: JSON.stringify(data)
   }),
 
   // Cancel/delete an order
   delete: (id) => request(`/api/orders/${id}`, {
     method: 'DELETE'
+  }),
+
+  // Calculate order
+  calculate: (restaurantId, productIds) => request('/api/orders/calculate', {
+    method: 'POST',
+    body: JSON.stringify({ restaurantId, productIds })
   })
 };

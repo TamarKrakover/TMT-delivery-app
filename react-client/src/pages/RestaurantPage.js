@@ -10,6 +10,7 @@ import MenuList from '../components/restaurant/MenuList';
 import ProductDetailModal from '../components/modals/ProductDetailModal';
 import RestaurantFormModal from '../components/modals/RestaurantFormModal';
 import ProductFormModal from '../components/modals/ProductFormModal';
+import ConfirmModal from '../components/modals/ConfirmModal';
 
 import { useAuth } from '../contexts/AuthContext';
 import { useRestaurant } from '../hooks/useRestaurant';
@@ -43,6 +44,7 @@ const RestaurantPage = () => {
   const productDetailModal = useModal();
   const editRestModal = useModal();
   const productFormModal = useModal('add');
+  const deleteRestModal = useModal();
 
   const handleEditRestaurantSubmit = async (form) => {
     try {
@@ -107,7 +109,7 @@ const RestaurantPage = () => {
               <button className="btn-admin" onClick={() => productFormModal.openModal(null, 'add')}>
                 <FiPlus /> Add Dish
               </button>
-              <button className="btn-admin btn-danger" onClick={deleteRestaurant}>
+              <button className="btn-admin btn-danger" onClick={() => deleteRestModal.openModal()}>
                 <FiTrash2 /> Delete Restaurant
               </button>
             </div>
@@ -162,6 +164,14 @@ const RestaurantPage = () => {
           error={productFormModal.error}
         />
       )}
+
+      <ConfirmModal 
+        isOpen={deleteRestModal.isOpen} 
+        title="Delete Restaurant" 
+        message={`Are you sure you want to delete ${restaurant.name}? This will remove all its menu items.`}
+        onConfirm={deleteRestaurant} 
+        onClose={deleteRestModal.closeModal} 
+      />
     </div>
   );
 };
