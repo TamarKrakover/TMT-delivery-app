@@ -1,18 +1,56 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FiX } from 'react-icons/fi';
 
 const RestaurantFormModal = ({ title, initialData, onSubmit, onClose, error }) => {
-  const [form, setForm] = useState(initialData || {
-    name: '',
-    description: '',
-    category: 'Burgers',
-    image: initialData?.image || '/images/restaurants/default.webp',
-    location: initialData?.location || { lat: 32.0853, lng: 34.7818 }
+  const [formError, setFormError] = useState('');
+
+  const categoryToImageKey = (category) => {
+    const cat = category ? category.toLowerCase() : '';
+    if (cat === 'burgers') return 'burger';
+    if (cat === 'pizza') return 'pizza';
+    if (cat === 'sushi') return 'sushi';
+    if (cat === 'asian') return 'asian';
+    if (cat === 'desserts') return 'dessert';
+    if (cat === 'salads') return 'salad';
+    if (cat === 'grill') return 'burger';
+    return 'general';
+  };
+
+  const [form, setForm] = useState(() => {
+    const category = initialData?.category || 'Burgers';
+    return {
+      name: initialData?.name || '',
+      description: initialData?.description || '',
+      category,
+      imageKey: initialData?.imageKey || categoryToImageKey(category),
+      image: initialData?.image || '',
+      location: initialData?.location || { lat: '', lng: '' }
+    };
   });
+
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = 'unset'; };
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(form);
+    if (!form.name) {
+      setFormError('Restaurant Name is required.');
+      return;
+    }
+    if (form.location.lat === '' || form.location.lng === '' || isNaN(parseFloat(form.location.lat)) || isNaN(parseFloat(form.location.lng))) {
+      setFormError('Valid Latitude and Longitude are required.');
+      return;
+    }
+    setFormError('');
+    onSubmit({
+      ...form,
+      location: {
+        lat: parseFloat(form.location.lat),
+        lng: parseFloat(form.location.lng)
+      }
+    });
   };
 
   return (
@@ -21,7 +59,7 @@ const RestaurantFormModal = ({ title, initialData, onSubmit, onClose, error }) =
         <button className="modal-close" onClick={onClose}><FiX /></button>
         <h2 className="modal-title">{title || 'Restaurant Details'}</h2>
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} noValidate>
           <div className="form-group">
             <label className="form-label">Restaurant Name</label>
             <input
@@ -50,7 +88,14 @@ const RestaurantFormModal = ({ title, initialData, onSubmit, onClose, error }) =
             <select
               className="form-input"
               value={form.category}
-              onChange={(e) => setForm({ ...form, category: e.target.value })}
+              onChange={(e) => {
+                const selectedCat = e.target.value;
+                setForm({
+                  ...form,
+                  category: selectedCat,
+                  imageKey: categoryToImageKey(selectedCat)
+                });
+              }}
             >
               <option value="Burgers">Burgers</option>
               <option value="Pizza">Pizza</option>
@@ -59,9 +104,9 @@ const RestaurantFormModal = ({ title, initialData, onSubmit, onClose, error }) =
               <option value="Desserts">Desserts</option>
               <option value="Salads">Salads</option>
               <option value="Grill">Grill</option>
+              <option value="General">General</option>
             </select>
           </div>
-
 
           <div className="form-group" style={{ display: 'flex', gap: '10px' }}>
             <div style={{ flex: 1 }}>
@@ -71,7 +116,7 @@ const RestaurantFormModal = ({ title, initialData, onSubmit, onClose, error }) =
                 step="any"
                 className="form-input"
                 value={form.location.lat}
-                onChange={(e) => setForm({ ...form, location: { ...form.location, lat: parseFloat(e.target.value) } })}
+                onChange={(e) => setForm({ ...form, location: { ...form.location, lat: e.target.value } })}
                 required
               />
             </div>
@@ -82,30 +127,24 @@ const RestaurantFormModal = ({ title, initialData, onSubmit, onClose, error }) =
                 step="any"
                 className="form-input"
                 value={form.location.lng}
-                onChange={(e) => setForm({ ...form, location: { ...form.location, lng: parseFloat(e.target.value) } })}
+                onChange={(e) => setForm({ ...form, location: { ...form.location, lng: e.target.value } })}
                 required
               />
             </div>
           </div>
 
           <div className="form-group">
-            <label className="form-label">Banner Image Theme</label>
-            <select
+            <label className="form-label">Custom Image URL</label>
+            <input
+              type="text"
               className="form-input"
-              value={form.image}
+              value={form.image || ''}
               onChange={(e) => setForm({ ...form, image: e.target.value })}
-            >
-              <option value="/images/restaurants/default.webp">Default Restaurant</option>
-              <option value="/images/restaurants/hamburger.webp">Burgers / Grill</option>
-              <option value="/images/restaurants/pizza.webp">Pizza</option>
-              <option value="/images/restaurants/sushi.webp">Sushi</option>
-              <option value="/images/restaurants/wok.webp">Asian</option>
-              <option value="/images/restaurants/sweet-dreams.webp">Desserts</option>
-              <option value="/images/restaurants/salad.webp">Salads</option>
-            </select>
+              placeholder="e.g. https://example.com/image.jpg"
+            />
           </div>
 
-          {error && <div className="form-error">{error}</div>}
+          {(error || formError) && <div className="form-error">{error || formError}</div>}
 
           <div className="form-actions">
             <button type="button" className="btn-outline" onClick={onClose}>Cancel</button>

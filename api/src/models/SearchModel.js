@@ -28,20 +28,8 @@ class SearchModel {
             (p.description && p.description.toLowerCase().includes(lowerCaseQuery))
         );
 
-        // Attach the full restaurant object to each matched product
-        const productsWithRestaurant = matchedProducts.map(p => {
-            const restaurant = db.restaurants.find(r => r.id === p.restaurantId);
-            return {
-                ...p,
-                restaurant: restaurant || { id: p.restaurantId, name: 'Unknown Restaurant' }
-            };
-        });
-
-        // Return a structured object
-        return {
-            restaurants: matchedRestaurants,
-            products: productsWithRestaurant
-        };
+        // Combine and return the matching restaurants and products
+        return [...matchedRestaurants, ...matchedProducts];
     }
 }
 

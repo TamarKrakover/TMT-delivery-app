@@ -9,14 +9,13 @@ const RestaurantList = ({ restaurants = [] }) => {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
 
+
   return (
-    <div className="restaurant-grid">
+    <div className="restaurant-list">
       {restaurants.map((restaurant) => {
-        const userLoc = currentUser?.location || { lat: 32.0853, lng: 34.7818 }; // fallback to default location if missing
-        const dist = userLoc && restaurant.location
-          ? calculateDistance(userLoc, restaurant.location)
+        const dist = currentUser?.location && restaurant.location
+          ? calculateDistance(currentUser.location, restaurant.location)
           : null;
-        console.log("Restaurant:", restaurant.name, "UserLoc:", userLoc, "RestLoc:", restaurant.location, "Calculated Dist:", dist);
         
         return (
           <RestaurantCard
@@ -25,8 +24,10 @@ const RestaurantList = ({ restaurants = [] }) => {
             name={restaurant.name}
             category={restaurant.category}
             image={restaurant.image}
-            description={restaurant.description}
-            distance={dist} 
+            imageKey={restaurant.imageKey}
+            rating={restaurant.rating || "5.0"}
+            deliveryTime={restaurant.deliveryTime || "20-30"}
+            distance={dist}
             onClick={() => navigate(`/restaurant/${restaurant.id}`)}
           />
         );

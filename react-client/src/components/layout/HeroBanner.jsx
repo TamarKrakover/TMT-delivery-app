@@ -13,28 +13,28 @@ const HeroBanner = () => {
       return {
         title: <>Good morning! Ready for <span>breakfast</span>?</>,
         subtitle: "Explore local bakeries, fresh coffee, and breakfast spots near you.",
-        backgroundImage: "/images/banners/breakfast.webp"
+        backgroundImage: "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=1200&auto=format&fit=crop&q=85"
       };
     } else if (hour >= 12 && hour < 18) {
       // Afternoon (Lunch)
       return {
         title: <>Lunch Time? We've got <span>you covered</span>.</>,
         subtitle: "Order from the best local restaurants and get your favorite meals delivered in minutes.",
-        backgroundImage: "/images/banners/lunch.webp"
+        backgroundImage: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=1200&auto=format&fit=crop&q=85"
       };
     } else if (hour >= 18 && hour < 22) {
       // Evening (Dinner)
       return {
         title: <>Time for a <span>delicious dinner</span>!</>,
         subtitle: "Treat yourself tonight. Discover top dinner choices nearby.",
-        backgroundImage: "/images/banners/dinner.webp"
+        backgroundImage: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&auto=format&fit=crop&q=85"
       };
     } else {
       // Late Night - Munchies (22:00 - 04:59)
       return {
         title: <>Late night <span>munchies</span>?</>,
         subtitle: "Satisfy your midnight cravings with 24/7 delivery spots near you.",
-        backgroundImage: "/images/banners/late-night2.webp"
+        backgroundImage: "https://images.unsplash.com/photo-1534308983496-4fabb1a015ee?w=1200&auto=format&fit=crop&q=85"
       };
     }
   };
