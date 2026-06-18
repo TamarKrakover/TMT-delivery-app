@@ -16,7 +16,7 @@ const ForbiddenPage = () => {
           You don't have permission to access this resource or perform this action. 
           Please log in with an account that has the required privileges.
         </p>
-        <div style={{ display: 'flex', gap: '15px' }}>
+        <div className="forbidden-actions">
           <button 
             className="btn-outline error-page-btn" 
             onClick={() => navigate('/')}

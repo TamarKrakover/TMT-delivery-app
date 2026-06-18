@@ -104,7 +104,7 @@ const UserProfilePage = () => {
 
         <section className="order-history-section">
           <h2 className="section-title">
-            <FiClock style={{ marginRight: '8px' }} /> 
+            <FiClock className="icon-margin-right" /> 
             Order History
           </h2>
 
@@ -133,9 +133,9 @@ const UserProfilePage = () => {
         </section>
 
         {(currentUser.role === 'owner' || currentUser.isAdmin || restaurants.some(r => r.creatorId === currentUser.id)) && (
-          <section className="order-history-section" style={{ marginTop: '40px' }}>
+          <section className="order-history-section order-history-section-spaced">
             <h2 className="section-title">
-              <FiList style={{ marginRight: '8px' }} /> 
+              <FiList className="icon-margin-right" /> 
               My Restaurants
             </h2>
             

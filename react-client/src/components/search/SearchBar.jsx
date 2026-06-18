@@ -80,7 +80,7 @@ const SearchBar = ({ placeholder = "Search for restaurants or dishes..." }) => {
 
   return (
     <div className="search-bar-wrapper" ref={wrapperRef}>
-      <FiSearch className="search-icon" onClick={handleSearchSubmit} style={{ cursor: 'pointer' }} />
+      <FiSearch className="search-icon" onClick={handleSearchSubmit} />
       <input
         type="text"
         className="search-bar-input"
@@ -91,7 +91,7 @@ const SearchBar = ({ placeholder = "Search for restaurants or dishes..." }) => {
         onFocus={() => query.trim() !== '' && setIsOpen(true)}
       />
       {query && (
-        <FiX className="clear-icon" onClick={handleClear} style={{ cursor: 'pointer' }} />
+        <FiX className="clear-icon" onClick={handleClear} />
       )}
 
       {isOpen && results.length > 0 && (

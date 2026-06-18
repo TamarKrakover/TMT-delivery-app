@@ -68,7 +68,7 @@ const RestaurantPage = () => {
     return (
       <div className="app-container">
         <Navbar />
-        <div style={{ textAlign: 'center', padding: '100px 20px', fontSize: '20px', fontWeight: 'bold' }}>
+        <div className="restaurant-loading">
           Loading Restaurant details...
         </div>
         <Footer />
@@ -80,7 +80,7 @@ const RestaurantPage = () => {
     return (
       <div className="app-container">
         <Navbar />
-        <div style={{ textAlign: 'center', padding: '100px 20px', color: 'var(--danger)' }}>
+        <div className="restaurant-error">
           <h2>Error</h2>
           <p>{error || 'Restaurant not found.'}</p>
         </div>

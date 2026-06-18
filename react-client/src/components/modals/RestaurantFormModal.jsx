@@ -115,8 +115,8 @@ const RestaurantFormModal = ({ title, initialData, onSubmit, onClose, error }) =
             </select>
           </div>
 
-          <div className="form-group" style={{ display: 'flex', gap: '10px' }}>
-            <div style={{ flex: 1 }}>
+          <div className="form-group form-group-row">
+            <div className="form-group-col">
               <label className="form-label">Latitude</label>
               <input
                 type="number"
@@ -126,7 +126,7 @@ const RestaurantFormModal = ({ title, initialData, onSubmit, onClose, error }) =
                 onChange={(e) => setForm({ ...form, location: { ...form.location, lat: e.target.value } })}
               />
             </div>
-            <div style={{ flex: 1 }}>
+            <div className="form-group-col">
               <label className="form-label">Longitude</label>
               <input
                 type="number"

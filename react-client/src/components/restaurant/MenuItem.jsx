@@ -17,7 +17,7 @@ const MenuItem = ({ product, restaurant, canModify, onClick, onEdit, onDelete })
           <span>No image available for this product</span>
         </div>
       )}
-      <div style={{ display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'space-between' }}>
+      <div className="menu-item-details-container">
       <div className="menu-item-info">
         <div className="menu-item-name-row">
           <h3 className="menu-item-name">{product.name}</h3>
@@ -41,8 +41,8 @@ const MenuItem = ({ product, restaurant, canModify, onClick, onEdit, onDelete })
         {canModify && (
           <div className="item-action-btns">
             {isDeleting ? (
-              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', background: 'var(--white)', padding: '2px 8px', borderRadius: '20px', boxShadow: 'var(--shadow-sm)' }}>
-                <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'var(--danger)' }}>Delete?</span>
+              <div className="menu-item-delete-confirm">
+                <span className="menu-item-delete-text">Delete?</span>
                 <button
                   className="btn-icon delete"
                   onClick={(e) => { e.stopPropagation(); onDelete(product.id, e); setIsDeleting(false); }}

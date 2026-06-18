@@ -10,11 +10,11 @@ const AuthLayout = ({ children, title, subtitle }) => {
     <div className="auth-container">
       <div className="auth-card">
         <div 
-          style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem', cursor: 'pointer' }}
+          className="auth-logo-container"
           onClick={() => navigate('/')}
           title="Return to Home Page"
         >
-          <img src={logo} alt="TMT Logo" style={{ height: '50px' }} />
+          <img src={logo} alt="TMT Logo" className="auth-logo" />
         </div>
         {title && <h2>{title}</h2>}
         {subtitle && <p className="subtitle">{subtitle}</p>}

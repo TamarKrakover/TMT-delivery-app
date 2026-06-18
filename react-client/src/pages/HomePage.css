@@ -186,3 +186,78 @@
   from { transform: translateY(20px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
+
+.restaurant-card-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.restaurant-card-actions-text {
+  font-size: 0.85em;
+  color: var(--primary);
+  font-weight: bold;
+}
+
+.category-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 40px;
+}
+
+.category-section-title-no-margin {
+  margin: 0;
+}
+
+.confirm-modal-content {
+  max-width: 450px;
+}
+
+.confirm-modal-message {
+  margin: 20px 0;
+  color: var(--dark);
+}
+
+.confirm-modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.btn-confirm-cancel {
+  padding: 8px 16px;
+  border: 1px solid var(--gray-300);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--dark);
+  cursor: pointer;
+}
+
+.btn-confirm-cancel:hover {
+  background: var(--gray-100);
+}
+
+.btn-confirm-danger {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  background: var(--danger);
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-confirm-danger:hover {
+  background: #dc2626;
+}
+
+.form-group-row {
+  display: flex;
+  gap: 10px;
+}
+
+.form-group-col {
+  flex: 1;
+}

@@ -177,3 +177,66 @@ body.dark-mode .form-group select {
   background-color: var(--light);
   border-color: var(--gray-200);
 }
+
+.auth-logo-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  cursor: pointer;
+}
+
+.auth-logo {
+  height: 50px;
+}
+
+.input-field-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-field-wrapper input {
+  width: 100%;
+}
+
+.input-field-has-password {
+  padding-right: 40px !important;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--gray-500);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.register-profile-avatar {
+  width: 80px;
+  height: 80px;
+  font-size: 2rem;
+}
+
+.hidden-file-input {
+  display: none;
+}
+
+.form-group-spaced {
+  margin-bottom: 20px;
+}
+
+.form-row {
+  display: flex;
+  gap: 10px;
+}
+
+.error-message-block {
+  display: block;
+  margin-top: -10px;
+  margin-bottom: 10px;
+}

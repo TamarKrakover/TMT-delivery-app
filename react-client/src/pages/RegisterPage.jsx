@@ -178,7 +178,7 @@ const RegisterPage = () => {
               {previewUrl ? (
                 <img src={previewUrl} alt="Preview" className="image-preview" />
               ) : (
-                <div className="profile-avatar-placeholder" style={{ width: '80px', height: '80px', fontSize: '2rem' }}>
+                <div className="profile-avatar-placeholder register-profile-avatar">
                   {(displayName || 'U').charAt(0).toUpperCase()}
                 </div>
               )}
@@ -196,7 +196,7 @@ const RegisterPage = () => {
                   accept="image/*"
                   ref={fileInputRef}
                   onChange={handleImageChange}
-                  style={{ display: 'none' }}
+                  className="hidden-file-input"
                 />
               </div>
             </div>
@@ -204,9 +204,9 @@ const RegisterPage = () => {
             {fieldErrors.profilePic && <span className="error-message">{fieldErrors.profilePic}</span>}
           </div>
 
-          <div className="form-group" style={{ marginBottom: '20px' }}>
+          <div className="form-group form-group-spaced">
             <label className="form-label">Your Location (Coordinates)</label>
-            <div style={{ display: 'flex', gap: '10px' }}>
+            <div className="form-row">
               <InputField
                 id="lat"
                 type="number"
@@ -224,7 +224,7 @@ const RegisterPage = () => {
                 step="any"
               />
             </div>
-            {fieldErrors.location && <span className="error-message" style={{ display: 'block', marginTop: '-10px', marginBottom: '10px' }}>{fieldErrors.location}</span>}
+            {fieldErrors.location && <span className="error-message error-message-block">{fieldErrors.location}</span>}
           </div>
 
           <Button type="submit" disabled={isLoading}>

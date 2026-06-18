@@ -173,8 +173,8 @@ const HomePage = () => {
           </div>
         )}
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '40px' }}>
-          <h2 className="category-section-title" style={{ marginTop: 0, marginBottom: 0 }}>Categories</h2>
+        <div className="category-section-header">
+          <h2 className="category-section-title category-section-title-no-margin">Categories</h2>
           {currentUser?.isAdmin && (
             <button className="btn-primary add-restaurant-btn" onClick={() => addCatModal.openModal()}>
               <FiPlus /> Add Category

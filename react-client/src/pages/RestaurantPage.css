@@ -477,3 +477,39 @@
   font-size: 16px;
   color: var(--dark-light);
 }
+
+.menu-item-details-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  justify-content: space-between;
+}
+
+.menu-item-delete-confirm {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background: var(--white);
+  padding: 2px 8px;
+  border-radius: 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+.menu-item-delete-text {
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--danger);
+}
+
+.restaurant-loading {
+  text-align: center;
+  padding: 100px 20px;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.restaurant-error {
+  text-align: center;
+  padding: 100px 20px;
+  color: var(--danger);
+}
