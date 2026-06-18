@@ -85,13 +85,10 @@ const RegisterPage = () => {
 
       setIsLoading(true);
       try {
-        let finalPic = '';
+        let finalPicUrl = '';
         if (profilePic) {
-          const reader = new FileReader();
-          finalPic = await new Promise((resolve) => {
-            reader.onloadend = () => resolve(reader.result);
-            reader.readAsDataURL(profilePic);
-          });
+          const uploadRes = await authService.uploadImage(profilePic);
+          finalPicUrl = uploadRes.url;
         }
 
         const userData = {
@@ -100,7 +97,7 @@ const RegisterPage = () => {
           name: displayName,
           role: role,
           location: { lat: parseFloat(lat), lng: parseFloat(lng) },
-          profilePic: finalPic
+          profilePic: finalPicUrl
         };
 
         await authService.register(userData);
