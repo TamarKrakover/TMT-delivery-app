@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { FiX } from '../../components/common/Icons';
 
-const ConfirmModal = ({ isOpen, title, message, onConfirm, onClose }) => {
+const ConfirmModal = ({ isOpen, title, message, onConfirm, onClose, confirmText = 'Confirm Delete', cancelText = 'Cancel', hideCancel = false }) => {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -20,19 +20,22 @@ const ConfirmModal = ({ isOpen, title, message, onConfirm, onClose }) => {
         <h2 className="modal-title">{title}</h2>
         <p className="confirm-modal-message">{message}</p>
         <div className="confirm-modal-actions">
-          <button 
-            className="btn-confirm-cancel"
-            onClick={onClose}
-          >
-            Cancel
-          </button>
+          {!hideCancel && (
+            <button 
+              className="btn-confirm-cancel"
+              onClick={onClose}
+            >
+              {cancelText}
+            </button>
+          )}
           <button 
             className="btn-confirm-danger"
             onClick={() => {
-              onConfirm();
+              if (onConfirm) onConfirm();
               onClose();
             }}
-          >  Confirm Delete
+          >
+            {confirmText}
           </button>
         </div>
       </div>
