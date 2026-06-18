@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiSearch, FiX } from '../../components/common/Icons';
 import { restaurantService } from '../../services/restaurantService';
-import mockRestaurants from '../../data/restaurants.json';
 import './SearchBar.css';
 
 const SearchBar = ({ placeholder = "Search for restaurants or dishes..." }) => {
@@ -38,10 +37,7 @@ const SearchBar = ({ placeholder = "Search for restaurants or dishes..." }) => {
         setIsOpen(true);
       } catch (err) {
         console.error("Search preview failed:", err);
-        // Fallback to local mock filtering on error to prevent breaking app
-        const lower = query.toLowerCase();
-        const fallback = mockRestaurants.filter(r => r.name.toLowerCase().includes(lower));
-        setResults(fallback);
+        setResults([]);
         setIsOpen(true);
       }
     }, 300);

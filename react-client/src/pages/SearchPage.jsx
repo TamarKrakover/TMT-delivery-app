@@ -7,7 +7,6 @@ import RestaurantCard from '../components/restaurant/RestaurantCard';
 import MenuItem from '../components/restaurant/MenuItem';
 import ProductDetailModal from '../components/modals/ProductDetailModal';
 import { restaurantService } from '../services/restaurantService';
-import mockRestaurants from '../data/restaurants.json';
 import ScrollableRow from '../components/common/ScrollableRow';
 import './SearchPage.css';
 
@@ -19,6 +18,7 @@ const SearchPage = () => {
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [allRestaurants, setAllRestaurants] = useState([]);
   const { darkMode } = useTheme();
 
   useEffect(() => {
@@ -26,7 +26,11 @@ const SearchPage = () => {
       if (!query) return;
       try {
         setLoading(true);
-        const data = await restaurantService.search(query);
+        const [data, allRests] = await Promise.all([
+          restaurantService.search(query),
+          restaurantService.getAll()
+        ]);
+        setAllRestaurants(allRests);
         // Separate combined search results by presence of fields (location/address for restaurants, price for products)
         const matchedRestaurants = data.filter(item => item.location !== undefined || item.address !== undefined);
         const matchedProducts = data.filter(item => item.price !== undefined);
@@ -34,13 +38,7 @@ const SearchPage = () => {
         setProducts(matchedProducts);
       } catch (err) {
         console.error("Search failed:", err);
-        // Fallback search locally in mockRestaurants on error
-        const lower = query.toLowerCase();
-        const matched = mockRestaurants.filter(r =>
-          r.name.toLowerCase().includes(lower) ||
-          (r.description && r.description.toLowerCase().includes(lower))
-        );
-        setRestaurants(matched);
+        setRestaurants([]);
         setProducts([]);
       } finally {
         setLoading(false);
@@ -51,7 +49,7 @@ const SearchPage = () => {
 
   // Helper to find restaurant by ID for dishes list
   const getRestaurant = (rId) => {
-    const found = mockRestaurants.find(r => r.id === rId);
+    const found = allRestaurants.find(r => r.id === rId);
     return found || { id: rId, name: 'Unknown Restaurant' };
   };
 
