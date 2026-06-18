@@ -65,7 +65,7 @@ const SidebarCart = () => {
       console.error('Calculation error:', err);
       setIsCalculating(false);
     });
-  }, [cartItems, cartRestaurant]);
+  }, [cartItems, cartRestaurant, isCartOpen]);
 
   const handleCheckout = async () => {
     if (!currentUser) {

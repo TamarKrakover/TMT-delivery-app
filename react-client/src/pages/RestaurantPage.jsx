@@ -158,7 +158,8 @@ const RestaurantPage = () => {
           initialData={productFormModal.mode === 'edit' ? {
             name: productFormModal.data?.name || '',
             description: productFormModal.data?.description || '',
-            price: productFormModal.data?.price || ''
+            price: productFormModal.data?.price || '',
+            image: productFormModal.data?.image || ''
           } : null}
           onSubmit={handleProductFormSubmit}
           onClose={productFormModal.closeModal}

@@ -55,7 +55,7 @@ const RestaurantFormModal = ({ title, initialData, onSubmit, onClose, error }) =
         imageUrl = await uploadService.uploadImage(selectedFile);
       }
       
-      onSubmit({
+      await onSubmit({
         ...form,
         image: imageUrl,
         location: {
@@ -65,6 +65,7 @@ const RestaurantFormModal = ({ title, initialData, onSubmit, onClose, error }) =
       });
     } catch (err) {
       setFormError('Failed to upload image. Please try again.');
+    } finally {
       setIsUploading(false);
     }
   };
