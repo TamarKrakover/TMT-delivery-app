@@ -5,68 +5,29 @@ const restaurantController = require('../controllers/restaurantController');
 const authMiddleware = require('../middlewares/authMiddleware');
 
 const productRoutes = require('./productRoutes');
-const RecommendationServer = require('../services/recommendationServer');
-const db = require('../models/InMemoryDB');
-const fs = require('fs');
-const path = require('path');
 
 // Group routes by path '/'
 router.route('/')
     .get(restaurantController.getAllRestaurants) // Get all restaurants
     .post(authMiddleware, restaurantController.createRestaurant); // Create a new restaurant
 
-// Route to fetch dynamic recommendations based on user's last viewed/ordered product
+const RecommendationServer = require('../services/recommendationServer');
+
+// Route to fetch recommendations based on user and last viewed product
 router.get('/recommendations', authMiddleware, async (req, res) => {
     const userId = req.userId;
-    let targetProductId = null;
+    const { productId } = req.query;
 
-    try {
-        const candidatePaths = [
-            path.join(__dirname, '../../../data/data.txt'),
-            path.join(__dirname, '../../data/data.txt'),
-            '/app/data/data.txt'
-        ];
-        let filePath = null;
-        for (const p of candidatePaths) {
-            if (fs.existsSync(p)) {
-                filePath = p;
-                break;
-            }
-        }
-
-        if (filePath) {
-            const content = fs.readFileSync(filePath, 'utf-8');
-            const lines = content.split('\n');
-            for (let i = lines.length - 1; i >= 0; i--) {
-                const line = lines[i].trim();
-                if (!line) continue;
-                const parts = line.split(/\s+/);
-                if (parts[0] === userId && parts.length > 1) {
-                    targetProductId = parts[parts.length - 1];
-                    break;
-                }
-            }
-        }
-    } catch (err) {
-        console.error('Error reading data.txt:', err);
+    if (!productId) {
+        return res.status(400).json({ error: 'productId query parameter is required' });
     }
 
-    if (!targetProductId) {
-        return res.status(200).json({ targetProductName: null, products: [] });
-    }
-
-    const product = db.products.find(p => p.id === targetProductId);
-    const targetProductName = product ? product.name : null;
-
     try {
-        const recommendedProducts = await RecommendationServer.get(userId, targetProductId);
-        res.status(200).json({
-            targetProductName,
-            products: recommendedProducts
-        });
+        const recommendedProducts = await RecommendationServer.get(userId, productId);
+        res.status(200).json(recommendedProducts);
     } catch (err) {
-        console.error('Error in GET /recommendations:', err);
-        res.status(500).json({ error: 'Internal server error' });
+        console.error('Error fetching recommendations:', err);
+        res.status(500).json({ error: 'Internal server error while fetching recommendations' });
     }
 });
 

@@ -31,7 +31,6 @@ services:
       - ./api/src:/app/src
       - ./api/app.js:/app/app.js
       - ./api/public:/app/public
-      - ./data:/app/data
       - /app/node_modules
     depends_on:
       - server

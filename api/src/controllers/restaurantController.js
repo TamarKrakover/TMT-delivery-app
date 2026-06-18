@@ -55,7 +55,7 @@ exports.getRestaurantById = (req, res) => {
 exports.updateRestaurant = (req, res) => {
     // Authentication is handled by authMiddleware
     const userId = req.userId;
-    
+
     const restaurant = RestaurantModel.findById(req.params.id);
     if (!restaurant) {
         return res.status(404).json({ error: 'Restaurant not found' });

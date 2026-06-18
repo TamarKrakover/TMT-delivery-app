@@ -71,17 +71,16 @@ class RecommendationServer {
     }
 
     // Sends a get command to retrieve recommendations for a user based on a target product,
-    // then maps recommended product IDs to their corresponding restaurants.
+    // then maps recommended product IDs to their corresponding product objects and restaurants.
     async get(userId, productId) {
         if (!userId || !productId) return [];
         const command = `get ${userId} ${productId}`;
         try {
             const response = await this._sendCommand(command);
             if (response.startsWith('200 Ok')) {
-                const lines = response.split('\n');
-                const pidsLine = lines[lines.length - 1].trim();
-                if (pidsLine && pidsLine !== '200 Ok') {
-                    const productIds = pidsLine.split(' ').filter(id => id.length > 0);
+                const cleanResponse = response.replace('200 Ok', '').replace(/\r/g, '').trim();
+                if (cleanResponse) {
+                    const productIds = cleanResponse.split(/\s+/).filter(id => id.length > 0);
                     
                     const db = require('../models/InMemoryDB');
                     const recommendedProducts = [];

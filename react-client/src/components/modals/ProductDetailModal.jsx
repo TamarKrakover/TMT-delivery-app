@@ -2,9 +2,11 @@ import React, { useEffect } from 'react';
 import { FiX } from '../../components/common/Icons';
 import { useCart } from '../../contexts/CartContext';
 import request from '../../services/api';
+import { useAuth } from '../../contexts/AuthContext';
 
 const ProductDetailModal = ({ product, restaurant, onClose }) => {
   const { addToCart } = useCart();
+  const { currentUser } = useAuth();
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -12,10 +14,15 @@ const ProductDetailModal = ({ product, restaurant, onClose }) => {
     // Trigger product view to log interaction on the backend
     if (product && restaurant) {
       request(`/api/restaurants/${restaurant.id}/products/${product.id}`).catch(() => {});
+      
+      // Save last viewed product for the current user
+      if (currentUser) {
+        localStorage.setItem(`lastViewedProduct_${currentUser.id}`, JSON.stringify(product));
+      }
     }
     
     return () => { document.body.style.overflow = 'unset'; };
-  }, [product, restaurant]);
+  }, [product, restaurant, currentUser]);
 
   if (!product) return null;
 
