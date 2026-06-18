@@ -107,9 +107,6 @@ const ProductFormModal = ({ title, initialData, onSubmit, onClose, error }) => {
                 {selectedFile ? selectedFile.name : 'Click to upload image'}
               </div>
             </div>
-            {form.image && !selectedFile && (
-               <small className="file-upload-current">Current: {form.image}</small>
-            )}
           </div>
 
           {(error || formError) && <div className="form-error">{error || formError}</div>}

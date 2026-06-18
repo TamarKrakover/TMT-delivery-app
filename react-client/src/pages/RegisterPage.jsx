@@ -3,9 +3,9 @@ import { useNavigate, Link } from 'react-router-dom';
 import { authService } from '../services/authService';
 import AuthLayout from '../components/layout/AuthLayout';
 import InputField from '../components/ui/InputField';
-import SelectField from '../components/ui/SelectField';
 import Button from '../components/ui/Button';
 import ErrorMessage from '../components/ui/ErrorMessage';
+import { FiShoppingBag, FiList } from '../components/common/Icons';
 import './Auth.css';
 
 const RegisterPage = () => {
@@ -140,16 +140,25 @@ const RegisterPage = () => {
             error={fieldErrors.displayName}
           />
 
-          <SelectField
-            id="role"
-            label="Account Type"
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-            options={[
-              { value: 'customer', label: 'Regular User' },
-              { value: 'owner', label: 'Restaurant Owner' }
-            ]}
-          />
+          <div className="form-group">
+            <label className="form-label">Account Type</label>
+            <div className="role-selector">
+              <div 
+                className={`role-card ${role === 'customer' ? 'active' : ''}`}
+                onClick={() => setRole('customer')}
+              >
+                <FiShoppingBag className="role-icon" />
+                <span className="role-title">Regular User</span>
+              </div>
+              <div 
+                className={`role-card ${role === 'owner' ? 'active' : ''}`}
+                onClick={() => setRole('owner')}
+              >
+                <FiList className="role-icon" />
+                <span className="role-title">Restaurant Owner</span>
+              </div>
+            </div>
+          </div>
 
           <InputField
             id="password"

@@ -192,3 +192,54 @@ body.dark-mode .auth-card {
   margin-top: -10px;
   margin-bottom: 10px;
 }
+
+.role-selector {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.role-card {
+  flex: 1;
+  padding: 16px;
+  border: 2px solid var(--gray-200);
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s ease;
+  background-color: var(--white);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.role-card:hover {
+  border-color: var(--primary-light);
+  background-color: var(--gray-50);
+}
+
+.role-card.active {
+  border-color: var(--primary);
+  background-color: rgba(99, 102, 241, 0.05);
+}
+
+.role-icon {
+  font-size: 24px;
+  color: var(--dark-light);
+  transition: color 0.2s ease;
+}
+
+.role-card.active .role-icon {
+  color: var(--primary);
+}
+
+.role-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--dark);
+}
+
+.role-card.active .role-title {
+  color: var(--primary);
+}

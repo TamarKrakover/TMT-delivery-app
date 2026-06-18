@@ -3,6 +3,7 @@ import { FiX, FiUploadCloud } from '../../components/common/Icons';
 import uploadService from '../../services/uploadService';
 
 const RestaurantFormModal = ({ title, initialData, onSubmit, onClose, error }) => {
+  const isEditMode = !!initialData?.name;
   const [formError, setFormError] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -152,8 +153,26 @@ const RestaurantFormModal = ({ title, initialData, onSubmit, onClose, error }) =
                 {selectedFile ? selectedFile.name : 'Click to upload image'}
               </div>
             </div>
-            {form.image && !selectedFile && (
-               <small className="file-upload-current">Current: {form.image}</small>
+
+            {!isEditMode && (
+              <div className="default-image-checkbox-wrapper">
+                <input 
+                  type="checkbox" 
+                  id="use-default-img"
+                  checked={form.image === '/api/uploads/restaurants/default.webp' && !selectedFile}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setForm({ ...form, image: '/api/uploads/restaurants/default.webp' });
+                      setSelectedFile(null);
+                    } else {
+                      setForm({ ...form, image: '' });
+                    }
+                  }}
+                />
+                <label htmlFor="use-default-img" className="default-image-checkbox-label">
+                  Use default restaurant image
+                </label>
+              </div>
             )}
           </div>
 

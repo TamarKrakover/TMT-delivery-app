@@ -142,8 +142,9 @@ const RestaurantPage = () => {
           initialData={{
             name: restaurant.name || '',
             description: restaurant.description || '',
-            category: restaurant.category || 'Burgers',
-            imageKey: restaurant.imageKey || 'burger'
+            category: restaurant.category || 'General',
+            image: restaurant.image || '',
+            location: restaurant.location || { lat: '', lng: '' }
           }}
           onSubmit={handleEditRestaurantSubmit}
           onClose={editRestModal.closeModal}

@@ -58,3 +58,17 @@
 .form-group-col {
   flex: 1;
 }
+
+.default-image-checkbox-wrapper {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.default-image-checkbox-label {
+  font-size: 14px;
+  color: var(--dark);
+  cursor: pointer;
+  user-select: none;
+}

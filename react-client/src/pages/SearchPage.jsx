@@ -8,7 +8,6 @@ import MenuItem from '../components/restaurant/MenuItem';
 import ProductDetailModal from '../components/modals/ProductDetailModal';
 import { restaurantService } from '../services/restaurantService';
 import mockRestaurants from '../data/restaurants.json';
-import request from '../services/api';
 import ScrollableRow from '../components/common/ScrollableRow';
 import './SearchPage.css';
 

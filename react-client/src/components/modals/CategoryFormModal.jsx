@@ -82,9 +82,6 @@ const CategoryFormModal = ({ onSubmit, onClose, error }) => {
                 {selectedFile ? selectedFile.name : 'Click to upload image'}
               </div>
             </div>
-            {formData.image && !selectedFile && (
-               <small className="file-upload-current">Current: {formData.image}</small>
-            )}
           </div>
           
           {(error || formError) && <div className="form-error">{error || formError}</div>}
