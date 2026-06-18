@@ -30,6 +30,7 @@ services:
     volumes:
       - ./api/src:/app/src
       - ./api/app.js:/app/app.js
+      - ./api/public:/app/public
       - /app/node_modules
     depends_on:
       - server

@@ -1,16 +1,27 @@
 import React from 'react';
 const DEFAULT_RESTAURANT_IMAGE = "/api/uploads/restaurants/default.webp";
 
-const RestaurantCard = ({ name, category, icon, image, distance, description, onClick }) => {
+const RestaurantCard = React.memo(({ id, name, category, icon, image, distance, description, onClick }) => {
   // Fallback chain: explicit image prop -> default fallback image
   const displayImage = image || DEFAULT_RESTAURANT_IMAGE;
 
+  const handleClick = () => {
+    if (onClick && id) {
+      onClick(id);
+    }
+  };
 
   return (
-    <div className="restaurant-card" onClick={onClick}>
+    <div className="restaurant-card" onClick={handleClick}>
       <div className="restaurant-image-wrapper">
         {displayImage ? (
-          <img src={displayImage} alt={name} className="restaurant-image" />
+          <img 
+            src={displayImage} 
+            alt={name} 
+            className="restaurant-image" 
+            loading="lazy" 
+            decoding="async" 
+          />
         ) : (
           <span>{icon}</span>
         )}
@@ -30,6 +41,6 @@ const RestaurantCard = ({ name, category, icon, image, distance, description, on
       </div>
     </div>
   );
-};
+});
 
 export default RestaurantCard;

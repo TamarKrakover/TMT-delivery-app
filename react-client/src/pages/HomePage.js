@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
@@ -96,38 +96,44 @@ const HomePage = () => {
     }
   };
 
-  const myRestaurants = currentUser && (currentUser.role === 'owner' || currentUser.isAdmin)
-    ? restaurants.filter(r => r.creatorId === currentUser.id).reverse()
-    : [];
+  const myRestaurants = useMemo(() => {
+    if (!currentUser || (currentUser.role !== 'owner' && !currentUser.isAdmin)) return [];
+    return restaurants.filter(r => r.creatorId === currentUser.id).reverse();
+  }, [restaurants, currentUser]);
 
-  const nearbyRestaurants = currentUser?.location
-    ? restaurants.filter(r => {
-        if (!r.location) return false;
-        const dist = calculateDistance(currentUser.location, r.location);
-        return dist !== null && dist <= 5;
-      }).sort((a, b) => {
-        const distA = calculateDistance(currentUser.location, a.location);
-        const distB = calculateDistance(currentUser.location, b.location);
-        return distA - distB;
-      })
-    : [];
+  const nearbyRestaurants = useMemo(() => {
+    if (!currentUser?.location) return [];
+    return restaurants.filter(r => {
+      if (!r.location) return false;
+      const dist = calculateDistance(currentUser.location, r.location);
+      return dist !== null && dist <= 5;
+    }).sort((a, b) => {
+      const distA = calculateDistance(currentUser.location, a.location);
+      const distB = calculateDistance(currentUser.location, b.location);
+      return distA - distB;
+    });
+  }, [restaurants, currentUser?.location]);
 
-  const displayedRestaurants = restaurants.filter(r => 
-    selectedCategory === 'All' || 
-    (r.category && r.category.toLowerCase() === selectedCategory.toLowerCase())
-  ).sort((a, b) => {
-    if (!currentUser?.location) return 0;
-    const distA = a.location ? calculateDistance(currentUser.location, a.location) : Infinity;
-    const distB = b.location ? calculateDistance(currentUser.location, b.location) : Infinity;
-    return distA - distB;
-  });
+  const displayedRestaurants = useMemo(() => {
+    return restaurants.filter(r => 
+      selectedCategory === 'All' || 
+      (r.category && r.category.toLowerCase() === selectedCategory.toLowerCase())
+    ).sort((a, b) => {
+      if (!currentUser?.location) return 0;
+      const distA = a.location ? calculateDistance(currentUser.location, a.location) : Infinity;
+      const distB = b.location ? calculateDistance(currentUser.location, b.location) : Infinity;
+      return distA - distB;
+    });
+  }, [restaurants, selectedCategory, currentUser?.location]);
 
-  const allCategory = { 
-    name: 'All', 
-    image: "/api/uploads/categories/all.webp",
-    count: restaurants.length
-  };
-  const displayCategories = [allCategory, ...categories];
+  const displayCategories = useMemo(() => {
+    const allCategory = { 
+      name: 'All', 
+      image: "/api/uploads/categories/all.webp",
+      count: restaurants.length
+    };
+    return [allCategory, ...categories];
+  }, [restaurants.length, categories]);
 
   return (
     <div className={`app-container ${darkMode ? 'dark-mode' : ''}`}>
