@@ -1,5 +1,5 @@
 import React from 'react';
-import { FiMapPin } from 'react-icons/fi';
+import { FiMapPin } from '../../components/common/Icons';
 
 const RestaurantHero = ({ restaurant, bgImage }) => {
   if (!restaurant) return null;

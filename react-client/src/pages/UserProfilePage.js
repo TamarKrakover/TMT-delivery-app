@@ -10,7 +10,7 @@ import { productService } from '../services/productService';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import { useTheme } from '../contexts/ThemeContext';
-import { FiClock, FiShoppingBag, FiList } from 'react-icons/fi';
+import { FiClock, FiShoppingBag, FiList } from '../components/common/Icons';
 import './UserProfilePage.css';
 
 const UserProfilePage = () => {

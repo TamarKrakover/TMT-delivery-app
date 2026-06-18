@@ -11,7 +11,7 @@ import { restaurantService } from '../services/restaurantService';
 import { categoryService } from '../services/categoryService';
 import mockRestaurants from '../data/restaurants.json';
 import { calculateDistance } from '../utils/distance';
-import { FiPlus } from 'react-icons/fi';
+import { FiPlus } from '../components/common/Icons';
 import { useAuth } from '../contexts/AuthContext';
 import { useModal } from '../hooks/useModal';
 import './HomePage.css';

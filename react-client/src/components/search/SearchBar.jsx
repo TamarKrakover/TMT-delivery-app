@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { IoIosSearch, IoMdClose } from 'react-icons/io';
+import { FiSearch, FiX } from '../../components/common/Icons';
 import { restaurantService } from '../../services/restaurantService';
 import mockRestaurants from '../../data/restaurants.json';
 import './SearchBar.css';
@@ -80,7 +80,7 @@ const SearchBar = ({ placeholder = "Search for restaurants or dishes..." }) => {
 
   return (
     <div className="search-bar-wrapper" ref={wrapperRef}>
-      <IoIosSearch className="search-icon" onClick={handleSearchSubmit} style={{ cursor: 'pointer' }} />
+      <FiSearch className="search-icon" onClick={handleSearchSubmit} style={{ cursor: 'pointer' }} />
       <input
         type="text"
         className="search-bar-input"
@@ -91,7 +91,7 @@ const SearchBar = ({ placeholder = "Search for restaurants or dishes..." }) => {
         onFocus={() => query.trim() !== '' && setIsOpen(true)}
       />
       {query && (
-        <IoMdClose className="clear-icon" onClick={handleClear} style={{ cursor: 'pointer' }} />
+        <FiX className="clear-icon" onClick={handleClear} style={{ cursor: 'pointer' }} />
       )}
 
       {isOpen && results.length > 0 && (

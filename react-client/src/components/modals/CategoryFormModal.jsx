@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FiX, FiUploadCloud } from 'react-icons/fi';
+import { FiX, FiUploadCloud } from '../../components/common/Icons';
 import uploadService from '../../services/uploadService';
 
 const CategoryFormModal = ({ onSubmit, onClose, error }) => {

@@ -4,7 +4,7 @@ import { useCart } from '../../contexts/CartContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { orderService } from '../../services/orderService';
 import request from '../../services/api';
-import { FiX, FiShoppingCart, FiMinus, FiPlus, FiTrash2, FiCheckCircle, FiAlertTriangle } from 'react-icons/fi';
+import { FiX, FiShoppingCart, FiMinus, FiPlus, FiTrash2, FiCheckCircle, FiAlertTriangle } from '../../components/common/Icons';
 import './SidebarCart.css';
 
 const SidebarCart = () => {

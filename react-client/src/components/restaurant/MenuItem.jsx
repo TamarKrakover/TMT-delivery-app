@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FiEdit, FiTrash2, FiCheck, FiX } from 'react-icons/fi';
+import { FiEdit, FiTrash2, FiCheck, FiX } from '../../components/common/Icons';
 import { useCart } from '../../contexts/CartContext';
 
 const MenuItem = ({ product, restaurant, canModify, onClick, onEdit, onDelete }) => {
