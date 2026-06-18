@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { FiX } from 'react-icons/fi';
+import { FiX } from '../../components/common/Icons';
 import { useCart } from '../../contexts/CartContext';
 import request from '../../services/api';
 

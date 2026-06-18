@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiSun, FiMoon, FiShoppingCart } from 'react-icons/fi';
+import { FiSun, FiMoon, FiShoppingCart } from '../../components/common/Icons';
 import SearchBar from '../search/SearchBar';
 import logo from '../../logoTMT.svg';
 import { useAuth } from '../../contexts/AuthContext';

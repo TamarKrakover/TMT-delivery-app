@@ -1,28 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { FiX } from 'react-icons/fi';
+import { FiX, FiUploadCloud } from '../../components/common/Icons';
+import uploadService from '../../services/uploadService';
 
 const RestaurantFormModal = ({ title, initialData, onSubmit, onClose, error }) => {
   const [formError, setFormError] = useState('');
-
-  const categoryToImageKey = (category) => {
-    const cat = category ? category.toLowerCase() : '';
-    if (cat === 'burgers') return 'burger';
-    if (cat === 'pizza') return 'pizza';
-    if (cat === 'sushi') return 'sushi';
-    if (cat === 'asian') return 'asian';
-    if (cat === 'desserts') return 'dessert';
-    if (cat === 'salads') return 'salad';
-    if (cat === 'grill') return 'burger';
-    return 'general';
-  };
+  const [isUploading, setIsUploading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
 
   const [form, setForm] = useState(() => {
-    const category = initialData?.category || 'Burgers';
+    const category = initialData?.category || 'General';
     return {
       name: initialData?.name || '',
       description: initialData?.description || '',
       category,
-      imageKey: initialData?.imageKey || categoryToImageKey(category),
       image: initialData?.image || '',
       location: initialData?.location || { lat: '', lng: '' }
     };
@@ -33,24 +23,43 @@ const RestaurantFormModal = ({ title, initialData, onSubmit, onClose, error }) =
     return () => { document.body.style.overflow = 'unset'; };
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setSelectedFile(e.target.files[0]);
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.name) {
       setFormError('Restaurant Name is required.');
       return;
     }
-    if (form.location.lat === '' || form.location.lng === '' || isNaN(parseFloat(form.location.lat)) || isNaN(parseFloat(form.location.lng))) {
+    if (!form.location.lat || !form.location.lng || isNaN(parseFloat(form.location.lat)) || isNaN(parseFloat(form.location.lng))) {
       setFormError('Valid Latitude and Longitude are required.');
       return;
     }
     setFormError('');
-    onSubmit({
-      ...form,
-      location: {
-        lat: parseFloat(form.location.lat),
-        lng: parseFloat(form.location.lng)
+    setIsUploading(true);
+
+    try {
+      let imageUrl = form.image;
+      if (selectedFile) {
+        imageUrl = await uploadService.uploadImage(selectedFile);
       }
-    });
+      
+      onSubmit({
+        ...form,
+        image: imageUrl,
+        location: {
+          lat: parseFloat(form.location.lat),
+          lng: parseFloat(form.location.lng)
+        }
+      });
+    } catch (err) {
+      setFormError('Failed to upload image. Please try again.');
+      setIsUploading(false);
+    }
   };
 
   return (
@@ -68,7 +77,6 @@ const RestaurantFormModal = ({ title, initialData, onSubmit, onClose, error }) =
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
               placeholder="e.g. Burger Palace"
-              required
             />
           </div>
 
@@ -92,11 +100,11 @@ const RestaurantFormModal = ({ title, initialData, onSubmit, onClose, error }) =
                 const selectedCat = e.target.value;
                 setForm({
                   ...form,
-                  category: selectedCat,
-                  imageKey: categoryToImageKey(selectedCat)
+                  category: selectedCat
                 });
               }}
             >
+              <option value="General">General</option>
               <option value="Burgers">Burgers</option>
               <option value="Pizza">Pizza</option>
               <option value="Sushi">Sushi</option>
@@ -104,7 +112,6 @@ const RestaurantFormModal = ({ title, initialData, onSubmit, onClose, error }) =
               <option value="Desserts">Desserts</option>
               <option value="Salads">Salads</option>
               <option value="Grill">Grill</option>
-              <option value="General">General</option>
             </select>
           </div>
 
@@ -117,7 +124,6 @@ const RestaurantFormModal = ({ title, initialData, onSubmit, onClose, error }) =
                 className="form-input"
                 value={form.location.lat}
                 onChange={(e) => setForm({ ...form, location: { ...form.location, lat: e.target.value } })}
-                required
               />
             </div>
             <div style={{ flex: 1 }}>
@@ -128,27 +134,36 @@ const RestaurantFormModal = ({ title, initialData, onSubmit, onClose, error }) =
                 className="form-input"
                 value={form.location.lng}
                 onChange={(e) => setForm({ ...form, location: { ...form.location, lng: e.target.value } })}
-                required
               />
             </div>
           </div>
 
           <div className="form-group">
-            <label className="form-label">Custom Image URL</label>
-            <input
-              type="text"
-              className="form-input"
-              value={form.image || ''}
-              onChange={(e) => setForm({ ...form, image: e.target.value })}
-              placeholder="e.g. https://example.com/image.jpg"
-            />
+            <label className="form-label">Upload Image</label>
+            <div className="file-upload-dropzone">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="file-upload-input"
+              />
+              <FiUploadCloud size={24} className="file-upload-icon" />
+              <div className="file-upload-text">
+                {selectedFile ? selectedFile.name : 'Click to upload image'}
+              </div>
+            </div>
+            {form.image && !selectedFile && (
+               <small className="file-upload-current">Current: {form.image}</small>
+            )}
           </div>
 
           {(error || formError) && <div className="form-error">{error || formError}</div>}
 
           <div className="form-actions">
             <button type="button" className="btn-outline" onClick={onClose}>Cancel</button>
-            <button type="submit" className="btn-primary">Save Changes</button>
+            <button type="submit" className="btn-primary" disabled={isUploading}>
+              {isUploading ? 'Uploading...' : 'Save Changes'}
+            </button>
           </div>
         </form>
       </div>

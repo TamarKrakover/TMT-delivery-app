@@ -1,5 +1,5 @@
 import React from 'react';
-import { FiClock, FiShoppingBag } from 'react-icons/fi';
+import { FiClock, FiShoppingBag } from '../../components/common/Icons';
 import './OrderCard.css';
 
 const OrderCard = ({ order, restaurant, restaurantProducts = [] }) => {

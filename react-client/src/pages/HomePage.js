@@ -6,10 +6,12 @@ import CategoryFilters from '../components/restaurant/CategoryFilters';
 import RestaurantList from '../components/restaurant/RestaurantList';
 import HeroBanner from '../components/layout/HeroBanner';
 import RestaurantFormModal from '../components/modals/RestaurantFormModal';
+import CategoryFormModal from '../components/modals/CategoryFormModal';
 import { restaurantService } from '../services/restaurantService';
+import { categoryService } from '../services/categoryService';
 import mockRestaurants from '../data/restaurants.json';
 import { calculateDistance } from '../utils/distance';
-import { FiPlus } from 'react-icons/fi';
+import { FiPlus } from '../components/common/Icons';
 import { useAuth } from '../contexts/AuthContext';
 import { useModal } from '../hooks/useModal';
 import './HomePage.css';
@@ -21,9 +23,24 @@ const HomePage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [restaurants, setRestaurants] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const addRestModal = useModal();
+  const addCatModal = useModal();
+
+  const fetchCategories = async () => {
+    try {
+      const cats = await categoryService.getAll();
+      setCategories(cats);
+    } catch (err) {
+      console.error("Failed to fetch categories:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     const loadRestaurants = async () => {
@@ -59,10 +76,41 @@ const HomePage = () => {
       
       const data = await restaurantService.getAll();
       setRestaurants(data);
+      fetchCategories(); // Refresh category counts
     } catch (err) {
       addRestModal.setError(err.message || 'Failed to create restaurant.');
     }
   };
+
+  const handleAddCategorySubmit = async (form) => {
+    if (!form.name) {
+      addCatModal.setError('Name is required.');
+      return;
+    }
+    try {
+      await categoryService.create(form);
+      addCatModal.closeModal();
+      fetchCategories();
+    } catch (err) {
+      addCatModal.setError(err.response?.data?.message || err.message || 'Failed to create category.');
+    }
+  };
+
+  const myRestaurants = currentUser && (currentUser.role === 'owner' || currentUser.isAdmin)
+    ? restaurants.filter(r => r.creatorId === currentUser.id).reverse()
+    : [];
+
+  const nearbyRestaurants = currentUser?.location
+    ? restaurants.filter(r => {
+        if (!r.location) return false;
+        const dist = calculateDistance(currentUser.location, r.location);
+        return dist !== null && dist <= 5;
+      }).sort((a, b) => {
+        const distA = calculateDistance(currentUser.location, a.location);
+        const distB = calculateDistance(currentUser.location, b.location);
+        return distA - distB;
+      })
+    : [];
 
   const displayedRestaurants = restaurants.filter(r => 
     selectedCategory === 'All' || 
@@ -74,6 +122,13 @@ const HomePage = () => {
     return distA - distB;
   });
 
+  const allCategory = { 
+    name: 'All', 
+    image: "/api/uploads/categories/all.webp",
+    count: restaurants.length
+  };
+  const displayCategories = [allCategory, ...categories];
+
   return (
     <div className={`app-container ${darkMode ? 'dark-mode' : ''}`}>
       <Navbar onSearch={setSearchQuery} />
@@ -82,23 +137,56 @@ const HomePage = () => {
       <HeroBanner />
 
       <section className="category-section">
-        <h2 className="category-section-title">Categories</h2>
+        {currentUser && (currentUser.role === 'owner' || currentUser.isAdmin) && (
+          <div className="admin-actions-bar">
+            <button className="btn-primary add-restaurant-btn" onClick={() => addRestModal.openModal()}>
+              <FiPlus /> Add Restaurant
+            </button>
+          </div>
+        )}
+
+        {currentUser && (currentUser.role === 'owner' || currentUser.isAdmin) && (
+          <div className="special-list-container">
+            <h2 className="section-title">My Restaurants</h2>
+            {myRestaurants.length > 0 ? (
+              <RestaurantList restaurants={myRestaurants} />
+            ) : (
+              <p className="empty-message">You haven't added any restaurants yet.</p>
+            )}
+          </div>
+        )}
+
+        {currentUser?.location && (
+          <div className="special-list-container">
+            <h2 className="section-title">What's there to eat nearby?</h2>
+            {nearbyRestaurants.length > 0 ? (
+              <RestaurantList restaurants={nearbyRestaurants} />
+            ) : (
+              <p className="empty-message">We couldn't find any restaurants within 5km of your location.</p>
+            )}
+          </div>
+        )}
+
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '40px' }}>
+          <h2 className="category-section-title" style={{ marginTop: 0, marginBottom: 0 }}>Categories</h2>
+          {currentUser?.isAdmin && (
+            <button className="btn-primary add-restaurant-btn" onClick={() => addCatModal.openModal()}>
+              <FiPlus /> Add Category
+            </button>
+          )}
+        </div>
         <CategoryFilters 
+          categories={displayCategories}
           selectedCategory={selectedCategory} 
           onCategorySelect={setSelectedCategory} 
         />
       </section>
 
       <main className="home-main">
-        <div className="home-header-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-          <h2 className="section-title" style={{ marginBottom: 0 }}>
+        <div className="home-header-row">
+          <h2 className="section-title">
             {selectedCategory} Restaurants {searchQuery && `matching "${searchQuery}"`}
           </h2>
-          {currentUser && (currentUser.role === 'owner' || currentUser.isAdmin) && (
-            <button className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }} onClick={() => addRestModal.openModal()}>
-              <FiPlus /> Add Restaurant
-            </button>
-          )}
         </div>
 
         {loading ? (
@@ -116,6 +204,14 @@ const HomePage = () => {
           onSubmit={handleAddRestaurantSubmit}
           onClose={addRestModal.closeModal}
           error={addRestModal.error}
+        />
+      )}
+
+      {addCatModal.isOpen && (
+        <CategoryFormModal
+          onSubmit={handleAddCategorySubmit}
+          onClose={addCatModal.closeModal}
+          error={addCatModal.error}
         />
       )}
     </div>

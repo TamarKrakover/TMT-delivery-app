@@ -1,0 +1,98 @@
+/* Error Pages (404, 500) */
+.error-page-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  text-align: center;
+  padding: 40px 20px;
+  background-color: var(--light);
+}
+
+.error-page-logo {
+  width: 180px;
+  margin-bottom: 30px;
+  filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));
+  border-radius: 50%;
+}
+
+.error-page-code {
+  font-size: 5rem;
+  margin: 0;
+  font-weight: 800;
+}
+
+.error-page-code.primary {
+  color: var(--primary);
+}
+
+.error-page-code.danger {
+  color: var(--danger);
+}
+
+.error-page-title {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  color: var(--dark);
+}
+
+.error-page-text {
+  color: var(--dark-light);
+  max-width: 500px;
+  font-size: 1.2rem;
+  margin-bottom: 40px;
+  line-height: 1.6;
+}
+
+.error-page-btn {
+  padding: 15px 40px;
+  font-size: 1.2rem;
+  border-radius: 50px;
+}
+
+/* Global Error Handler Toast */
+.global-error-toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: var(--danger);
+  color: white;
+  padding: 15px 20px;
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  box-shadow: var(--shadow-lg);
+  z-index: 9999;
+  animation: slideInUp 0.3s ease-out;
+}
+
+.global-error-toast-content {
+  flex: 1;
+}
+
+.global-error-toast-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.global-error-toast-text {
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.global-error-toast-close {
+  background: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: flex;
+}
+
+@keyframes slideInUp {
+  from { transform: translateY(100px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}

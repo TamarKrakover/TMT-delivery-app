@@ -1,5 +1,5 @@
 import React from 'react';
-import { FiInfo } from 'react-icons/fi';
+import { FiInfo } from '../../components/common/Icons';
 import MenuItem from './MenuItem';
 
 const MenuList = ({ products, restaurant, canModify, onProductClick, onEditProduct, onDeleteProduct }) => {

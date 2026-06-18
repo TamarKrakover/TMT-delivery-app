@@ -9,12 +9,17 @@ app.set('json spaces', 2);
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
+const path = require('path');
+app.use('/api/uploads', express.static(path.join(__dirname, 'public/uploads')));
+
 // Import all routes
 const userRoutes = require('./src/routes/userRoutes');
 const restaurantRoutes = require('./src/routes/restaurantRoutes');
 const orderRoutes = require('./src/routes/orderRoutes');
 const searchRoutes = require('./src/routes/searchRoutes');
 const tokenRoutes = require('./src/routes/tokenRoutes');
+const categoryRoutes = require('./src/routes/categoryRoutes');
+const uploadRoutes = require('./src/routes/uploadRoutes');
 
 // Mount routes to their respective paths
 app.use('/api/users', userRoutes);
@@ -22,6 +27,8 @@ app.use('/api/restaurants', restaurantRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/search', searchRoutes);
 app.use('/api/tokens', tokenRoutes);
+app.use('/api/categories', categoryRoutes);
+app.use('/api/upload', uploadRoutes);
 
 // Catch-all route for undefined endpoints
 app.use((req, res) => {

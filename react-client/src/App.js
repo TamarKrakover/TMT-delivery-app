@@ -6,6 +6,8 @@ import RegisterPage from './pages/RegisterPage';
 import RestaurantPage from './pages/RestaurantPage';
 import SearchPage from './pages/SearchPage';
 import UserProfilePage from './pages/UserProfilePage';
+import NotFoundPage from './pages/NotFoundPage';
+import ForbiddenPage from './pages/ForbiddenPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
 import { ThemeProvider } from './contexts/ThemeContext';
@@ -34,6 +36,8 @@ function App() {
                   </ProtectedRoute>
                 } 
               />
+              <Route path="/403" element={<ForbiddenPage />} />
+              <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </Router>
         </CartProvider>

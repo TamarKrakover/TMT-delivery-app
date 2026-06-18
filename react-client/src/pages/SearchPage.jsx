@@ -4,11 +4,13 @@ import { useTheme } from '../contexts/ThemeContext';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
 import RestaurantCard from '../components/restaurant/RestaurantCard';
+import MenuItem from '../components/restaurant/MenuItem';
+import ProductDetailModal from '../components/modals/ProductDetailModal';
 import { restaurantService } from '../services/restaurantService';
 import mockRestaurants from '../data/restaurants.json';
 import request from '../services/api';
+import ScrollableRow from '../components/common/ScrollableRow';
 import './SearchPage.css';
-const imageHamburger = "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=80";
 
 const SearchPage = () => {
   const [searchParams] = useSearchParams();
@@ -16,6 +18,7 @@ const SearchPage = () => {
   const query = searchParams.get('q') || '';
   const [restaurants, setRestaurants] = useState([]);
   const [products, setProducts] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const { darkMode } = useTheme();
 
@@ -47,10 +50,10 @@ const SearchPage = () => {
     fetchResults();
   }, [query]);
 
-  // Helper to find restaurant name by ID for dishes list
-  const getRestaurantName = (rId) => {
+  // Helper to find restaurant by ID for dishes list
+  const getRestaurant = (rId) => {
     const found = mockRestaurants.find(r => r.id === rId);
-    return found ? found.name : 'Restaurant';
+    return found || { id: rId, name: 'Unknown Restaurant' };
   };
 
   return (
@@ -72,21 +75,21 @@ const SearchPage = () => {
               {restaurants.length === 0 ? (
                 <p className="search-no-results">No restaurants match your search.</p>
               ) : (
-                <div className="search-restaurants-scroll">
+                <ScrollableRow className="search-restaurants-scroll-wrapper">
+                  <div className="search-restaurants-scroll">
                   {restaurants.map(r => (
                     <div key={r.id} className="search-restaurant-card-wrapper">
                       <RestaurantCard
                         name={r.name}
                         category={r.category}
                         address={r.address}
-                        rating={r.rating || "5.0"}
-                        deliveryTime={r.deliveryTime || "20-30"}
-                        imageKey={r.imageKey}
+                        image={r.image}
                         onClick={() => navigate(`/restaurant/${r.id}`)}
                       />
                     </div>
                   ))}
-                </div>
+                  </div>
+                </ScrollableRow>
               )}
             </div>
 
@@ -101,35 +104,13 @@ const SearchPage = () => {
               ) : (
                 <div className="search-related-grid">
                   {products.map(p => (
-                    <div 
-                      key={p.id} 
-                      className="related-product-card" 
-                      onClick={() => {
-                        request(`/api/restaurants/${p.restaurantId}/products/${p.id}`).catch(() => {});
-                        navigate(`/restaurant/${p.restaurantId}`);
-                      }}
-                    >
-                      <div className="related-product-info">
-                        <div>
-                          <span className="related-product-price">₪{p.price}.00</span>
-                          <h4 className="related-product-name">{p.name}</h4>
-                          <p className="related-product-restaurant">
-                            {getRestaurantName(p.restaurantId)}
-                          </p>
-                        </div>
-                        <div className="related-product-meta">
-                          <span>🚴 ₪0.00</span>
-                          <span>•</span>
-                          <span>30-40 min</span>
-                        </div>
-                      </div>
-                      <div className="related-product-image-wrapper">
-                        <img 
-                          src={imageHamburger} 
-                          alt={p.name} 
-                          className="related-product-image" 
-                        />
-                      </div>
+                    <div key={p.id} className="search-restaurant-card-wrapper" style={{ margin: '10px 0' }}>
+                      <MenuItem 
+                        product={p} 
+                        restaurant={getRestaurant(p.restaurantId)}
+                        canModify={false}
+                        onClick={() => setSelectedProduct(p)} 
+                      />
                     </div>
                   ))}
                 </div>
@@ -139,6 +120,13 @@ const SearchPage = () => {
         )}
       </main>
       <Footer />
+      {selectedProduct && (
+        <ProductDetailModal
+          product={selectedProduct}
+          restaurant={getRestaurant(selectedProduct.restaurantId)}
+          onClose={() => setSelectedProduct(null)}
+        />
+      )}
     </div>
   );
 };

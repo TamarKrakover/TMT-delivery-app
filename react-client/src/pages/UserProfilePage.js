@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
 import OrderCard from '../components/order/OrderCard';
 import { orderService } from '../services/orderService';
 import { restaurantService } from '../services/restaurantService';
+import RestaurantList from '../components/restaurant/RestaurantList';
 import { productService } from '../services/productService';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import { useTheme } from '../contexts/ThemeContext';
-import { FiClock, FiShoppingBag, FiList } from 'react-icons/fi';
+import { FiClock, FiShoppingBag, FiList } from '../components/common/Icons';
 import './UserProfilePage.css';
 
 const UserProfilePage = () => {
+  const navigate = useNavigate();
   const { currentUser } = useAuth();
   const { checkoutTrigger } = useCart();
   const { darkMode } = useTheme();
@@ -143,16 +146,33 @@ const UserProfilePage = () => {
                 <p>You haven't added any restaurants yet.</p>
               </div>
             ) : (
-              <div className="orders-list" style={{ gap: '16px' }}>
-                {restaurants.filter(r => r.creatorId === currentUser.id).map(rest => (
-                  <div key={rest.id} className="order-card" style={{ padding: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                      <h3 style={{ margin: '0 0 8px 0', fontSize: '1.2rem', color: 'var(--text-color)' }}>{rest.name}</h3>
-                      <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--gray-500)' }}>{rest.address}</p>
+              <div className="restaurant-list-container">
+                {restaurants.filter(r => r.creatorId === currentUser.id).map(rest => {
+                  const DEFAULT_IMAGE = "/api/uploads/restaurants/default.webp";
+                  const displayImage = rest.image || DEFAULT_IMAGE;
+                  
+                  return (
+                    <div 
+                      key={rest.id} 
+                      className="restaurant-list-card" 
+                      onClick={() => navigate(`/restaurant/${rest.id}`)}
+                    >
+                      <img 
+                        src={displayImage} 
+                        alt={rest.name} 
+                        className="restaurant-list-image"
+                      />
+                      <div className="restaurant-list-info">
+                        <div className="restaurant-list-header">
+                          <h3 className="restaurant-list-title">{rest.name}</h3>
+                          <span className="restaurant-list-badge">{rest.category}</span>
+                        </div>
+                        <p className="restaurant-list-desc">{rest.address || rest.description}</p>
+                      </div>
+                      <span className="order-status processing restaurant-list-status">Active</span>
                     </div>
-                    <span className="order-status processing" style={{ backgroundColor: 'var(--primary-color)', color: 'white', border: 'none' }}>Active</span>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </section>
