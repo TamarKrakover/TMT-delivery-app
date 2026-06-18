@@ -40,6 +40,12 @@ const RestaurantFormModal = ({ title, initialData, onSubmit, onClose, error }) =
       setFormError('Valid Latitude and Longitude are required.');
       return;
     }
+    
+    if (!isEditMode && !selectedFile && form.image !== '/api/uploads/restaurants/default.webp') {
+      setFormError('Please upload an image or select the default image.');
+      return;
+    }
+    
     setFormError('');
     setIsUploading(true);
 
