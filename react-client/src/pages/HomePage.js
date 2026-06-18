@@ -15,6 +15,8 @@ import { FiPlus } from '../components/common/Icons';
 import { useAuth } from '../contexts/AuthContext';
 import { useModal } from '../hooks/useModal';
 import './HomePage.css';
+import MenuItem from '../components/restaurant/MenuItem';
+import './RestaurantPage.css';
 
 const HomePage = () => {
   const { currentUser } = useAuth();
@@ -25,6 +27,7 @@ const HomePage = () => {
   const [restaurants, setRestaurants] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [recommendationData, setRecommendationData] = useState({ targetProductName: null, products: [] });
 
   const addRestModal = useModal();
   const addCatModal = useModal();
@@ -41,6 +44,26 @@ const HomePage = () => {
   useEffect(() => {
     fetchCategories();
   }, []);
+
+  useEffect(() => {
+    const loadRecommendations = async () => {
+      if (!currentUser) {
+        setRecommendationData({ targetProductName: null, products: [] });
+        return;
+      }
+      try {
+        const data = await restaurantService.getRecommendations();
+        if (data) {
+          setRecommendationData(data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch recommendations:", err);
+        setRecommendationData({ targetProductName: null, products: [] });
+      }
+    };
+
+    loadRecommendations();
+  }, [currentUser]);
 
   useEffect(() => {
     const loadRestaurants = async () => {
@@ -169,6 +192,31 @@ const HomePage = () => {
               <RestaurantList restaurants={nearbyRestaurants} />
             ) : (
               <p className="empty-message">We couldn't find any restaurants within 5km of your location.</p>
+            )}
+          </div>
+        )}
+
+        {currentUser && (
+          <div className="special-list-container">
+            <h2 className="section-title">
+              {recommendationData.targetProductName 
+                ? `if you liked ${recommendationData.targetProductName} you might also like:` 
+                : 'Based on your activity'}
+            </h2>
+            {recommendationData.products && recommendationData.products.length > 0 ? (
+              <div className="menu-grid" style={{ marginTop: '20px' }}>
+                {recommendationData.products.map((product) => (
+                  <MenuItem
+                    key={product.id}
+                    product={product}
+                    restaurant={product.restaurant}
+                    canModify={false}
+                    onClick={() => {}}
+                  />
+                ))}
+              </div>
+            ) : (
+              <p className="empty-message">No recommendations available yet. Try viewing some dishes or placing an order!</p>
             )}
           </div>
         )}

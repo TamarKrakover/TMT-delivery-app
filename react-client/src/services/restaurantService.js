@@ -25,5 +25,8 @@ export const restaurantService = {
   }),
 
   // Search for restaurants or products matching query
-  search: (query) => request(`/api/search/${query}`)
+  search: (query) => request(`/api/search/${query}`),
+
+  // Get recommendations based on dynamic user activity
+  getRecommendations: () => request('/api/restaurants/recommendations')
 };
