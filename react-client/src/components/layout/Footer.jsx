@@ -7,7 +7,8 @@ const Footer = () => {
     <footer className="footer">
       <img src={logo} alt="Logo" className="logo" />
       <p>© {new Date().getFullYear()} TMT Delivery. Made with ❤️ for Advanced Programming.</p>
-      <p>Images by Magnific: <a href="https://www.magnific.com">www.magnific.com</a></p>
+      <p>Images by Magnific & Unsplash: </p>
+      <p><a href="https://www.magnific.com">www.magnific.com</a> | <a href="https://unsplash.com">Unsplash.com</a></p>
     </footer>
   );
 };

@@ -3,6 +3,7 @@ import { useAuth } from './AuthContext';
 import { orderService } from '../services/orderService';
 import { restaurantService } from '../services/restaurantService';
 import { productService } from '../services/productService';
+import ConfirmModal from '../components/modals/ConfirmModal';
 
 const CartContext = createContext();
 
@@ -15,6 +16,7 @@ export const CartProvider = ({ children }) => {
   const [isCartOpen, setCartOpen] = useState(false);
   const [conflictItem, setConflictItem] = useState(null);
   const [checkoutTrigger, setCheckoutTrigger] = useState(0);
+  const [authAlertOpen, setAuthAlertOpen] = useState(false);
 
   const fetchCart = useCallback(async () => {
     if (!currentUser) {
@@ -105,7 +107,6 @@ export const CartProvider = ({ children }) => {
         if (activeOrderId) {
           await orderService.update(activeOrderId, { productIds });
         } else {
-          const newOrder = await orderService.create(restaurantId, productIds);
           // fetchCart to get the new order ID reliably
           fetchCart();
         }
@@ -118,7 +119,7 @@ export const CartProvider = ({ children }) => {
 
   const addToCart = async (product, restaurant) => {
     if (!currentUser) {
-      alert("Please sign in to add items to your cart.");
+      setAuthAlertOpen(true);
       return;
     }
 
@@ -267,6 +268,14 @@ export const CartProvider = ({ children }) => {
       }}
     >
       {children}
+      <ConfirmModal
+        isOpen={authAlertOpen}
+        title="Authentication Required"
+        message="Please sign in to add items to your cart."
+        onClose={() => setAuthAlertOpen(false)}
+        hideCancel={true}
+        confirmText="OK"
+      />
     </CartContext.Provider>
   );
 };

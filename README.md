@@ -20,7 +20,7 @@ docker compose up --build
 
 #### Running Services:
 * **React Client Frontend**: Accessible at [http://localhost:3000](http://localhost:3000)
-* **Node.js Express API Gateway**: Accessible at [http://localhost:8080](http://localhost:8080)
+* **Node.js Express API Gateway**: Accessible at `http://localhost:8080`
 * **C++ Recommendation Server**: Runs internally on port `5555`
 
 ---
@@ -91,6 +91,15 @@ Below is an overview of the screenshots from the `runScreenShot/` directory, ill
   - **Dynamic Distance**: Highlights "pizza makpizza" (recently added) at `0.0 km` distance since it aligns with the user's coordinate location. Other restaurants are listed with dynamically calculated distances (e.g., `0.4 km`, `0.7 km`).
   - **Sections**: Groups restaurants into "My Restaurants", "What's there to eat nearby?", "Categories"- and display by the selected category.
   - **Theme Toggle**: The moon icon in the upper right header toggles between Light and Dark mode.
+
+---
+
+### Search Results Page 
+![Search Results](runScreenShot/searchPage.png)
+* **Page Route**: `/search?q=query`
+* Displays dynamic search results based on user queries (e.g., searching for "burger").
+  - **Restaurants and Stores**: Lists all restaurants whose name or description match the search term.
+  - **Related Items**: Displays specific menu items from various restaurants that match the query, allowing users to discover individual dishes across the platform and add them directly to their cart.
 
 ---
 
