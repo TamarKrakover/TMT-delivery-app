@@ -2,7 +2,6 @@
 .categories-container {
   display: flex;
   gap: 16px;
-  overflow-x: auto;
   padding: 10px 0;
   margin-bottom: 10px;
   scrollbar-width: none;

@@ -1,0 +1,68 @@
+.scrollable-row-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.scrollable-row-content {
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  width: 100%;
+  scroll-behavior: smooth;
+  padding-bottom: 5px; /* prevent shadow clipping */
+}
+
+.scrollable-row-content::-webkit-scrollbar {
+  display: none;
+}
+
+.scroll-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--white);
+  border: 1px solid var(--gray-200);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--dark);
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.2s ease;
+}
+
+.scroll-arrow:hover {
+  background-color: var(--primary);
+  color: var(--white);
+  border-color: var(--primary);
+  transform: translateY(-50%) scale(1.05);
+}
+
+.scroll-arrow-left {
+  left: -20px;
+}
+
+.scroll-arrow-right {
+  right: -20px;
+}
+
+/* Adjust layout on small screens where buttons might overflow the screen width */
+@media (max-width: 768px) {
+  .scroll-arrow-left {
+    left: 0px;
+  }
+  .scroll-arrow-right {
+    right: 0px;
+  }
+  .scroll-arrow {
+    width: 36px;
+    height: 36px;
+  }
+}

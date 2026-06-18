@@ -2,7 +2,6 @@
 .restaurant-grid {
   display: flex;
   gap: 24px;
-  overflow-x: auto;
   padding: 10px 4px;
   margin-top: 20px;
   scrollbar-width: none;

@@ -9,6 +9,7 @@ import ProductDetailModal from '../components/modals/ProductDetailModal';
 import { restaurantService } from '../services/restaurantService';
 import mockRestaurants from '../data/restaurants.json';
 import request from '../services/api';
+import ScrollableRow from '../components/common/ScrollableRow';
 import './SearchPage.css';
 
 const SearchPage = () => {
@@ -74,7 +75,8 @@ const SearchPage = () => {
               {restaurants.length === 0 ? (
                 <p className="search-no-results">No restaurants match your search.</p>
               ) : (
-                <div className="search-restaurants-scroll">
+                <ScrollableRow className="search-restaurants-scroll-wrapper">
+                  <div className="search-restaurants-scroll">
                   {restaurants.map(r => (
                     <div key={r.id} className="search-restaurant-card-wrapper">
                       <RestaurantCard
@@ -86,7 +88,8 @@ const SearchPage = () => {
                       />
                     </div>
                   ))}
-                </div>
+                  </div>
+                </ScrollableRow>
               )}
             </div>
 

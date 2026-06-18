@@ -171,3 +171,15 @@ export const FiSearch = (props) => (
     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
   </svg>
 );
+
+export const FiChevronLeft = (props) => (
+  <svg {...svgProps(props)}>
+    <polyline points="15 18 9 12 15 6"></polyline>
+  </svg>
+);
+
+export const FiChevronRight = (props) => (
+  <svg {...svgProps(props)}>
+    <polyline points="9 18 15 12 9 6"></polyline>
+  </svg>
+);

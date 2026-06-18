@@ -1,9 +1,11 @@
 import React from 'react';
 import './CategoryFilters.css';
+import ScrollableRow from '../common/ScrollableRow';
 const CategoryFilters = ({ categories = [], selectedCategory, onCategorySelect }) => {
 
   return (
-    <div className="categories-container">
+    <ScrollableRow className="categories-container-wrapper">
+      <div className="categories-container">
       {categories.map((category) => (
         <div
           key={category.name}
@@ -17,7 +19,8 @@ const CategoryFilters = ({ categories = [], selectedCategory, onCategorySelect }
           </div>
         </div>
       ))}
-    </div>
+      </div>
+    </ScrollableRow>
   );
 };
 
