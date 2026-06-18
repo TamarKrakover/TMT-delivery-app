@@ -85,13 +85,10 @@ const RegisterPage = () => {
 
       setIsLoading(true);
       try {
-        let finalPic = '';
+        let finalPicUrl = '';
         if (profilePic) {
-          const reader = new FileReader();
-          finalPic = await new Promise((resolve) => {
-            reader.onloadend = () => resolve(reader.result);
-            reader.readAsDataURL(profilePic);
-          });
+          const uploadRes = await authService.uploadImage(profilePic);
+          finalPicUrl = uploadRes.url;
         }
 
         const userData = {
@@ -100,7 +97,7 @@ const RegisterPage = () => {
           name: displayName,
           role: role,
           location: { lat: parseFloat(lat), lng: parseFloat(lng) },
-          profilePic: finalPic
+          profilePic: finalPicUrl
         };
 
         await authService.register(userData);
@@ -187,12 +184,19 @@ const RegisterPage = () => {
               )}
 
               <div className="upload-btn-wrapper">
-                <Button type="button" className="btn-outline">Choose Image</Button>
+                <Button 
+                  type="button" 
+                  className="btn-outline"
+                  onClick={() => fileInputRef.current.click()}
+                >
+                  Choose Image
+                </Button>
                 <input
                   type="file"
                   accept="image/*"
                   ref={fileInputRef}
                   onChange={handleImageChange}
+                  style={{ display: 'none' }}
                 />
               </div>
             </div>

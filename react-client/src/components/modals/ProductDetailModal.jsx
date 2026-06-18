@@ -23,6 +23,16 @@ const ProductDetailModal = ({ product, restaurant, onClose }) => {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <button className="modal-close" onClick={onClose}><FiX /></button>
+        {product.image ? (
+          <div 
+            className="product-modal-image"
+            style={{ backgroundImage: `url(${product.image})` }} 
+          />
+        ) : (
+          <div className="product-modal-no-image">
+            No image available for this product
+          </div>
+        )}
         <h2 className="modal-title">{product.name}</h2>
         <div className="product-modal-price">${parseFloat(product.price).toFixed(2)}</div>
         <p className="product-modal-desc">{product.description || 'No description available.'}</p>

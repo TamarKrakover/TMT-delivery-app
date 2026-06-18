@@ -11,10 +11,10 @@ const MenuItem = ({ product, restaurant, canModify, onClick, onEdit, onDelete })
   return (
     <div className="menu-item-card" onClick={() => !isDeleting && onClick(product)}>
       {hasImage ? (
-        <div style={{ width: '130px', height: '100%', minHeight: '130px', flexShrink: 0, backgroundImage: `url(${product.image})`, backgroundSize: 'cover', backgroundPosition: 'center', borderRadius: '8px' }}></div>
+        <div className="menu-item-image" style={{ backgroundImage: `url(${product.image})` }}></div>
       ) : (
-        <div style={{ width: '130px', height: '100%', minHeight: '130px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#333', borderRadius: '8px', padding: '10px', textAlign: 'center' }}>
-          <span style={{ fontSize: '0.8rem', color: '#ccc' }}>No image available for this product</span>
+        <div className="menu-item-no-image">
+          <span>No image available for this product</span>
         </div>
       )}
       <div style={{ display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'space-between' }}>

@@ -16,5 +16,22 @@ export const authService = {
   // Get specific user details, allowing custom headers (used during login)
   getUserDetails: (userId, headers) => request(`/api/users/${userId}`, {
     headers: headers
-  })
+  }),
+
+  // Upload profile image
+  uploadImage: async (file) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    
+    const response = await fetch('/api/upload', {
+      method: 'POST',
+      body: formData
+    });
+    
+    if (!response.ok) {
+      throw new Error('Image upload failed');
+    }
+    
+    return await response.json();
+  }
 };
