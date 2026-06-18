@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import RestaurantCard from './RestaurantCard';
 import { useAuth } from '../../contexts/AuthContext';
@@ -6,10 +6,13 @@ import { calculateDistance } from '../../utils/distance';
 import ScrollableRow from '../common/ScrollableRow';
 import './Restaurant.css';
 
-const RestaurantList = ({ restaurants = [] }) => {
+const RestaurantList = React.memo(({ restaurants = [] }) => {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
 
+  const handleCardClick = useCallback((id) => {
+    navigate(`/restaurant/${id}`);
+  }, [navigate]);
 
   return (
     <ScrollableRow className="restaurant-grid-wrapper">
@@ -28,13 +31,13 @@ const RestaurantList = ({ restaurants = [] }) => {
             image={restaurant.image}
             distance={dist}
             description={restaurant.description}
-            onClick={() => navigate(`/restaurant/${restaurant.id}`)}
+            onClick={handleCardClick}
           />
         );
       })}
       </div>
     </ScrollableRow>
   );
-};
+});
 
 export default RestaurantList;
