@@ -47,22 +47,22 @@
 
 .order-status.delivered {
   background-color: rgba(34, 197, 94, 0.1);
-  color: #16a34a;
+  color: var(--success);
 }
 
 .order-status.pending {
   background-color: rgba(234, 179, 8, 0.1);
-  color: #ca8a04;
+  color: var(--warning);
 }
 
 .order-status.preparing {
   background-color: rgba(59, 130, 246, 0.1);
-  color: #2563eb;
+  color: var(--info);
 }
 
 .order-status.cancelled {
   background-color: rgba(239, 68, 68, 0.1);
-  color: #dc2626;
+  color: var(--danger);
 }
 
 .order-items-list {

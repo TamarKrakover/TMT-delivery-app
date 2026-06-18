@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { FiEdit, FiTrash2, FiCheck, FiX } from '../../components/common/Icons';
 import { useCart } from '../../contexts/CartContext';
 
-const MenuItem = ({ product, restaurant, canModify, onClick, onEdit, onDelete }) => {
+const MenuItem = ({ product, restaurant, canModify, onClick, onEdit, onDelete, showRestaurantName }) => {
   const { addToCart } = useCart();
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -19,6 +19,11 @@ const MenuItem = ({ product, restaurant, canModify, onClick, onEdit, onDelete })
       )}
       <div className="menu-item-details-container">
       <div className="menu-item-info">
+        {showRestaurantName && restaurant && (
+          <div className="menu-item-restaurant-name">
+            {restaurant.name}
+          </div>
+        )}
         <div className="menu-item-name-row">
           <h3 className="menu-item-name">{product.name}</h3>
           <span className="menu-item-price">${parseFloat(product.price).toFixed(2)}</span>

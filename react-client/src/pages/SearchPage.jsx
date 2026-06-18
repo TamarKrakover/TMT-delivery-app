@@ -80,9 +80,10 @@ const SearchPage = () => {
                   {restaurants.map(r => (
                     <div key={r.id} className="search-restaurant-card-wrapper">
                       <RestaurantCard
+                        id={r.id}
                         name={r.name}
                         category={r.category}
-                        address={r.address}
+                        description={r.description || r.address}
                         image={r.image}
                         onClick={() => navigate(`/restaurant/${r.id}`)}
                       />
@@ -110,6 +111,7 @@ const SearchPage = () => {
                         restaurant={getRestaurant(p.restaurantId)}
                         canModify={false}
                         onClick={() => setSelectedProduct(p)} 
+                        showRestaurantName={true}
                       />
                     </div>
                   ))}

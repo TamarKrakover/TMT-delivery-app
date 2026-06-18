@@ -18,7 +18,7 @@ const InputField = ({
 
   return (
     <div className="form-group">
-      {label && <label htmlFor={id}>{label}</label>}
+      {label && <label htmlFor={id} className="form-label">{label}</label>}
       <div className="input-field-wrapper">
         <input
           id={id}
@@ -27,7 +27,7 @@ const InputField = ({
           value={value}
           onChange={onChange}
           autoComplete={autoComplete}
-          className={`${error ? 'error' : ''} ${isPassword ? 'input-field-has-password' : ''}`}
+          className={`form-input ${error ? 'error' : ''} ${isPassword ? 'input-field-has-password' : ''}`}
         />
         {isPassword && (
           <button
@@ -40,7 +40,7 @@ const InputField = ({
         )}
       </div>
       {error ? (
-        <span className="error-message">{error}</span>
+        <span className="form-error">{error}</span>
       ) : hint ? (
         <span className="form-hint">{hint}</span>
       ) : null}

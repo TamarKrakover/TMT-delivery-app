@@ -1,6 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
+import './components/common/Buttons.css';
+import './components/common/Forms.css';
+import './components/common/Modals.css';
+import './components/common/FileUpload.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
