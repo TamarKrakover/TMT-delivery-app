@@ -28,6 +28,7 @@ const db = {
         { name: 'Desserts', image: "/api/uploads/categories/dessert.webp" },
         { name: 'Sushi', image: "/api/uploads/categories/sushi.webp" },
         { name: 'Salads', image: "/api/uploads/categories/salad.webp" },
+        { name: 'Grill', image: "/api/uploads/categories/grill.webp" },
         { name: 'General', image: "/api/uploads/categories/all.webp" }
     ]
 };
