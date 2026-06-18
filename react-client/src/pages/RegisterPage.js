@@ -187,12 +187,19 @@ const RegisterPage = () => {
               )}
 
               <div className="upload-btn-wrapper">
-                <Button type="button" className="btn-outline">Choose Image</Button>
+                <Button 
+                  type="button" 
+                  className="btn-outline"
+                  onClick={() => fileInputRef.current.click()}
+                >
+                  Choose Image
+                </Button>
                 <input
                   type="file"
                   accept="image/*"
                   ref={fileInputRef}
                   onChange={handleImageChange}
+                  style={{ display: 'none' }}
                 />
               </div>
             </div>
