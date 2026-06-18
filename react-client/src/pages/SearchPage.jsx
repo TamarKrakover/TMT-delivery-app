@@ -8,7 +8,6 @@ import MenuItem from '../components/restaurant/MenuItem';
 import ProductDetailModal from '../components/modals/ProductDetailModal';
 import { restaurantService } from '../services/restaurantService';
 import mockRestaurants from '../data/restaurants.json';
-import request from '../services/api';
 import ScrollableRow from '../components/common/ScrollableRow';
 import './SearchPage.css';
 
@@ -80,9 +79,10 @@ const SearchPage = () => {
                   {restaurants.map(r => (
                     <div key={r.id} className="search-restaurant-card-wrapper">
                       <RestaurantCard
+                        id={r.id}
                         name={r.name}
                         category={r.category}
-                        address={r.address}
+                        description={r.description || r.address}
                         image={r.image}
                         onClick={() => navigate(`/restaurant/${r.id}`)}
                       />
@@ -104,12 +104,13 @@ const SearchPage = () => {
               ) : (
                 <div className="search-related-grid">
                   {products.map(p => (
-                    <div key={p.id} className="search-restaurant-card-wrapper" style={{ margin: '10px 0' }}>
+                    <div key={p.id} className="search-restaurant-card-wrapper search-restaurant-card-wrapper-spaced">
                       <MenuItem 
                         product={p} 
                         restaurant={getRestaurant(p.restaurantId)}
                         canModify={false}
                         onClick={() => setSelectedProduct(p)} 
+                        showRestaurantName={true}
                       />
                     </div>
                   ))}

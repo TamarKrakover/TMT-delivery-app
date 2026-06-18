@@ -60,22 +60,17 @@ const Navbar = ({ onSearch }) => {
           <div className="navbar-user-info">
             <div 
               onClick={() => navigate('/profile')} 
-              style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}
+              className="navbar-profile-trigger"
               title="View Profile & Order History"
             >
               {currentUser.profilePic ? (
                 <img 
                   src={currentUser.profilePic} 
                   alt="Profile" 
-                  style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }} 
+                  className="navbar-profile-pic" 
                 />
               ) : (
-                <div style={{ 
-                  width: '32px', height: '32px', borderRadius: '50%', 
-                  backgroundColor: 'var(--primary)', color: 'white', 
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', 
-                  fontWeight: 'bold', fontSize: '14px' 
-                }}>
+                <div className="navbar-profile-avatar">
                   {(currentUser.name || 'U').charAt(0).toUpperCase()}
                 </div>
               )}
@@ -113,7 +108,7 @@ const Navbar = ({ onSearch }) => {
       {showLogoutModal && (
         <div className="conflict-modal-overlay">
           <div className="conflict-modal">
-            <div className="conflict-modal-header" style={{ color: 'var(--dark)' }}>
+            <div className="conflict-modal-header">
               <h3 className="conflict-modal-title">Sign Out</h3>
             </div>
             <p className="conflict-modal-text">

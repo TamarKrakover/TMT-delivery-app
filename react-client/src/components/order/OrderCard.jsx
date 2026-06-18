@@ -49,7 +49,7 @@ const OrderCard = ({ order, restaurant, restaurantProducts = [] }) => {
           </span>
         </div>
         {itemNames.length > 0 && (
-          <div style={{ fontSize: '0.85rem', color: 'var(--gray-500)', marginTop: '8px', paddingLeft: '24px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          <div className="order-card-items-details">
             {itemNames.map((item, idx) => (
               <span key={idx}>• {item}</span>
             ))}

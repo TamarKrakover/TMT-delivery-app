@@ -3,6 +3,7 @@ import { FiX, FiUploadCloud } from '../../components/common/Icons';
 import uploadService from '../../services/uploadService';
 
 const ProductFormModal = ({ title, initialData, onSubmit, onClose, error }) => {
+  const isEditMode = !!initialData?.name;
   const [formError, setFormError] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -35,6 +36,12 @@ const ProductFormModal = ({ title, initialData, onSubmit, onClose, error }) => {
       setFormError('Price must be strictly positive (greater than 0).');
       return;
     }
+    
+    if (!isEditMode && !selectedFile && form.image !== '/api/uploads/products/no-image.webp') {
+      setFormError('Please upload an image or select "No Image".');
+      return;
+    }
+    
     setFormError('');
     setIsUploading(true);
 
@@ -107,8 +114,26 @@ const ProductFormModal = ({ title, initialData, onSubmit, onClose, error }) => {
                 {selectedFile ? selectedFile.name : 'Click to upload image'}
               </div>
             </div>
-            {form.image && !selectedFile && (
-               <small className="file-upload-current">Current: {form.image}</small>
+
+            {!isEditMode && (
+              <div className="default-image-checkbox-wrapper">
+                <input 
+                  type="checkbox" 
+                  id="no-img"
+                  checked={form.image === '/api/uploads/products/no-image.webp' && !selectedFile}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setForm({ ...form, image: '/api/uploads/products/no-image.webp' });
+                      setSelectedFile(null);
+                    } else {
+                      setForm({ ...form, image: '' });
+                    }
+                  }}
+                />
+                <label htmlFor="no-img" className="default-image-checkbox-label">
+                  No Image (Use default placeholder)
+                </label>
+              </div>
             )}
           </div>
 

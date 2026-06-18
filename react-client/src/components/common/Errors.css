@@ -96,3 +96,8 @@
   from { transform: translateY(100px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
+
+.forbidden-actions {
+  display: flex;
+  gap: 15px;
+}

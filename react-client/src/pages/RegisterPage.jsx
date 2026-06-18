@@ -3,9 +3,9 @@ import { useNavigate, Link } from 'react-router-dom';
 import { authService } from '../services/authService';
 import AuthLayout from '../components/layout/AuthLayout';
 import InputField from '../components/ui/InputField';
-import SelectField from '../components/ui/SelectField';
 import Button from '../components/ui/Button';
 import ErrorMessage from '../components/ui/ErrorMessage';
+import { FiShoppingBag, FiList } from '../components/common/Icons';
 import './Auth.css';
 
 const RegisterPage = () => {
@@ -140,16 +140,25 @@ const RegisterPage = () => {
             error={fieldErrors.displayName}
           />
 
-          <SelectField
-            id="role"
-            label="Account Type"
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-            options={[
-              { value: 'customer', label: 'Regular User' },
-              { value: 'owner', label: 'Restaurant Owner' }
-            ]}
-          />
+          <div className="form-group">
+            <label className="form-label">Account Type</label>
+            <div className="role-selector">
+              <div 
+                className={`role-card ${role === 'customer' ? 'active' : ''}`}
+                onClick={() => setRole('customer')}
+              >
+                <FiShoppingBag className="role-icon" />
+                <span className="role-title">Regular User</span>
+              </div>
+              <div 
+                className={`role-card ${role === 'owner' ? 'active' : ''}`}
+                onClick={() => setRole('owner')}
+              >
+                <FiList className="role-icon" />
+                <span className="role-title">Restaurant Owner</span>
+              </div>
+            </div>
+          </div>
 
           <InputField
             id="password"
@@ -178,7 +187,7 @@ const RegisterPage = () => {
               {previewUrl ? (
                 <img src={previewUrl} alt="Preview" className="image-preview" />
               ) : (
-                <div className="profile-avatar-placeholder" style={{ width: '80px', height: '80px', fontSize: '2rem' }}>
+                <div className="profile-avatar-placeholder register-profile-avatar">
                   {(displayName || 'U').charAt(0).toUpperCase()}
                 </div>
               )}
@@ -196,7 +205,7 @@ const RegisterPage = () => {
                   accept="image/*"
                   ref={fileInputRef}
                   onChange={handleImageChange}
-                  style={{ display: 'none' }}
+                  className="hidden-file-input"
                 />
               </div>
             </div>
@@ -204,9 +213,9 @@ const RegisterPage = () => {
             {fieldErrors.profilePic && <span className="error-message">{fieldErrors.profilePic}</span>}
           </div>
 
-          <div className="form-group" style={{ marginBottom: '20px' }}>
+          <div className="form-group form-group-spaced">
             <label className="form-label">Your Location (Coordinates)</label>
-            <div style={{ display: 'flex', gap: '10px' }}>
+            <div className="form-row">
               <InputField
                 id="lat"
                 type="number"
@@ -224,7 +233,7 @@ const RegisterPage = () => {
                 step="any"
               />
             </div>
-            {fieldErrors.location && <span className="error-message" style={{ display: 'block', marginTop: '-10px', marginBottom: '10px' }}>{fieldErrors.location}</span>}
+            {fieldErrors.location && <span className="error-message error-message-block">{fieldErrors.location}</span>}
           </div>
 
           <Button type="submit" disabled={isLoading}>

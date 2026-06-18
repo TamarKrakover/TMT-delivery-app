@@ -18,8 +18,8 @@ const InputField = ({
 
   return (
     <div className="form-group">
-      {label && <label htmlFor={id}>{label}</label>}
-      <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+      {label && <label htmlFor={id} className="form-label">{label}</label>}
+      <div className="input-field-wrapper">
         <input
           id={id}
           type={inputType}
@@ -27,32 +27,20 @@ const InputField = ({
           value={value}
           onChange={onChange}
           autoComplete={autoComplete}
-          className={error ? 'error' : ''}
-          style={{ width: '100%', paddingRight: isPassword ? '40px' : '1rem' }}
+          className={`form-input ${error ? 'error' : ''} ${isPassword ? 'input-field-has-password' : ''}`}
         />
         {isPassword && (
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            style={{
-              position: 'absolute',
-              right: '10px',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              color: 'var(--gray-500)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '0'
-            }}
+            className="password-toggle-btn"
           >
             {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
           </button>
         )}
       </div>
       {error ? (
-        <span className="error-message">{error}</span>
+        <span className="form-error">{error}</span>
       ) : hint ? (
         <span className="form-hint">{hint}</span>
       ) : null}
