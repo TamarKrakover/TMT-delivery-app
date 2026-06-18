@@ -63,7 +63,7 @@ graph TD
 * **In-Memory Data Store**: The API server persists data in volatile structures. Data is reset upon server restart.
 * **Authentication**: Secured using custom header verification. The React application sends commands using JWT-based headers to authenticate requests.
 * **Distance Calculation**: The application uses user and restaurant coordinates (Latitude/Longitude) to dynamically compute and render distances in kilometers.
-* **Theme Switching**: A unified [ThemeContext.js](file:///react-client/src/contexts/ThemeContext.js) listens for toggle triggers, modifying the CSS variables on the document body (`body.dark-mode`). The user's preferred theme is saved in `localStorage` per user ID, ensuring it persists across sessions.
+* **Theme Switching**: A unified [ThemeContext.jsx](file:///react-client/src/contexts/ThemeContext.js) listens for toggle triggers, modifying the CSS variables on the document body (`body.dark-mode`). The user's preferred theme is saved in `localStorage` per user ID, ensuring it persists across sessions.
 
 ---
 
@@ -71,76 +71,76 @@ graph TD
 
 Below is an overview of the screenshots from the `runScreenShot/` directory, illustrating key application views and workflows:
 
-### 1. Registration Screen 
+### Registration Screen 
 ![Registration Screen](runScreenShot/run1.png)
 * **Page Route**: `/register`
 * Allows new users to sign up. Features field validations (e.g., minimum 8 character password with letters and special characters), username check, display name, account type selection, optional profile picture selection (previewing local images), and location coordinate inputs (Latitude and Longitude) used for nearby restaurant distance calculations.
 
 ---
 
-### 2. Add Restaurant Modal 
+### Add Restaurant Modal 
 ![Add Restaurant](runScreenShot/run2.png)
-* : A modal interface visible to authorized owners. It prompts for the Restaurant Name, Description, Category (dropdown selection), Latitude/Longitude coordinates, and custom image file upload. The background page is blurred out for user focus.
+*  **Usage**: A modal interface visible to authorized owners. It prompts for the Restaurant Name, Description, Category (dropdown selection), Latitude/Longitude coordinates, and custom image file upload. The background page is blurred out for user focus.
 
 ---
 
-### 3. Homepage Overview 
+### Homepage Overview 
 ![Homepage](runScreenShot/run3.png)
 * **Page Route**: `/`
-* Shows the primary dashboard after login.
+* Shows the primary dashboard after login (before login only categories are shown).
   - **Dynamic Distance**: Highlights "pizza makpizza" (recently added) at `0.0 km` distance since it aligns with the user's coordinate location. Other restaurants are listed with dynamically calculated distances (e.g., `0.4 km`, `0.7 km`).
-  - **Sections**: Groups restaurants into "My Restaurants", "What's there to eat nearby?", "Categories", and "All Restaurants".
+  - **Sections**: Groups restaurants into "My Restaurants", "What's there to eat nearby?", "Categories"- and display by the selected category.
   - **Theme Toggle**: The moon icon in the upper right header toggles between Light and Dark mode.
 
 ---
 
-### 4. Restaurant Details & Menu 
+### Restaurant Details & Menu 
 ![Restaurant Details](runScreenShot/run4.png)
 * **Page Route**: `/restaurant/:id` (e.g., `/restaurant/r1` for Burger Palace)
 * Displays a hero banner, category badge, and description of the restaurant. Displays menu cards featuring product names, pricing, detailed descriptions, and quick "Add to Cart" actions.
 
 ---
 
-### 5. Restaurant View for Owners 
+### Restaurant View for Owners 
 ![Restaurant Owner View](runScreenShot/run5.png)
 * Shows the newly created restaurant details page before any dishes are added. Since the logged-in user is the owner, special management controls appear below the description banner: **Edit Details**, **+ Add Dish**, and **Delete Restaurant**.
 
 ---
 
-### 6. Adding Menu Items 
+### Adding Menu Items 
 ![Add Menu Item](runScreenShot/run6.png)
-* The custom modal allowing owners to add a new dish to their menu by defining the name, price in USD ($), description, and uploading a product image.
+* The custom modal allowing owners to add a new dish to their menu by defining the name, price in USD ($), description, and uploading a product image (defult messege-image instead of image if not uploaded).
 
 ---
 
-### 7. Managed Menu View 
+### Managed Menu View 
 ![Managed Menu](runScreenShot/run7.png)
 * Renders the updated menu containing the added dish. In addition to "Add to Cart", the owner has quick edit and delete options for the item directly on the card.
 
 ---
 
-### 8. Product Details Dialog 
+### Product Details Dialog 
 ![Product Details Modal](runScreenShot/run8.png)
 * Clicking a menu card opens a modal presenting a large view of the dish, its pricing, detailed ingredients, and a direct checkout action button ("Add to Order").
 
 ---
 
-### 9. Interactive Shopping Cart Drawer 
+### Interactive Shopping Cart Drawer 
 ![Shopping Cart](runScreenShot/run9.png)
 * A slide-out right drawer showing current cart contents. Users can edit item quantities (increment/decrement), delete items, see the running subtotal dynamically calculated, and complete checkout.
 
 ---
 
-### 10. Order Confirmation 
+### Order Confirmation 
 ![Order Confirmed](runScreenShot/run10.png)
 * Upon clicking "Place Order", the cart updates in real-time to show a success state with a checkmark confirming the order has been submitted.
 
 ---
 
-### 11. User Profile & History 
+### User Profile & History 
 ![User Profile](runScreenShot/run11.png)
 * **Page Route**: `/profile`
-*Shows user account details. Includes:
+* **Profile Details**: Shows user account details. Includes:
   - **Order History**: Lists previously placed orders with order date, detailed item listing with quantities, total price, and real-time status (e.g., "Processing").
   - **My Restaurants**: A section displaying all restaurants registered by this user.
 
@@ -150,4 +150,6 @@ Below is an overview of the screenshots from the `runScreenShot/` directory, ill
 The application includes a system-wide Dark Mode.
 * **How it works**: In the navigation bar, a theme toggle button switches between Light and Dark mode.
 * **Persistent Preference**: Toggling the theme writes the preference (`theme_<userID>: "dark" | "light"`) into the browser's `localStorage` linked to the specific authenticated user.
-* **Styling**: Swapping is handled globally in [index.css](file:///react-client/src/index.css) by overriding background and text color CSS variables under the `body.dark-mode` selector. This guarantees smooth, low-latency theme transitions without requiring full page re-renders.
+* **Styling**: Swapping is handled globally in [index.css](./react-client/src/index.css) by overriding background and text color CSS variables under the `body.dark-mode` selector. This guarantees smooth, low-latency theme transitions without requiring full page re-renders.
+  ![Dark Mode](runScreenShot/darkMode.png)
+
