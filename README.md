@@ -151,3 +151,5 @@ The application includes a system-wide Dark Mode.
 * **How it works**: In the navigation bar, a theme toggle button switches between Light and Dark mode.
 * **Persistent Preference**: Toggling the theme writes the preference (`theme_<userID>: "dark" | "light"`) into the browser's `localStorage` linked to the specific authenticated user.
 * **Styling**: Swapping is handled globally in [index.css](./react-client/src/index.css) by overriding background and text color CSS variables under the `body.dark-mode` selector. This guarantees smooth, low-latency theme transitions without requiring full page re-renders.
+  ![Dark Mode](runScreenShot/darkMode.png)
+
