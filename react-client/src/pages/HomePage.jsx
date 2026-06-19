@@ -9,7 +9,6 @@ import RestaurantFormModal from '../components/modals/RestaurantFormModal';
 import CategoryFormModal from '../components/modals/CategoryFormModal';
 import { restaurantService } from '../services/restaurantService';
 import { categoryService } from '../services/categoryService';
-import mockRestaurants from '../data/restaurants.json';
 import { calculateDistance } from '../utils/distance';
 import { FiPlus } from '../components/common/Icons';
 import { useAuth } from '../contexts/AuthContext';
@@ -56,7 +55,7 @@ const HomePage = () => {
         }
       } catch (err) {
         console.error("Failed to fetch restaurants:", err);
-        setRestaurants(mockRestaurants);
+        setRestaurants([]);
       } finally {
         setLoading(false);
       }

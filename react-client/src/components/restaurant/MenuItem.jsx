@@ -6,7 +6,7 @@ const MenuItem = ({ product, restaurant, canModify, onClick, onEdit, onDelete, s
   const { addToCart } = useCart();
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const hasImage = !!product.image;
+  const hasImage = !!product.image && !product.image.includes('no-image.webp');
 
   return (
     <div className="menu-item-card" onClick={() => !isDeleting && onClick(product)}>

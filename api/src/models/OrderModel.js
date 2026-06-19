@@ -8,9 +8,23 @@ const generateOrderId = () => {
 };
 
 class OrderModel {
+    // dynamically recalculate the current total price of an order
+    static _recalculatePrice(order) {
+        if (!order || !order.productIds) return order;
+        let calculatedTotal = 0;
+        order.productIds.forEach(pid => {
+            const product = ProductModel.findById(order.restaurantId, pid);
+            if (product && product.price) {
+                calculatedTotal += product.price;
+            }
+        });
+        order.totalPrice = calculatedTotal;
+        return order;
+    }
+
     // retrieves all orders from the database
     static getAll() {
-        return db.orders;
+        return db.orders.map(o => this._recalculatePrice(o));
     }
 
     // creates a new order with default values for missing fields
@@ -45,12 +59,13 @@ class OrderModel {
 
     // finds and returns a specific order by its unique ID
     static findById(id) {
-        return db.orders.find(o => o.id === id);
+        const order = db.orders.find(o => o.id === id);
+        return this._recalculatePrice(order);
     }
 
     // retrieves a list of all orders belonging to a specific user
     static findByUserId(userId) {
-        return db.orders.filter(order => order.userId === userId);
+        return db.orders.filter(order => order.userId === userId).map(o => this._recalculatePrice(o));
     }
 
     // updates an existing order while preserving its original ID

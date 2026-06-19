@@ -107,7 +107,7 @@ export const CartProvider = ({ children }) => {
         if (activeOrderId) {
           await orderService.update(activeOrderId, { productIds });
         } else {
-          const newOrder = await orderService.create(restaurantId, productIds);
+          await orderService.create(restaurantId, productIds);
           // fetchCart to get the new order ID reliably
           fetchCart();
         }
