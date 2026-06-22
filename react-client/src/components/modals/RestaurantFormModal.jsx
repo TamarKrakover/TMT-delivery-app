@@ -3,6 +3,7 @@ import { FiX, FiUploadCloud } from '../../components/common/Icons';
 import uploadService from '../../services/uploadService';
 
 const RestaurantFormModal = ({ title, initialData, onSubmit, onClose, error }) => {
+  const isEditMode = !!initialData?.name;
   const [formError, setFormError] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -39,6 +40,12 @@ const RestaurantFormModal = ({ title, initialData, onSubmit, onClose, error }) =
       setFormError('Valid Latitude and Longitude are required.');
       return;
     }
+    
+    if (!isEditMode && !selectedFile && form.image !== '/api/uploads/restaurants/default.webp') {
+      setFormError('Please upload an image or select the default image.');
+      return;
+    }
+    
     setFormError('');
     setIsUploading(true);
 
@@ -48,7 +55,7 @@ const RestaurantFormModal = ({ title, initialData, onSubmit, onClose, error }) =
         imageUrl = await uploadService.uploadImage(selectedFile);
       }
       
-      onSubmit({
+      await onSubmit({
         ...form,
         image: imageUrl,
         location: {
@@ -58,6 +65,7 @@ const RestaurantFormModal = ({ title, initialData, onSubmit, onClose, error }) =
       });
     } catch (err) {
       setFormError('Failed to upload image. Please try again.');
+    } finally {
       setIsUploading(false);
     }
   };
@@ -115,8 +123,8 @@ const RestaurantFormModal = ({ title, initialData, onSubmit, onClose, error }) =
             </select>
           </div>
 
-          <div className="form-group" style={{ display: 'flex', gap: '10px' }}>
-            <div style={{ flex: 1 }}>
+          <div className="form-group form-group-row">
+            <div className="form-group-col">
               <label className="form-label">Latitude</label>
               <input
                 type="number"
@@ -126,7 +134,7 @@ const RestaurantFormModal = ({ title, initialData, onSubmit, onClose, error }) =
                 onChange={(e) => setForm({ ...form, location: { ...form.location, lat: e.target.value } })}
               />
             </div>
-            <div style={{ flex: 1 }}>
+            <div className="form-group-col">
               <label className="form-label">Longitude</label>
               <input
                 type="number"
@@ -152,8 +160,26 @@ const RestaurantFormModal = ({ title, initialData, onSubmit, onClose, error }) =
                 {selectedFile ? selectedFile.name : 'Click to upload image'}
               </div>
             </div>
-            {form.image && !selectedFile && (
-               <small className="file-upload-current">Current: {form.image}</small>
+
+            {!isEditMode && (
+              <div className="default-image-checkbox-wrapper">
+                <input 
+                  type="checkbox" 
+                  id="use-default-img"
+                  checked={form.image === '/api/uploads/restaurants/default.webp' && !selectedFile}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setForm({ ...form, image: '/api/uploads/restaurants/default.webp' });
+                      setSelectedFile(null);
+                    } else {
+                      setForm({ ...form, image: '' });
+                    }
+                  }}
+                />
+                <label htmlFor="use-default-img" className="default-image-checkbox-label">
+                  Use default restaurant image
+                </label>
+              </div>
             )}
           </div>
 

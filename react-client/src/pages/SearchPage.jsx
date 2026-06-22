@@ -7,8 +7,6 @@ import RestaurantCard from '../components/restaurant/RestaurantCard';
 import MenuItem from '../components/restaurant/MenuItem';
 import ProductDetailModal from '../components/modals/ProductDetailModal';
 import { restaurantService } from '../services/restaurantService';
-import mockRestaurants from '../data/restaurants.json';
-import request from '../services/api';
 import ScrollableRow from '../components/common/ScrollableRow';
 import './SearchPage.css';
 
@@ -20,6 +18,7 @@ const SearchPage = () => {
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [allRestaurants, setAllRestaurants] = useState([]);
   const { darkMode } = useTheme();
 
   useEffect(() => {
@@ -27,7 +26,11 @@ const SearchPage = () => {
       if (!query) return;
       try {
         setLoading(true);
-        const data = await restaurantService.search(query);
+        const [data, allRests] = await Promise.all([
+          restaurantService.search(query),
+          restaurantService.getAll()
+        ]);
+        setAllRestaurants(allRests);
         // Separate combined search results by presence of fields (location/address for restaurants, price for products)
         const matchedRestaurants = data.filter(item => item.location !== undefined || item.address !== undefined);
         const matchedProducts = data.filter(item => item.price !== undefined);
@@ -35,13 +38,7 @@ const SearchPage = () => {
         setProducts(matchedProducts);
       } catch (err) {
         console.error("Search failed:", err);
-        // Fallback search locally in mockRestaurants on error
-        const lower = query.toLowerCase();
-        const matched = mockRestaurants.filter(r =>
-          r.name.toLowerCase().includes(lower) ||
-          (r.description && r.description.toLowerCase().includes(lower))
-        );
-        setRestaurants(matched);
+        setRestaurants([]);
         setProducts([]);
       } finally {
         setLoading(false);
@@ -52,7 +49,7 @@ const SearchPage = () => {
 
   // Helper to find restaurant by ID for dishes list
   const getRestaurant = (rId) => {
-    const found = mockRestaurants.find(r => r.id === rId);
+    const found = allRestaurants.find(r => r.id === rId);
     return found || { id: rId, name: 'Unknown Restaurant' };
   };
 
@@ -80,9 +77,10 @@ const SearchPage = () => {
                   {restaurants.map(r => (
                     <div key={r.id} className="search-restaurant-card-wrapper">
                       <RestaurantCard
+                        id={r.id}
                         name={r.name}
                         category={r.category}
-                        address={r.address}
+                        description={r.description || r.address}
                         image={r.image}
                         onClick={() => navigate(`/restaurant/${r.id}`)}
                       />
@@ -104,12 +102,13 @@ const SearchPage = () => {
               ) : (
                 <div className="search-related-grid">
                   {products.map(p => (
-                    <div key={p.id} className="search-restaurant-card-wrapper" style={{ margin: '10px 0' }}>
+                    <div key={p.id} className="search-restaurant-card-wrapper search-restaurant-card-wrapper-spaced">
                       <MenuItem 
                         product={p} 
                         restaurant={getRestaurant(p.restaurantId)}
                         canModify={false}
                         onClick={() => setSelectedProduct(p)} 
+                        showRestaurantName={true}
                       />
                     </div>
                   ))}

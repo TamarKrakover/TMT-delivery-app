@@ -31,9 +31,9 @@ const RestaurantCard = React.memo(({ id, name, category, icon, image, distance, 
         <h3 className="restaurant-name">{name}</h3>
         {description && <p className="restaurant-description">{description}</p>}
 
-        <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+        <div className="restaurant-card-actions">
           {distance !== null && distance !== undefined && (
-            <span style={{ fontSize: '0.85em', color: 'var(--primary)', fontWeight: 'bold' }}>
+            <span className="restaurant-card-actions-text">
               📍 {distance.toFixed(1)} km
             </span>
           )}

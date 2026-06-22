@@ -1,193 +1,164 @@
-# TMTproject - Web Server API
-## Version Management from Exercise 2
+# TMT Delivery - Food Ordering & Recommendation System
 
-The code submitted for Exercise 2 has been "locked" in a dedicated branch named `Ex2`. This ensures that the grader can evaluate the previous submission exactly as it was, and the work on Exercise 3 on the `main` branch (and its feature branches) does not overwrite or interfere with Exercise 2.
+TMT Delivery is a complete, containerized food delivery application (similar to Wolt). It integrates a C++ Recommendation Engine, a Node.js Express REST API, and a dynamic React Single Page Application (SPA).
 
-## About The Application
+---
 
-This project is a Web Server API serving as the core of a food delivery application (similar to Wolt). 
-The server uses an MVC architecture and provides a RESTful API to manage users, restaurants, products, orders, and search functionality. 
-All responses are formatted in JSON.
+## 🚀 How to Run and Build the Project
 
-This server acts as a client to the **Product Recommendation System**, communicating via a socket connection to record user actions (e.g., viewing a product).
+The entire stack is containerized using Docker and orchestrated with [docker-compose.yml](file:///docker-compose.yml). 
 
-![Run Screenshot](runScreenShot.png)
+### Prerequisites
+Make sure you have [Docker](https://www.docker.com/) and **Docker Compose** installed on your system.
 
-## How to Run
-
-The application is completely containerized and managed using `Docker Compose`.
-
-To build and start both servers, run the following command in the root directory:
+### Running the Application
+To build and start all three services (C++ Recommendation Server, Node.js API Server, and React Frontend), run the following command in the project root directory:
 
 ```bash
 docker compose up --build
 ```
 
-The Web API Server will run on `http://localhost:8080`, and it will automatically connect to the C++ Recommendation Server via TCP on port `5555`.
+#### Running Services:
+* **React Client Frontend**: Accessible at [http://localhost:3000](http://localhost:3000)
+* **Node.js Express API Gateway**: Accessible at `http://localhost:8080`
+* **C++ Recommendation Server**: Runs internally on port `5555`
 
-## Execution Examples (CURL)
+---
 
-> [!NOTE]
-> **Terminal Compatibility:** The `curl` commands below are formatted for Unix-like shells (e.g., Linux, macOS, WSL, or Git Bash) using single quotes for the JSON body. If you are running these in native Windows **PowerShell** or **Command Prompt**, you will need to use `curl.exe` and escape the double quotes appropriately (e.g., `-d "{\"key\": \"value\"}"`).
+### Running C++ Server Unit Tests
+The project contains automated unit tests for the C++ Recommendation Server (using GoogleTest). To run these tests within the Docker environment, execute:
 
-Here is a demonstration of interacting with the API running on `localhost:8080`:
-
-### Registration (Users)
 ```bash
-curl -i -X POST http://localhost:8080/api/users -H "Content-Type: application/json" -d '{"username": "johndoe", "password": "123", "name": "John Doe", "phone": "555-1234", "address": "123 Main St"}'
-```
-**Expected Output:**
-```http
-HTTP/1.1 201 Created
-X-Powered-By: Express
-Location: /api/users/<userID>
-Date: <date and hour>
-Connection: keep-alive
-Keep-Alive: timeout=5
-Content-Length: 0
+docker compose --profile test run tests
 ```
 
-### Creating a Restaurant (Restaurants)
-```bash
-curl -i -X POST http://localhost:8080/api/restaurants -H "Content-Type: application/json" -H "x-user-id: <userID>" -d '{"name": "McDonalds", "address": "456 Burger St"}'
-```
-**Expected Output:**
-```http
-HTTP/1.1 201 Created
-X-Powered-By: Express
-Location: /api/restaurants/<restaurantID>
-Date: <date and hour>
-Connection: keep-alive
-Keep-Alive: timeout=5
-Content-Length: 0
+---
+
+## 🏗️ How the Project is Built (Architecture)
+
+The application follows a highly modular, decoupled architecture distributed across three layers:
+
+```mermaid
+graph TD
+    Client[React Frontend - Port 3000] <-->|HTTP REST / JSON| API[Express API Gateway - Port 8080]
+    API <-->|TCP Socket / Port 5555| Recommendation[C++ Recommendation Engine]
 ```
 
-### Adding a Product (Products)
-```bash
-curl -i -X POST http://localhost:8080/api/restaurants/<restaurantID>/products -H "Content-Type: application/json" -H "x-user-id: <userID>" -d '{"name": "Big Mac", "price": 5.99}'
-```
-**Expected Output:**
-```http
-HTTP/1.1 201 Created
-X-Powered-By: Express
-Location: /api/restaurants/<restaurantID>/products/<productID>
-Date: <date and hour>
-Connection: keep-alive
-Keep-Alive: timeout=5
-Content-Length: 0
-```
+### Component Breakdown
+1. **Frontend Client ([react-client/](file:///react-client))**:
+   - Built using **React 19** and **React Router DOM 7**.
+   - Leverages React Context for global state management (such as Theme and Authentication).
+   - Custom styling with vanilla CSS supporting a fully responsive layout and seamless Dark/Light Mode.
+2. **REST API Server ([api/](file:///api))**:
+   - Built with **Node.js** and **Express**.
+   - Serves as the central API gateway handling CRUD requests for users, restaurants, products, and orders.
+   - Implements an MVC pattern, persisting resources in-memory using [InMemoryDB.js](file:///api/src/models/InMemoryDB.js).
+   - Functions as a client to the recommendation engine, sending tracking events (e.g., when a user views a product) over a standard TCP Socket on port `5555`.
+3. **Recommendation Engine ([cpp/](file:///cpp))**:
+   - High-performance server written in **C++** and compiled with **CMake**.
+   - Tracks user viewing behavior and utilizes collaborative filtering and item-to-item recommendations to recommend alternative restaurants.
+   - Listens for TCP connections inside the container network.
 
-### Creating an Order (Orders)
-```bash
-curl -i -X POST http://localhost:8080/api/orders -H "Content-Type: application/json" -H "x-user-id: <userID>" -d '{"restaurantId": "<restaurantID>", "productIds": ["<productID>"], "totalPrice": 5.99}'
-```
-**Expected Output:**
-```http
-HTTP/1.1 201 Created
-X-Powered-By: Express
-Location: /api/orders/<orderID>
-Date: <date and hour>
-Connection: keep-alive
-Keep-Alive: timeout=5
-Content-Length: 0
-```
+### Key Implementation Details
+* **In-Memory Data Store**: The API server persists data in volatile structures. Data is reset upon server restart.
+* **Authentication**: Secured using custom header verification. The React application sends commands using JWT-based headers to authenticate requests.
+* **Distance Calculation**: The application uses user and restaurant coordinates (Latitude/Longitude) to dynamically compute and render distances in kilometers.
+* **Theme Switching**: A unified [ThemeContext.jsx](file:///react-client/src/contexts/ThemeContext.js) listens for toggle triggers, modifying the CSS variables on the document body (`body.dark-mode`). The user's preferred theme is saved in `localStorage` per user ID, ensuring it persists across sessions.
 
-### Search (Search)
-```bash
-curl -i http://localhost:8080/api/search/Mac
-```
-**Expected Output:**
-```http
-HTTP/1.1 200 OK
-X-Powered-By: Express
-Content-Type: application/json; charset=utf-8
-Content-Length: 151
-ETag: <etag_value>
-Date: <date and hour>
-Connection: keep-alive
-Keep-Alive: timeout=5
+---
 
-[
-  {
-    "id": "<productID>",
-    "restaurantId": "<restaurantID>",
-    "name": "<name>",
-    "description": "<description>",
-    "price": "<price>"
-  }
-]  
-```
+## 📸 Interface and Walkthrough 
 
-## Available RESTful API Endpoints
+Below is an overview of the screenshots from the `runScreenShot/` directory, illustrating key application views and workflows:
 
-> [!IMPORTANT]
-> **Authentication:** Endpoints marked with **(Auth required)** expect a custom HTTP header named `x-user-id`. The value of this header must be a valid User ID obtained from the Login (`POST /api/tokens`) endpoint.
+### Registration Screen 
+![Registration Screen](runScreenShot/run1.png)
+* **Page Route**: `/register`
+* Allows new users to sign up. Features field validations (e.g., minimum 8 character password with letters and special characters), username check, display name, account type selection, optional profile picture selection (previewing local images), and location coordinate inputs (Latitude and Longitude) used for nearby restaurant distance calculations.
 
-### Authentication and Registration
-- `POST /api/users` - Create a new user. **(Public)**
-  - *Required JSON body:* `username`, `password`, `name`, `phone`, `address`
-- `POST /api/tokens` - Login and get user token. **(Public)**
-  - *Required JSON body:* `username`, `password`
-- `GET /api/users/:id` - Retrieve user details. **(Auth required)**
+---
 
-### Restaurants
-- `GET /api/restaurants` - List all restaurants. **(Public)**
-- `GET /api/restaurants/:id` - Get specific restaurant details. **(Public)**
-- `POST /api/restaurants` - Create a new restaurant. **(Auth required)**
-  - *Required JSON body:* `name`, `address`
-  - *Optional JSON body:* `description` (defaults to empty), `category` (defaults to 'General')
-- `PATCH /api/restaurants/:id` - Edit a restaurant. **(Auth required)**
-  - *Optional JSON body:* `name`, `address`, `description`, `category` (Only send what you want to update)
-- `DELETE /api/restaurants/:id` - Delete a restaurant. **(Auth required)**
+### Add Restaurant Modal 
+![Add Restaurant](runScreenShot/run2.png)
+*  **Usage**: A modal interface visible to authorized owners. It prompts for the Restaurant Name, Description, Category (dropdown selection), Latitude/Longitude coordinates, and custom image file upload. The background page is blurred out for user focus.
 
-### Products
-- `GET /api/restaurants/:id/products` - List restaurant products. **(Public)**
-- `GET /api/restaurants/:id/products/:pId` - Get a specific product. **(Public / Optional Auth to track views)**
-- `POST /api/restaurants/:id/products` - Add a product. **(Auth required)**
-  - *Required JSON body:* `name`, `price`
-  - *Optional JSON body:* `description` (defaults to empty)
-- `PATCH /api/restaurants/:id/products/:pId` - Update a product. **(Auth required)**
-  - *Optional JSON body:* `name`, `price`, `description` (Only send what you want to update)
-- `DELETE /api/restaurants/:id/products/:pId` - Delete a product. **(Auth required)**
+---
 
-### Orders
-- `POST /api/orders` - Create an order. **(Auth required)**
-  - *Required JSON body:* `restaurantId`, `productIds` (must be an array)
-- `GET /api/orders` - List user orders. **(Auth required)**
-- `GET /api/orders/:id` - Get specific order details. **(Auth required)**
-- `PATCH /api/orders/:id` - Update an order. **(Auth required)**
-  - *Required JSON body:* `productIds` (must be an array)
-- `DELETE /api/orders/:id` - Delete/cancel an order. **(Auth required)**
+### Homepage Overview 
+![Homepage](runScreenShot/run3.png)
+* **Page Route**: `/`
+* Shows the primary dashboard after login (before login only categories are shown).
+  - **Dynamic Distance**: Highlights "pizza makpizza" (recently added) at `0.0 km` distance since it aligns with the user's coordinate location. Other restaurants are listed with dynamically calculated distances (e.g., `0.4 km`, `0.7 km`).
+  - **Sections**: Groups restaurants into "My Restaurants", "What's there to eat nearby?", "Categories"- and display by the selected category.
+  - **Theme Toggle**: The moon icon in the upper right header toggles between Light and Dark mode.
 
-### Search
-- `GET /api/search/:query` - Search for restaurants or products matching the query. **(Public)**
+---
 
-## Architecture & Design Notes
+### Search Results Page 
+![Search Results](runScreenShot/searchPage.png)
+* **Page Route**: `/search?q=query`
+* Displays dynamic search results based on user queries (e.g., searching for "burger").
+  - **Restaurants and Stores**: Lists all restaurants whose name or description match the search term.
+  - **Related Items**: Displays specific menu items from various restaurants that match the query, allowing users to discover individual dishes across the platform and add them directly to their cart.
 
-* **Environment:** NodeJS with Express framework.
-* **Data Persistence:** In-memory databases using volatile data structures. Data is wiped upon server restart.
-* **Error Handling:** All errors return standard HTTP status codes (400, 401, 403, 404, 500) and a consistent JSON format: `{"error": "Description of the error"}`.
-* **Resource IDs:** Unique identifiers are generated on the server using timestamps and prefixes (e.g., `u_` for users, `r_` for restaurants, `p_` for products, `o_` for orders).
-* **Architecture Pattern (MVC):** The server is built strictly using the Model-View-Controller (MVC) pattern.
-* **Design Principles:** SOLID principles and Loose Coupling are strictly followed for modularity, testability, and future extensibility.
-* **Integration:** The Express web server connects over TCP to the C++ Recommendation Server from Ex 2.
+---
 
-### Project Structure
-```text
-.
-├── README.md
-├── docker-compose.yml
-|   ├── api/                       # Web API Server (NodeJS/Express)
-│     ├── Dockerfile.api
-│     ├── package.json
-│     ├── package.json
-│     └── src/
-│       ├── controllers/
-│       ├── models/
-│       ├── routes/
-│       └── services/
-|   ├── cpp/                       # Recommendation Server (C++)
-│     ├── Dockerfile
-│   └── src/
-└── data/                      
-```
+### Restaurant Details & Menu 
+![Restaurant Details](runScreenShot/run4.png)
+* **Page Route**: `/restaurant/:id` (e.g., `/restaurant/r1` for Burger Palace)
+* Displays a hero banner, category badge, and description of the restaurant. Displays menu cards featuring product names, pricing, detailed descriptions, and quick "Add to Cart" actions.
+
+---
+
+### Restaurant View for Owners 
+![Restaurant Owner View](runScreenShot/run5.png)
+* Shows the newly created restaurant details page before any dishes are added. Since the logged-in user is the owner, special management controls appear below the description banner: **Edit Details**, **+ Add Dish**, and **Delete Restaurant**.
+
+---
+
+### Adding Menu Items 
+![Add Menu Item](runScreenShot/run6.png)
+* The custom modal allowing owners to add a new dish to their menu by defining the name, price in USD ($), description, and uploading a product image (defult messege-image instead of image if not uploaded).
+
+---
+
+### Managed Menu View 
+![Managed Menu](runScreenShot/run7.png)
+* Renders the updated menu containing the added dish. In addition to "Add to Cart", the owner has quick edit and delete options for the item directly on the card.
+
+---
+
+### Product Details Dialog 
+![Product Details Modal](runScreenShot/run8.png)
+* Clicking a menu card opens a modal presenting a large view of the dish, its pricing, detailed ingredients, and a direct checkout action button ("Add to Order").
+
+---
+
+### Interactive Shopping Cart Drawer 
+![Shopping Cart](runScreenShot/run9.png)
+* A slide-out right drawer showing current cart contents. Users can edit item quantities (increment/decrement), delete items, see the running subtotal dynamically calculated, and complete checkout.
+
+---
+
+### Order Confirmation 
+![Order Confirmed](runScreenShot/run10.png)
+* Upon clicking "Place Order", the cart updates in real-time to show a success state with a checkmark confirming the order has been submitted.
+
+---
+
+### User Profile & History 
+![User Profile](runScreenShot/run11.png)
+* **Page Route**: `/profile`
+* **Profile Details**: Shows user account details. Includes:
+  - **Order History**: Lists previously placed orders with order date, detailed item listing with quantities, total price, and real-time status (e.g., "Processing").
+  - **My Restaurants**: A section displaying all restaurants registered by this user.
+
+---
+
+### 🌓 Dark Mode Toggle
+The application includes a system-wide Dark Mode.
+* **How it works**: In the navigation bar, a theme toggle button switches between Light and Dark mode.
+* **Persistent Preference**: Toggling the theme writes the preference (`theme_<userID>: "dark" | "light"`) into the browser's `localStorage` linked to the specific authenticated user.
+* **Styling**: Swapping is handled globally in [index.css](./react-client/src/index.css) by overriding background and text color CSS variables under the `body.dark-mode` selector. This guarantees smooth, low-latency theme transitions without requiring full page re-renders.
+  ![Dark Mode](runScreenShot/darkMode.png)
+

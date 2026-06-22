@@ -1,0 +1,35 @@
+/* Global Buttons */
+.btn-primary {
+  background-color: var(--primary);
+  color: var(--white);
+  padding: 10px 22px;
+  border-radius: 50px;
+  border: none;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 194, 232, 0.3);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--dark);
+  padding: 10px 22px;
+  border-radius: 50px;
+  border: 1.5px solid var(--gray-200);
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-outline:hover {
+  border-color: var(--dark);
+  background-color: var(--gray-100);
+}
