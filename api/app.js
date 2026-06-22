@@ -1,6 +1,11 @@
 const express = require('express');
+const connectDB = require('./src/config/db');
+
 const app = express();
 const port = 8080;
+
+// Connect to MongoDB
+connectDB();
 
 // Organize the print format
 app.set('json spaces', 2);
