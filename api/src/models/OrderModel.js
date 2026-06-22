@@ -1,160 +1,166 @@
-const db = require('./InMemoryDB');
+const mongoose = require('mongoose');
 const RecommendationServer = require('../services/recommendationServer');
 const ProductModel = require('./ProductModel');
 
-// generates a unique order ID based on timestamp and a random number
-const generateOrderId = () => {
-    return 'o_' + Date.now().toString() + '_' + Math.floor(Math.random() * 1000);
+const orderSchema = new mongoose.Schema({
+    userId: { type: String, required: true },
+    restaurantId: { type: String, required: true },
+    productIds: [{ type: String }],
+    totalPrice: { type: Number, default: 0 },
+    status: { type: String, default: 'Pending' }
+}, {
+    timestamps: true
+});
+
+orderSchema.set('toJSON', {
+    virtuals: true,
+    transform: (doc, ret) => {
+        ret.id = ret._id;
+        delete ret._id;
+        delete ret.__v;
+    }
+});
+
+// dynamically recalculate the current total price of an order
+orderSchema.statics._recalculatePrice = async function(orderDoc) {
+    if (!orderDoc || !orderDoc.productIds) return orderDoc;
+    let calculatedTotal = 0;
+    
+    // We fetch all products at once to be more efficient
+    const products = await ProductModel.find({
+        restaurantId: orderDoc.restaurantId,
+        _id: { $in: orderDoc.productIds }
+    });
+    
+    products.forEach(product => {
+        if (product && product.price) {
+            calculatedTotal += product.price;
+        }
+    });
+    
+    orderDoc.totalPrice = calculatedTotal;
+    return orderDoc;
 };
 
-class OrderModel {
-    // dynamically recalculate the current total price of an order
-    static _recalculatePrice(order) {
-        if (!order || !order.productIds) return order;
-        let calculatedTotal = 0;
-        order.productIds.forEach(pid => {
-            const product = ProductModel.findById(order.restaurantId, pid);
-            if (product && product.price) {
-                calculatedTotal += product.price;
+// retrieves all orders from the database
+orderSchema.statics.getAll = async function() {
+    const orders = await this.find();
+    const result = [];
+    for (let o of orders) {
+        result.push(await this._recalculatePrice(o));
+    }
+    return result;
+};
+
+// creates a new order with default values for missing fields
+orderSchema.statics.createOrder = async function(data) {
+    let calculatedTotal = 0;
+    if (data.productIds && Array.isArray(data.productIds)) {
+        const products = await ProductModel.find({
+            restaurantId: data.restaurantId,
+            _id: { $in: data.productIds }
+        });
+        products.forEach(p => {
+            if (p && p.price) {
+                calculatedTotal += p.price;
             }
         });
-        order.totalPrice = calculatedTotal;
-        return order;
     }
 
-    // retrieves all orders from the database
-    static getAll() {
-        return db.orders.map(o => this._recalculatePrice(o));
+    const order = new this({
+        userId: data.userId,
+        restaurantId: data.restaurantId,
+        productIds: data.productIds || [],
+        totalPrice: calculatedTotal,
+        status: 'Pending'
+    });
+
+    const savedOrder = await order.save();
+
+    if (data.userId && data.productIds && data.productIds.length > 0) {
+        RecommendationServer.save(data.userId, data.productIds).catch(() => {});
     }
 
-    // creates a new order with default values for missing fields
-    static create(data) {
-        let calculatedTotal = 0;
-        if (data.productIds && Array.isArray(data.productIds)) {
-            data.productIds.forEach(pid => {
-                const product = ProductModel.findById(data.restaurantId, pid);
-                if (product && product.price) {
-                    calculatedTotal += product.price;
-                }
-            });
-        }
+    return savedOrder;
+};
 
-        const newOrder = {
-            id: generateOrderId(),
-            userId: data.userId,
-            restaurantId: data.restaurantId,
-            productIds: data.productIds || [],
-            totalPrice: calculatedTotal,
-            status: 'Pending', 
-            createdAt: new Date().toISOString()
-        };
-        db.orders.push(newOrder);
-
-        if (data.userId && data.productIds && data.productIds.length > 0) {
-            RecommendationServer.save(data.userId, data.productIds).catch(() => {});
-        }
-
-        return newOrder;
+// retrieves a list of all orders belonging to a specific user
+orderSchema.statics.findByUserId = async function(userId) {
+    const orders = await this.find({ userId });
+    const result = [];
+    for (let o of orders) {
+        result.push(await this._recalculatePrice(o));
     }
+    return result;
+};
 
-    // finds and returns a specific order by its unique ID
-    static findById(id) {
-        const order = db.orders.find(o => o.id === id);
-        return this._recalculatePrice(order);
-    }
+// updates an existing order while preserving its original ID
+// Explicitly build the updated order to prevent security hacks (like stealing ownership)
+// Recalculate price securely if products changed
+orderSchema.statics.updateOrder = async function(id, data) {
+    const oldOrder = await this.findById(id);
+    if (!oldOrder) return null;
 
-    // retrieves a list of all orders belonging to a specific user
-    static findByUserId(userId) {
-        return db.orders.filter(order => order.userId === userId).map(o => this._recalculatePrice(o));
-    }
+    const oldProductIds = oldOrder.productIds || [];
+    const newProductIds = data.productIds;
 
-    // updates an existing order while preserving its original ID
-    static update(id, data) {
-        const index = db.orders.findIndex(o => o.id === id);
-        if (index === -1) return null;
-
-        const oldOrder = db.orders[index];
-        const oldProductIds = oldOrder.productIds || [];
-        const newProductIds = data.productIds;
-
-        if (newProductIds && Array.isArray(newProductIds)) {
-            const allUserOrders = this.findByUserId(oldOrder.userId);
-            const otherOrdersProducts = new Set();
-            allUserOrders.forEach(o => {
-                if (o.id !== id && o.productIds) {
-                    o.productIds.forEach(pid => otherOrdersProducts.add(pid));
-                }
-            });
-
-            const newProductIdsSet = new Set(newProductIds);
-            const productsToDelete = oldProductIds.filter(pid => 
-                !newProductIdsSet.has(pid) && !otherOrdersProducts.has(pid)
-            );
-
-            if (productsToDelete.length > 0) {
-                RecommendationServer.delete(oldOrder.userId, productsToDelete).catch(() => {});
+    if (newProductIds && Array.isArray(newProductIds)) {
+        const allUserOrders = await this.findByUserId(oldOrder.userId);
+        const otherOrdersProducts = new Set();
+        allUserOrders.forEach(o => {
+            if (o.id !== id && o.productIds) {
+                o.productIds.forEach(pid => otherOrdersProducts.add(pid));
             }
+        });
 
-            if (newProductIds.length > 0) {
-                RecommendationServer.save(oldOrder.userId, newProductIds).catch(() => {});
-            }
+        const newProductIdsSet = new Set(newProductIds);
+        const productsToDelete = oldProductIds.filter(pid => 
+            !newProductIdsSet.has(pid) && !otherOrdersProducts.has(pid)
+        );
+
+        if (productsToDelete.length > 0) {
+            RecommendationServer.delete(oldOrder.userId, productsToDelete).catch(() => {});
         }
 
-        // Explicitly build the updated order to prevent security hacks (like stealing ownership)
-        const updatedOrder = {
-            id: oldOrder.id,
-            userId: oldOrder.userId,
-            restaurantId: oldOrder.restaurantId,
-            status: data.status ? data.status : oldOrder.status,
-            createdAt: oldOrder.createdAt,
-            // Allow productIds to be updated if provided
-            productIds: (newProductIds && Array.isArray(newProductIds)) ? newProductIds : oldProductIds,
-            // Initialize totalPrice with the old one, it might be recalculated below
-            totalPrice: oldOrder.totalPrice
-        };
-
-        // Recalculate price securely if products changed
-        if (newProductIds && Array.isArray(newProductIds)) {
-            let calculatedTotal = 0;
-            newProductIds.forEach(pid => {
-                const product = ProductModel.findById(updatedOrder.restaurantId, pid);
-                if (product && product.price) {
-                    calculatedTotal += product.price;
-                }
-            });
-            updatedOrder.totalPrice = calculatedTotal;
+        if (newProductIds.length > 0) {
+            RecommendationServer.save(oldOrder.userId, newProductIds).catch(() => {});
         }
-
-        db.orders[index] = updatedOrder;
-        return updatedOrder;
     }
 
-    // deletes an order by its ID
-    static delete(id) {
-        const index = db.orders.findIndex(o => o.id === id);
-        if (index === -1) return false;
-
-        const order = db.orders[index];
-
-        if (order.productIds && order.productIds.length > 0) {
-            const allUserOrders = this.findByUserId(order.userId);
-            const otherOrdersProducts = new Set();
-            allUserOrders.forEach(o => {
-                if (o.id !== id && o.productIds) {
-                    o.productIds.forEach(pid => otherOrdersProducts.add(pid));
-                }
-            });
-
-            const productsToDelete = order.productIds.filter(pid => !otherOrdersProducts.has(pid));
-
-            if (productsToDelete.length > 0) {
-                RecommendationServer.delete(order.userId, productsToDelete).catch(() => {});
-            }
-        }
-
-        db.orders.splice(index, 1);
-        return true;
+    if (data.status) oldOrder.status = data.status;
+    if (newProductIds && Array.isArray(newProductIds)) {
+        oldOrder.productIds = newProductIds;
     }
-}
 
+    await this._recalculatePrice(oldOrder);
+    return oldOrder.save();
+};
+
+// deletes an order by its ID
+orderSchema.statics.deleteOrder = async function(id) {
+    const order = await this.findById(id);
+    if (!order) return false;
+
+    if (order.productIds && order.productIds.length > 0) {
+        const allUserOrders = await this.findByUserId(order.userId);
+        const otherOrdersProducts = new Set();
+        allUserOrders.forEach(o => {
+            if (o.id !== id && o.productIds) {
+                o.productIds.forEach(pid => otherOrdersProducts.add(pid));
+            }
+        });
+
+        const productsToDelete = order.productIds.filter(pid => !otherOrdersProducts.has(pid));
+
+        if (productsToDelete.length > 0) {
+            RecommendationServer.delete(order.userId, productsToDelete).catch(() => {});
+        }
+    }
+
+    await this.findByIdAndDelete(id);
+    return true;
+};
+
+
+const OrderModel = mongoose.model('Order', orderSchema);
 module.exports = OrderModel;

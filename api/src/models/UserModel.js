@@ -1,46 +1,54 @@
-const db = require('./InMemoryDB');
+const mongoose = require('mongoose');
 
-// Generate a unique user ID using a timestamp and a random number
-const generateUserId = () => {
-    return 'u_' + Date.now().toString() + '_' + Math.floor(Math.random() * 1000);
+const userSchema = new mongoose.Schema({
+    username: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    name: { type: String, required: true },
+    role: { type: String, default: 'customer' },
+    isAdmin: { type: Boolean, default: false },
+    location: {
+        lat: { type: Number },
+        lng: { type: Number }
+    },
+    profilePic: { type: String, default: null }
+}, {
+    timestamps: true
+});
+
+// Automatically transform _id to id when sending to client
+userSchema.set('toJSON', {
+    virtuals: true,
+    transform: (doc, ret) => {
+        ret.id = ret._id;
+        delete ret._id;
+        delete ret.__v;
+    }
+});
+
+// Create a new user
+userSchema.statics.create = async function(data) {
+    // Check if the username is already taken
+    if (await this.findByUsername(data.username)) {
+        throw new Error('Username already exists');
+    }
+    const user = new this(data);
+    return user.save();
 };
 
-class UserModel {
+// Retrieve a user by their exact username
+userSchema.statics.findByUsername = function(username) {
+    return this.findOne({ username });
+};
 
-    // Create a new user
-    static create(data) {
-        // Check if the username is already taken
-        if (this.findByUsername(data.username)) {
-            throw new Error('Username already exists');
-        }
+// Find a user by ID
+userSchema.statics.findUserById = function(id) {
+    return this.findById(id);
+};
 
-        const newUser = {
-            id: generateUserId(),
-            username: data.username,
-            password: data.password,
-            name: data.name,
-            role: data.role || 'customer',
-            location: data.location,
-            profilePic: data.profilePic || null
-        };
-        db.users.push(newUser);
-        return newUser;
-    }
+// Find a user by both username and password
+userSchema.statics.findByCredentials = function(username, password) {
+    return this.findOne({ username, password });
+};
 
-    // Retrieve a user by their exact username
-    static findByUsername(username) {
-        return db.users.find(u => u.username === username);
-    }
-    
-    // Find a user by ID
-    static findUserById(id) {
-        return db.users.find(u => u.id === id);
-    }
-
-    // Find a user by both username and password
-    static findByCredentials(username, password) {
-        return db.users.find(u => u.username === username && u.password === password);
-    }
-}
-
+const UserModel = mongoose.model('User', userSchema);
 module.exports = UserModel;
