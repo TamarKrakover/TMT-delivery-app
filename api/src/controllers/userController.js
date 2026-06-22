@@ -1,6 +1,6 @@
 const UserModel = require('../models/UserModel');
 
-exports.createUser = (req, res) =>{
+exports.createUser = async (req, res) =>{
     // Extract all expected fields from the request body
     const { username, password, name } = req.body;
 
@@ -11,7 +11,7 @@ exports.createUser = (req, res) =>{
 
     try {
         // Create the new user via the Model
-        const newUser = UserModel.create(req.body);
+        const newUser = await UserModel.create(req.body);
 
         // Set the Location header pointing to the newly created user
         const resourceLocation = '/api/users/' + newUser.id;
