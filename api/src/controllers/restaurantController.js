@@ -63,7 +63,6 @@ exports.getRestaurantById = async (req, res) => {
 exports.updateRestaurant = async (req, res) => {
     // Authentication is handled by authMiddleware
     const userId = req.userId;
-    
     try {
         const restaurant = await RestaurantModel.findById(req.params.id);
         if (!restaurant) {

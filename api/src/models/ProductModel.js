@@ -39,15 +39,22 @@ productSchema.statics.create = function(restaurantId, data) {
 };
 
 // finds and returns a specific product by its ID and restaurant ID
-// if a userId is provided, logs the view to the recommendation server
+// if a userId is provided, logs the view to the recommendation server and updates user's last viewed product
 productSchema.statics.findByIdWithLog = async function(restaurantId, productId, userId = null) {
     const product = await this.findOne({ restaurantId, _id: productId });
     
     if (product && userId) {
         RecommendationServer.save(userId, productId).catch(() => {});
+        const UserModel = require('./UserModel');
+        await UserModel.updateLastViewedProduct(userId, productId);
     }
     
     return product;
+};
+
+// finds and returns a specific product by its global ID across all restaurants
+productSchema.statics.findByGlobalId = function(productId) {
+    return this.findById(productId);
 };
 
 const ProductModel = mongoose.model('Product', productSchema);

@@ -9,24 +9,32 @@ import RestaurantFormModal from '../components/modals/RestaurantFormModal';
 import CategoryFormModal from '../components/modals/CategoryFormModal';
 import { restaurantService } from '../services/restaurantService';
 import { categoryService } from '../services/categoryService';
+import { productService } from '../services/productService';
 import { calculateDistance } from '../utils/distance';
 import { FiPlus } from '../components/common/Icons';
 import { useAuth } from '../contexts/AuthContext';
 import { useModal } from '../hooks/useModal';
+import MenuItem from '../components/restaurant/MenuItem';
+import ProductDetailModal from '../components/modals/ProductDetailModal';
 import './HomePage.css';
+import './RestaurantPage.css';
 
 const HomePage = () => {
   const { currentUser } = useAuth();
   const { darkMode } = useTheme();
-  
+
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [restaurants, setRestaurants] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [lastViewedProduct, setLastViewedProduct] = useState(null);
+  const [recommendations, setRecommendations] = useState([]);
+  const [recommendationsStatus, setRecommendationsStatus] = useState('idle');
 
   const addRestModal = useModal();
   const addCatModal = useModal();
+  const productDetailModal = useModal();
 
   const fetchCategories = async () => {
     try {
@@ -40,6 +48,60 @@ const HomePage = () => {
   useEffect(() => {
     fetchCategories();
   }, []);
+
+  useEffect(() => {
+    const loadRecommendations = async () => {
+      if (currentUser) {
+        if (!currentUser.lastViewedProduct) {
+          setLastViewedProduct(null);
+          setRecommendations([]);
+          setRecommendationsStatus('idle');
+          return;
+        }
+
+        // Try to load from localStorage first for instant display
+        let productObj = null;
+        const stored = localStorage.getItem(`lastViewedProduct_${currentUser.id}`);
+        if (stored) {
+          try {
+            const parsed = JSON.parse(stored);
+            if (parsed && parsed.id === currentUser.lastViewedProduct) {
+              productObj = parsed;
+            }
+          } catch (e) {
+            console.error("Failed to parse stored product details", e);
+          }
+        }
+
+        // If not found in localStorage or ID mismatch, load from backend
+        if (!productObj) {
+          try {
+            productObj = await productService.getByGlobalId(currentUser.lastViewedProduct);
+          } catch (e) {
+            console.error("Failed to fetch global product details", e);
+          }
+        }
+        setLastViewedProduct(productObj);
+
+        try {
+          setRecommendationsStatus('loading');
+          const data = await productService.getRecommendations(currentUser.id, currentUser.lastViewedProduct);
+          setRecommendations(data || []);
+          setRecommendationsStatus('success');
+        } catch (e) {
+          console.error("Failed to load recommendations:", e);
+          setRecommendations([]);
+          setRecommendationsStatus('error');
+        }
+      } else {
+        setLastViewedProduct(null);
+        setRecommendations([]);
+        setRecommendationsStatus('idle');
+      }
+    };
+
+    loadRecommendations();
+  }, [currentUser, productDetailModal.isOpen]);
 
   useEffect(() => {
     const loadRestaurants = async () => {
@@ -72,7 +134,7 @@ const HomePage = () => {
     try {
       await restaurantService.create(form);
       addRestModal.closeModal();
-      
+
       const data = await restaurantService.getAll();
       setRestaurants(data);
       fetchCategories(); // Refresh category counts
@@ -114,8 +176,8 @@ const HomePage = () => {
   }, [restaurants, currentUser?.location]);
 
   const displayedRestaurants = useMemo(() => {
-    return restaurants.filter(r => 
-      selectedCategory === 'All' || 
+    return restaurants.filter(r =>
+      selectedCategory === 'All' ||
       (r.category && r.category.toLowerCase() === selectedCategory.toLowerCase())
     ).sort((a, b) => {
       if (!currentUser?.location) return 0;
@@ -126,8 +188,8 @@ const HomePage = () => {
   }, [restaurants, selectedCategory, currentUser?.location]);
 
   const displayCategories = useMemo(() => {
-    const allCategory = { 
-      name: 'All', 
+    const allCategory = {
+      name: 'All',
       image: "/api/uploads/categories/all.webp",
       count: restaurants.length
     };
@@ -137,7 +199,7 @@ const HomePage = () => {
   return (
     <div className={`app-container ${darkMode ? 'dark-mode' : ''}`}>
       <Navbar onSearch={setSearchQuery} />
-      
+
       {/* Time-based dynamic hero banner */}
       <HeroBanner />
 
@@ -172,6 +234,42 @@ const HomePage = () => {
           </div>
         )}
 
+        {currentUser && (
+          <div className="special-list-container">
+            {!currentUser.lastViewedProduct ? (
+              <h2 className="section-title">check out your taste!</h2>
+            ) : (
+              <>
+                <h2 className="section-title">
+                  if you liked {lastViewedProduct ? lastViewedProduct.name : '...'} you might also like
+                </h2>
+                {recommendationsStatus === 'loading' && (
+                  <div className="loading">Loading recommendations...</div>
+                )}
+                {recommendationsStatus === 'success' && recommendations.length > 0 && (
+                  <div className="menu-grid" style={{ marginTop: '20px' }}>
+                    {recommendations.map((item) => (
+                      <MenuItem
+                        key={item.product.id}
+                        product={item.product}
+                        restaurant={item.restaurant}
+                        canModify={false}
+                        onClick={(p) => productDetailModal.openModal({ ...p, restaurant: item.restaurant })}
+                      />
+                    ))}
+                  </div>
+                )}
+                {recommendationsStatus === 'success' && recommendations.length === 0 && (
+                  <p className="empty-message">No recommended products found.</p>
+                )}
+                {recommendationsStatus === 'error' && (
+                  <p className="empty-message">Failed to load recommendations.</p>
+                )}
+              </>
+            )}
+          </div>
+        )}
+
         <div className="category-section-header">
           <h2 className="category-section-title category-section-title-no-margin">Categories</h2>
           {currentUser?.isAdmin && (
@@ -180,10 +278,10 @@ const HomePage = () => {
             </button>
           )}
         </div>
-        <CategoryFilters 
+        <CategoryFilters
           categories={displayCategories}
-          selectedCategory={selectedCategory} 
-          onCategorySelect={setSelectedCategory} 
+          selectedCategory={selectedCategory}
+          onCategorySelect={setSelectedCategory}
         />
       </section>
 
@@ -217,6 +315,14 @@ const HomePage = () => {
           onSubmit={handleAddCategorySubmit}
           onClose={addCatModal.closeModal}
           error={addCatModal.error}
+        />
+      )}
+
+      {productDetailModal.isOpen && (
+        <ProductDetailModal
+          product={productDetailModal.data}
+          restaurant={productDetailModal.data?.restaurant}
+          onClose={productDetailModal.closeModal}
         />
       )}
     </div>

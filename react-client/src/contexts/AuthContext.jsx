@@ -20,6 +20,16 @@ export const AuthProvider = ({ children }) => {
     setCurrentUser(null);
   };
 
+  const updateLastViewedProduct = (product) => {
+    if (currentUser && product) {
+      if (currentUser.lastViewedProduct === product.id) return;
+      const updatedUser = { ...currentUser, lastViewedProduct: product.id };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      setCurrentUser(updatedUser);
+      localStorage.setItem(`lastViewedProduct_${currentUser.id}`, JSON.stringify(product));
+    }
+  };
+
   useEffect(() => {
     const handleStorageChange = () => {
       const userStr = localStorage.getItem('user');
@@ -31,7 +41,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ currentUser, login, logout }}>
+    <AuthContext.Provider value={{ currentUser, login, logout, updateLastViewedProduct }}>
       {children}
     </AuthContext.Provider>
   );

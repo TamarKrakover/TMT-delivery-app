@@ -70,6 +70,23 @@ class RecommendationServer {
         return await this._sendCommand(command);
     }
 
+    // Sends a get command to retrieve recommendations for a user based on a target product.
+    // Returns a space-separated string of recommended product IDs.
+    async get(userId, productId) {
+        if (!userId || !productId) return '';
+        const command = `get ${userId} ${productId}`;
+        try {
+            const response = await this._sendCommand(command);
+            if (response.startsWith('200 Ok')) {
+                return response.replace('200 Ok', '').replace(/\r/g, '').trim();
+            }
+            return '';
+        } catch (error) {
+            console.error('Error in RecommendationServer.get:', error);
+            return '';
+        }
+    }
+
     // helper implementing state session logic: tries POST or PATCH depending on initialization,
     // with try-catch fallback.
     async save(userId, productIds) {

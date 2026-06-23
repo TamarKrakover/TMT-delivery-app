@@ -25,5 +25,8 @@ export const restaurantService = {
   }),
 
   // Search for restaurants or products matching query
-  search: (query) => request(`/api/search/${query}`)
+  search: (query) => request(`/api/search/${query}`),
+
+  // Get recommended products based on user and last viewed product
+  getRecommendations: (productId) => request(`/api/restaurants/recommendations?productId=${productId}`)
 };

@@ -10,7 +10,8 @@ const userSchema = new mongoose.Schema({
         lat: { type: Number },
         lng: { type: Number }
     },
-    profilePic: { type: String, default: null }
+    profilePic: { type: String, default: null },
+    lastViewedProduct: { type: String, default: null }
 }, {
     timestamps: true
 });
@@ -48,6 +49,17 @@ userSchema.statics.findUserById = function(id) {
 // Find a user by both username and password
 userSchema.statics.findByCredentials = function(username, password) {
     return this.findOne({ username, password });
+};
+
+// Update the user's last viewed product
+userSchema.statics.updateLastViewedProduct = async function(userId, productId) {
+    const user = await this.findById(userId);
+    if (user) {
+        user.lastViewedProduct = productId;
+        await user.save();
+        return user;
+    }
+    return null;
 };
 
 const UserModel = mongoose.model('User', userSchema);
