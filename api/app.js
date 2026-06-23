@@ -20,6 +20,7 @@ const searchRoutes = require('./src/routes/searchRoutes');
 const tokenRoutes = require('./src/routes/tokenRoutes');
 const categoryRoutes = require('./src/routes/categoryRoutes');
 const uploadRoutes = require('./src/routes/uploadRoutes');
+const recommendationRoutes = require('./src/routes/recommendationRoutes');
 
 // Mount routes to their respective paths
 app.use('/api/users', userRoutes);
@@ -29,6 +30,17 @@ app.use('/api/search', searchRoutes);
 app.use('/api/tokens', tokenRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/recommendations', recommendationRoutes);
+
+const ProductModel = require('./src/models/ProductModel');
+app.get('/api/products/:productId', (req, res) => {
+    const { productId } = req.params;
+    const product = ProductModel.findByGlobalId(productId);
+    if (!product) {
+        return res.status(404).json({ error: 'Product not found' });
+    }
+    res.status(200).json(product);
+});
 
 // Catch-all route for undefined endpoints
 app.use((req, res) => {

@@ -9,6 +9,7 @@ import RestaurantFormModal from '../components/modals/RestaurantFormModal';
 import CategoryFormModal from '../components/modals/CategoryFormModal';
 import { restaurantService } from '../services/restaurantService';
 import { categoryService } from '../services/categoryService';
+import { productService } from '../services/productService';
 import { calculateDistance } from '../utils/distance';
 import { FiPlus } from '../components/common/Icons';
 import { useAuth } from '../contexts/AuthContext';
@@ -28,7 +29,8 @@ const HomePage = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [lastViewedProduct, setLastViewedProduct] = useState(null);
-  const [recommendedProducts, setRecommendedProducts] = useState([]);
+  const [recommendations, setRecommendations] = useState([]);
+  const [recommendationsStatus, setRecommendationsStatus] = useState('idle');
 
   const addRestModal = useModal();
   const addCatModal = useModal();
@@ -50,34 +52,51 @@ const HomePage = () => {
   useEffect(() => {
     const loadRecommendations = async () => {
       if (currentUser) {
+        if (!currentUser.lastViewedProduct) {
+          setLastViewedProduct(null);
+          setRecommendations([]);
+          setRecommendationsStatus('idle');
+          return;
+        }
+
+        // Try to load from localStorage first for instant display
+        let productObj = null;
         const stored = localStorage.getItem(`lastViewedProduct_${currentUser.id}`);
         if (stored) {
-          let parsedProduct = null;
           try {
-            parsedProduct = JSON.parse(stored);
-            setLastViewedProduct(parsedProduct);
+            const parsed = JSON.parse(stored);
+            if (parsed && parsed.id === currentUser.lastViewedProduct) {
+              productObj = parsed;
+            }
           } catch (e) {
-            console.error("Failed to parse last viewed product:", e);
-            setLastViewedProduct(null);
-            setRecommendedProducts([]);
-            return;
+            console.error("Failed to parse stored product details", e);
           }
+        }
 
+        // If not found in localStorage or ID mismatch, load from backend
+        if (!productObj) {
           try {
-            // Fetch recommendations from C++ server via API
-            const recommendations = await restaurantService.getRecommendations(parsedProduct.id);
-            setRecommendedProducts(recommendations || []);
+            productObj = await productService.getByGlobalId(currentUser.lastViewedProduct);
           } catch (e) {
-            console.error("Failed to load recommendations:", e);
-            setRecommendedProducts([]);
+            console.error("Failed to fetch global product details", e);
           }
-        } else {
-          setLastViewedProduct(null);
-          setRecommendedProducts([]);
+        }
+        setLastViewedProduct(productObj);
+
+        try {
+          setRecommendationsStatus('loading');
+          const data = await productService.getRecommendations(currentUser.id, currentUser.lastViewedProduct);
+          setRecommendations(data || []);
+          setRecommendationsStatus('success');
+        } catch (e) {
+          console.error("Failed to load recommendations:", e);
+          setRecommendations([]);
+          setRecommendationsStatus('error');
         }
       } else {
         setLastViewedProduct(null);
-        setRecommendedProducts([]);
+        setRecommendations([]);
+        setRecommendationsStatus('idle');
       }
     };
 
@@ -215,23 +234,38 @@ const HomePage = () => {
           </div>
         )}
 
-        {currentUser && lastViewedProduct && (
+        {currentUser && (
           <div className="special-list-container">
-            <h2 className="section-title">if you liked {lastViewedProduct.name} you might also like</h2>
-            {recommendedProducts.length > 0 ? (
-              <div className="menu-grid" style={{ marginTop: '20px' }}>
-                {recommendedProducts.map((product) => (
-                  <MenuItem
-                    key={product.id}
-                    product={product}
-                    restaurant={product.restaurant}
-                    canModify={false}
-                    onClick={(p) => productDetailModal.openModal(p)}
-                  />
-                ))}
-              </div>
+            {!currentUser.lastViewedProduct ? (
+              <h2 className="section-title">check out your taste!</h2>
             ) : (
-              <p className="empty-message">No recommended products found.</p>
+              <>
+                <h2 className="section-title">
+                  if you liked {lastViewedProduct ? lastViewedProduct.name : '...'} you might also like
+                </h2>
+                {recommendationsStatus === 'loading' && (
+                  <div className="loading">Loading recommendations...</div>
+                )}
+                {recommendationsStatus === 'success' && recommendations.length > 0 && (
+                  <div className="menu-grid" style={{ marginTop: '20px' }}>
+                    {recommendations.map((item) => (
+                      <MenuItem
+                        key={item.product.id}
+                        product={item.product}
+                        restaurant={item.restaurant}
+                        canModify={false}
+                        onClick={(p) => productDetailModal.openModal({ ...p, restaurant: item.restaurant })}
+                      />
+                    ))}
+                  </div>
+                )}
+                {recommendationsStatus === 'success' && recommendations.length === 0 && (
+                  <p className="empty-message">No recommended products found.</p>
+                )}
+                {recommendationsStatus === 'error' && (
+                  <p className="empty-message">Failed to load recommendations.</p>
+                )}
+              </>
             )}
           </div>
         )}

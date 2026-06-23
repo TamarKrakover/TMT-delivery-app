@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { FiX } from '../../components/common/Icons';
 import { useCart } from '../../contexts/CartContext';
 import request from '../../services/api';
@@ -6,23 +6,25 @@ import { useAuth } from '../../contexts/AuthContext';
 
 const ProductDetailModal = ({ product, restaurant, onClose }) => {
   const { addToCart } = useCart();
-  const { currentUser } = useAuth();
+  const { currentUser, updateLastViewedProduct } = useAuth();
+  const trackedProductIdRef = useRef(null);
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
     
     // Trigger product view to log interaction on the backend
-    if (product && restaurant) {
+    if (product && restaurant && trackedProductIdRef.current !== product.id) {
+      trackedProductIdRef.current = product.id;
       request(`/api/restaurants/${restaurant.id}/products/${product.id}`).catch(() => {});
       
       // Save last viewed product for the current user
       if (currentUser) {
-        localStorage.setItem(`lastViewedProduct_${currentUser.id}`, JSON.stringify(product));
+        updateLastViewedProduct(product);
       }
     }
     
     return () => { document.body.style.overflow = 'unset'; };
-  }, [product, restaurant, currentUser]);
+  }, [product, restaurant, currentUser, updateLastViewedProduct]);
 
   if (!product) return null;
 

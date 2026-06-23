@@ -7,6 +7,12 @@ export const productService = {
   // Get specific product details
   getById: (restaurantId, productId) => request(`/api/restaurants/${restaurantId}/products/${productId}`),
 
+  // Get recommended products based on user and last viewed product
+  getRecommendations: (userId, productId) => request(`/api/recommendations/${userId}/${productId}`),
+
+  // Get specific product by global ID
+  getByGlobalId: (productId) => request(`/api/products/${productId}`),
+
   // Add a product to a restaurant
   create: (restaurantId, data) => request(`/api/restaurants/${restaurantId}/products`, {
     method: 'POST',

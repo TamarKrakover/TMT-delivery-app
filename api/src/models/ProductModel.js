@@ -32,15 +32,21 @@ class ProductModel {
     }
 
     // finds and returns a specific product by its ID and restaurant ID
-    // if a userId is provided, logs the view to the recommendation server
+    // if a userId is provided, logs the view to the recommendation server and updates user's last viewed product
     static findById(restaurantId, productId, userId = null) {
         const product = db.products.find(p => p.restaurantId === restaurantId && p.id === productId);
         
         if (product && userId) {
             RecommendationServer.save(userId, productId).catch(() => {});
+            UserModel.updateLastViewedProduct(userId, productId);
         }
         
         return product;
+    }
+
+    // finds and returns a specific product by its global ID across all restaurants
+    static findByGlobalId(productId) {
+        return db.products.find(p => p.id === productId);
     }
 
     // updates an existing product's fields while protecting its original IDs

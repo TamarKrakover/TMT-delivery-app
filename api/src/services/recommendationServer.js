@@ -70,38 +70,20 @@ class RecommendationServer {
         return await this._sendCommand(command);
     }
 
-    // Sends a get command to retrieve recommendations for a user based on a target product,
-    // then maps recommended product IDs to their corresponding product objects and restaurants.
+    // Sends a get command to retrieve recommendations for a user based on a target product.
+    // Returns a space-separated string of recommended product IDs.
     async get(userId, productId) {
-        if (!userId || !productId) return [];
+        if (!userId || !productId) return '';
         const command = `get ${userId} ${productId}`;
         try {
             const response = await this._sendCommand(command);
             if (response.startsWith('200 Ok')) {
-                const cleanResponse = response.replace('200 Ok', '').replace(/\r/g, '').trim();
-                if (cleanResponse) {
-                    const productIds = cleanResponse.split(/\s+/).filter(id => id.length > 0);
-                    
-                    const db = require('../models/InMemoryDB');
-                    const recommendedProducts = [];
-                    
-                    for (const pid of productIds) {
-                        const product = db.products.find(p => p.id === pid);
-                        if (product) {
-                            const restaurant = db.restaurants.find(r => r.id === product.restaurantId);
-                            recommendedProducts.push({
-                                ...product,
-                                restaurant: restaurant || null
-                            });
-                        }
-                    }
-                    return recommendedProducts;
-                }
+                return response.replace('200 Ok', '').replace(/\r/g, '').trim();
             }
-            return [];
+            return '';
         } catch (error) {
             console.error('Error in RecommendationServer.get:', error);
-            return [];
+            return '';
         }
     }
 

@@ -21,7 +21,8 @@ class UserModel {
             name: data.name,
             role: data.role || 'customer',
             location: data.location,
-            profilePic: data.profilePic || null
+            profilePic: data.profilePic || null,
+            lastViewedProduct: null
         };
         db.users.push(newUser);
         return newUser;
@@ -40,6 +41,16 @@ class UserModel {
     // Find a user by both username and password
     static findByCredentials(username, password) {
         return db.users.find(u => u.username === username && u.password === password);
+    }
+
+    // Update the user's last viewed product
+    static updateLastViewedProduct(userId, productId) {
+        const user = this.findUserById(userId);
+        if (user) {
+            user.lastViewedProduct = productId;
+            return user;
+        }
+        return null;
     }
 }
 
