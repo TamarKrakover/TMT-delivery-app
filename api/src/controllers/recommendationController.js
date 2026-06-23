@@ -20,9 +20,9 @@ const getRecommendations = async (req, res) => {
         if (responseString) {
             const productIds = responseString.split(/\s+/).filter(id => id.length > 0);
             for (const pid of productIds) {
-                const product = ProductModel.findByGlobalId(pid);
+                const product = await ProductModel.findByGlobalId(pid);
                 if (product) {
-                    const restaurant = RestaurantModel.findById(product.restaurantId);
+                    const restaurant = await RestaurantModel.findById(product.restaurantId);
                     results.push({
                         product,
                         restaurant: restaurant || null
