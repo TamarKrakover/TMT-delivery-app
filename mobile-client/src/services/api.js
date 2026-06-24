@@ -1,0 +1,160 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
+
+export const BASE_URL = 'http://10.100.102.2:8080';
+
+
+const USER_SESSION_KEY = 'user_session';
+
+/**
+ * Get the current user's session from AsyncStorage
+ */
+export const getUserSession = async () => {
+  try {
+    const session = await AsyncStorage.getItem(USER_SESSION_KEY);
+    return session ? JSON.parse(session) : null;
+  } catch (error) {
+    console.error('Error reading user session:', error);
+    return null;
+  }
+};
+
+/**
+ * Set the current user's session in AsyncStorage
+ */
+export const setUserSession = async (userSession) => {
+  try {
+    await AsyncStorage.setItem(USER_SESSION_KEY, JSON.stringify(userSession));
+  } catch (error) {
+    console.error('Error saving user session:', error);
+  }
+};
+
+/**
+ * Clear the current user's session (Logout)
+ */
+export const clearUserSession = async () => {
+  try {
+    await AsyncStorage.removeItem(USER_SESSION_KEY);
+  } catch (error) {
+    console.error('Error clearing user session:', error);
+  }
+};
+
+/**
+ * Generic request helper with automatic header injection
+ */
+export const apiRequest = async (endpoint, options = {}) => {
+  const session = await getUserSession();
+  const userId = session ? session.id : 'temp_user';
+
+  const headers = {
+    'Content-Type': 'application/json',
+    'x-user-id': userId,
+    ...options.headers,
+  };
+
+  const url = `${BASE_URL}${endpoint}`;
+
+  // If body is FormData, don't set Content-Type header manually (let fetch determine boundaries)
+  if (options.body instanceof FormData) {
+    delete headers['Content-Type'];
+  }
+
+  const response = await fetch(url, {
+    ...options,
+    headers,
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error || 'Something went wrong');
+  }
+
+  // HTTP 201 (Created) and 204 (No Content) might not return body content
+  if (response.status === 201 || response.status === 204) {
+    // If there is location header returned (e.g. for registration), parse it
+    const location = response.headers.get('location');
+    const text = await response.text();
+    let body = null;
+    if (text) {
+      try {
+        body = JSON.parse(text);
+      } catch (e) {}
+    }
+    return { location, body };
+  }
+
+  const text = await response.text();
+  return text ? JSON.parse(text) : null;
+};
+
+/**
+ * Authentication and User Services
+ */
+export const authService = {
+  // Login: POST /api/tokens
+  login: async (username, password) => {
+    const result = await apiRequest('/api/tokens', {
+      method: 'POST',
+      body: JSON.stringify({ username, password }),
+    });
+    // result is { id: userId }
+    return result;
+  },
+
+  // Register: POST /api/users
+  register: async (userData) => {
+    return await apiRequest('/api/users', {
+      method: 'POST',
+      body: JSON.stringify(userData),
+    });
+  },
+
+  // Fetch specific user details
+  getUserDetails: async (userId, customId) => {
+    const headers = customId ? { 'x-user-id': customId } : {};
+    return await apiRequest(`/api/users/${userId}`, {
+      headers,
+    });
+  },
+
+  // Upload image to backend
+  uploadImage: async (imageAsset) => {
+    const formData = new FormData();
+    
+    // Convert the local image URI to a standard Blob object using XMLHttpRequest (reliable on both Web and Android file:// URIs)
+    const blob = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        resolve(xhr.response);
+      };
+      xhr.onerror = function (e) {
+        console.error('XHR error converting URI to Blob:', e);
+        reject(new TypeError("Network request failed"));
+      };
+      xhr.responseType = "blob";
+      xhr.open("GET", imageAsset.uri, true);
+      xhr.send(null);
+    });
+
+    const mimeType = blob.type || 'image/jpeg';
+    const fileExt = mimeType.split('/')[1] || 'jpeg';
+    
+    formData.append('image', blob, `photo.${fileExt}`);
+
+    const response = await fetch(`${BASE_URL}/api/upload`, {
+      method: 'POST',
+      body: formData,
+      // No headers to let browser/native set boundary
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      console.error('Image upload failed response:', errText);
+      throw new Error('Image upload failed');
+    }
+
+    return await response.json(); // returns { url: "/api/uploads/misc/..." }
+  },
+};
