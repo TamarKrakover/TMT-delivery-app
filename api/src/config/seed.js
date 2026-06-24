@@ -13,63 +13,68 @@ const importData = async () => {
     try {
         await connectDB();
         
-        console.log('Clearing existing data...');
-        await UserModel.deleteMany();
-        await RestaurantModel.deleteMany();
-        await ProductModel.deleteMany();
-        await CategoryModel.deleteMany();
-        await OrderModel.deleteMany();
-
         console.log('Importing categories...');
         for (let cat of db.categories) {
-            await CategoryModel.create({ name: cat.name, image: cat.image });
+            const exists = await CategoryModel.findOne({ name: cat.name });
+            if (!exists) {
+                await CategoryModel.create({ name: cat.name, image: cat.image });
+            }
         }
 
         console.log('Importing users...');
         const userMap = new Map(); // Old ID -> New _id
         for (let user of db.users) {
-            const newUser = new UserModel({
-                username: user.username,
-                password: user.password,
-                name: user.name,
-                role: user.role || 'customer',
-                isAdmin: user.isAdmin || false,
-                location: user.location,
-                profilePic: user.profilePic || null
-            });
-            const saved = await newUser.save();
-            userMap.set(user.id, saved._id.toString());
+            let existingUser = await UserModel.findOne({ username: user.username });
+            if (!existingUser) {
+                const newUser = new UserModel({
+                    username: user.username,
+                    password: user.password,
+                    name: user.name,
+                    role: user.role || 'customer',
+                    isAdmin: user.isAdmin || false,
+                    location: user.location,
+                    profilePic: user.profilePic || null
+                });
+                existingUser = await newUser.save();
+            }
+            userMap.set(user.id, existingUser._id.toString());
         }
 
         console.log('Importing restaurants...');
         const restMap = new Map(); // Old ID -> New _id
         for (let rest of db.restaurants) {
-            const newCreatorId = userMap.get(rest.creatorId) || rest.creatorId;
-            const newRest = new RestaurantModel({
-                name: rest.name,
-                description: rest.description,
-                category: rest.category,
-                image: rest.image,
-                location: rest.location,
-                creatorId: newCreatorId
-            });
-            const saved = await newRest.save();
-            restMap.set(rest.id, saved._id.toString());
+            let existingRest = await RestaurantModel.findOne({ name: rest.name });
+            if (!existingRest) {
+                const newCreatorId = userMap.get(rest.creatorId) || rest.creatorId;
+                const newRest = new RestaurantModel({
+                    name: rest.name,
+                    description: rest.description,
+                    category: rest.category,
+                    image: rest.image,
+                    location: rest.location,
+                    creatorId: newCreatorId
+                });
+                existingRest = await newRest.save();
+            }
+            restMap.set(rest.id, existingRest._id.toString());
         }
 
         console.log('Importing products...');
         const prodMap = new Map(); // Old ID -> New _id
         for (let prod of db.products) {
-            const newRestId = restMap.get(prod.restaurantId) || prod.restaurantId;
-            const newProd = new ProductModel({
-                restaurantId: newRestId,
-                name: prod.name,
-                description: prod.description,
-                price: prod.price,
-                image: prod.image
-            });
-            const saved = await newProd.save();
-            prodMap.set(prod.id, saved._id.toString());
+            let existingProd = await ProductModel.findOne({ name: prod.name });
+            if (!existingProd) {
+                const newRestId = restMap.get(prod.restaurantId) || prod.restaurantId;
+                const newProd = new ProductModel({
+                    restaurantId: newRestId,
+                    name: prod.name,
+                    description: prod.description,
+                    price: prod.price,
+                    image: prod.image
+                });
+                existingProd = await newProd.save();
+            }
+            prodMap.set(prod.id, existingProd._id.toString());
         }
 
         console.log('Importing orders...');
@@ -78,22 +83,34 @@ const importData = async () => {
             const newRestId = restMap.get(order.restaurantId) || order.restaurantId;
             const newProductIds = (order.productIds || []).map(pid => prodMap.get(pid) || pid);
             
-            const newOrder = new OrderModel({
+            const existingOrder = await OrderModel.findOne({
                 userId: newUserId,
                 restaurantId: newRestId,
-                productIds: newProductIds,
-                totalPrice: order.totalPrice,
-                status: order.status
+                totalPrice: order.totalPrice
             });
-            await newOrder.save();
+
+            if (!existingOrder) {
+                const newOrder = new OrderModel({
+                    userId: newUserId,
+                    restaurantId: newRestId,
+                    productIds: newProductIds,
+                    totalPrice: order.totalPrice,
+                    status: order.status
+                });
+                await newOrder.save();
+            }
         }
 
         console.log('Data Imported Successfully!');
-        process.exit();
+        if (require.main === module) process.exit();
     } catch (error) {
         console.error('Error with data import', error);
-        process.exit(1);
+        if (require.main === module) process.exit(1);
     }
 };
 
-importData();
+if (require.main === module) {
+    importData();
+}
+
+module.exports = importData;

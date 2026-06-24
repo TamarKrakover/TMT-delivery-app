@@ -5,8 +5,16 @@ const app = express();
 const port = 8080;
 
 // Connect to MongoDB
-connectDB();
-
+connectDB().then(async () => {
+    // Auto-seed data safely (it will only add missing items and won't overwrite)
+    try {
+        console.log('Ensuring all initial data exists (Auto-seed)...');
+        const seedData = require('./src/config/seed');
+        await seedData();
+    } catch (e) {
+        console.error('Failed to auto-seed database:', e);
+    }
+});
 // Organize the print format
 app.set('json spaces', 2);
 
