@@ -57,5 +57,11 @@ export default StyleSheet.create({
     ...FONTS.body1,
     color: lightTheme.textSecondary,
     marginTop: SIZES.sm,
+  },
+  sectionTitle: {
+    ...FONTS.h3,
+    color: lightTheme.text,
+    paddingHorizontal: SIZES.md,
+    marginBottom: SIZES.sm,
   }
 });

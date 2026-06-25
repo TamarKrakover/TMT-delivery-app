@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Image } from 'react-native';
+import { View, Text, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import styles from '../styles/HomeScreen.styles';
 import { Ionicons } from '@expo/vector-icons';
-import { categoryService, restaurantService, getLastViewedProduct } from '../services/api';
+import { categoryService, restaurantService, getLastViewedProduct, userService } from '../services/api';
+import { calculateDistance } from '../utils/distance';
 import CategoryList from '../components/home/CategoryList';
 import RestaurantList from '../components/restaurant/RestaurantList';
+import RestaurantCard from '../components/restaurant/RestaurantCard';
 import RecommendedProducts from '../components/home/RecommendedProducts';
 
 export default function HomeScreen({ navigation, userSession }) {
@@ -14,6 +16,7 @@ export default function HomeScreen({ navigation, userSession }) {
   const [restaurants, setRestaurants] = useState([]);
   const [recommendations, setRecommendations] = useState([]);
   const [lastViewed, setLastViewed] = useState(null);
+  const [fullUser, setFullUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -28,14 +31,11 @@ export default function HomeScreen({ navigation, userSession }) {
         setRestaurants(restsData || []);
 
         if (userSession?.id) {
+          const user = await userService.getUserById(userSession.id).catch(() => null);
+          setFullUser(user);
+
           let viewedProduct = await getLastViewedProduct(userSession.id);
-          
-          // --- זמני: כדי להוכיח שה-C++ וקובץ data.txt עובדים ---
-          // אם אין היסטוריה בטלפון החדש, נדמה שצפינו במוצר עם ה-ID הזה מהקובץ שלך
-          if (!viewedProduct) {
-            viewedProduct = { id: "6a3a699199a4047fd20b6832", name: "מוצר לדוגמה מ-data.txt" };
-          }
-          // -----------------------------------------------------------
+
 
           if (viewedProduct) {
             setLastViewed(viewedProduct);
@@ -52,13 +52,33 @@ export default function HomeScreen({ navigation, userSession }) {
     fetchData();
   }, [userSession?.id]);
 
+  const nearbyRestaurants = React.useMemo(() => {
+    if (!restaurants || !fullUser?.location) return [];
+    
+    return restaurants.map(r => {
+      const dist = r.location ? calculateDistance(fullUser.location, r.location) : null;
+      return { ...r, distance: dist };
+    })
+    .filter(r => r.distance !== null && r.distance <= 5)
+    .sort((a, b) => a.distance - b.distance);
+  }, [restaurants, fullUser]);
+
   const displayedRestaurants = React.useMemo(() => {
     if (!restaurants) return [];
-    if (selectedCategory === 'All') return restaurants;
-    return restaurants.filter(
-      r => r.category && r.category.toLowerCase() === selectedCategory.toLowerCase()
-    );
-  }, [restaurants, selectedCategory]);
+    
+    // Base mapping to attach distance
+    const withDistance = restaurants.map(r => {
+      const dist = (fullUser?.location && r.location) ? calculateDistance(fullUser.location, r.location) : null;
+      return { ...r, distance: dist };
+    });
+
+    // Default: Filter by category (no distance sort)
+    const filtered = selectedCategory === 'All' 
+      ? withDistance 
+      : withDistance.filter(r => r.category && r.category.toLowerCase() === selectedCategory.toLowerCase());
+      
+    return filtered;
+  }, [restaurants, selectedCategory, fullUser]);
 
   const renderHeader = () => (
     <View style={{ marginBottom: 16 }}>
@@ -69,6 +89,22 @@ export default function HomeScreen({ navigation, userSession }) {
           recommendations={recommendations} 
           lastViewedProduct={lastViewed}
         />
+      )}
+
+      {nearbyRestaurants.length > 0 && (
+        <View style={{ marginTop: 24, marginBottom: 20 }}>
+          <Text style={styles.sectionTitle}>Nearby Restaurants</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {nearbyRestaurants.map((restaurant) => (
+              <View key={restaurant.id || restaurant._id} style={{ width: 250, marginRight: 15 }}>
+                <RestaurantCard 
+                  restaurant={restaurant} 
+                  onPress={(r) => console.log('Pressed', r.name)} 
+                />
+              </View>
+            ))}
+          </ScrollView>
+        </View>
       )}
 
       <CategoryList 
@@ -107,7 +143,8 @@ export default function HomeScreen({ navigation, userSession }) {
 
       <View style={styles.content}>
         <RestaurantList 
-          restaurants={displayedRestaurants}
+
+restaurants={displayedRestaurants}
           listHeaderComponent={renderHeader}
           onRestaurantPress={(restaurant) => {
             // We will navigate to Restaurant detail screen later
