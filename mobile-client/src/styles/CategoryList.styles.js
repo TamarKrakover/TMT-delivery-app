@@ -1,13 +1,13 @@
 import { StyleSheet } from 'react-native';
-import { lightTheme, SIZES, FONTS, COLORS } from '../theme/theme';
+import { SIZES, FONTS, COLORS } from '../theme/theme';
 
-export default StyleSheet.create({
+export default (theme) => StyleSheet.create({
   container: {
     marginVertical: SIZES.md,
   },
   sectionTitle: {
     ...FONTS.h3,
-    color: lightTheme.text,
+    color: theme.text,
     paddingHorizontal: SIZES.md,
     marginBottom: SIZES.sm,
   },
@@ -22,7 +22,7 @@ export default StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: lightTheme.surface,
+    backgroundColor: theme.surface,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: SIZES.xs,
@@ -45,7 +45,7 @@ export default StyleSheet.create({
   },
   categoryName: {
     ...FONTS.body2,
-    color: lightTheme.textSecondary,
+    color: theme.textSecondary,
     fontWeight: '500',
   },
   categoryNameSelected: {

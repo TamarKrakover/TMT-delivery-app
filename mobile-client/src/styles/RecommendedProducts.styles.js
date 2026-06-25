@@ -1,13 +1,13 @@
 import { StyleSheet } from 'react-native';
-import { lightTheme, SIZES, FONTS, COLORS } from '../theme/theme';
+import { SIZES, FONTS, COLORS } from '../theme/theme';
 
-export default StyleSheet.create({
+export default (theme) => StyleSheet.create({
   container: {
     marginVertical: SIZES.md,
   },
   sectionTitle: {
     ...FONTS.h3,
-    color: lightTheme.text,
+    color: theme.text,
     paddingHorizontal: SIZES.md,
     marginBottom: SIZES.sm,
   },
@@ -16,7 +16,7 @@ export default StyleSheet.create({
   },
   cardContainer: {
     width: 140,
-    backgroundColor: lightTheme.surface,
+    backgroundColor: theme.surface,
     borderRadius: SIZES.radius,
     marginHorizontal: SIZES.sm,
     shadowColor: '#000',
@@ -26,13 +26,13 @@ export default StyleSheet.create({
     elevation: 3,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: lightTheme.borderLight,
+    borderColor: theme.borderLight,
     marginBottom: SIZES.sm,
   },
   imageWrapper: {
     width: '100%',
     height: 100,
-    backgroundColor: lightTheme.border,
+    backgroundColor: theme.border,
   },
   productImage: {
     width: '100%',
@@ -45,7 +45,7 @@ export default StyleSheet.create({
   nameText: {
     ...FONTS.body2,
     fontWeight: 'bold',
-    color: lightTheme.text,
+    color: theme.text,
     marginBottom: 2,
   },
   priceText: {
@@ -55,7 +55,7 @@ export default StyleSheet.create({
   },
   restaurantText: {
     ...FONTS.caption,
-    color: lightTheme.textSecondary,
+    color: theme.textSecondary,
     fontSize: 10,
     marginTop: 2,
   }

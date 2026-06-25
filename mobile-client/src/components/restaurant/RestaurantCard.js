@@ -1,11 +1,15 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity } from 'react-native';
-import styles from '../../styles/RestaurantCard.styles';
+import createStyles from '../../styles/RestaurantCard.styles';
+import { useTheme } from '../../contexts/ThemeContext';
 import { BASE_URL } from '../../services/api';
 
 const DEFAULT_RESTAURANT_IMAGE = "/api/uploads/restaurants/default.webp";
 
 export default function RestaurantCard({ restaurant, onPress }) {
+  const { theme } = useTheme();
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
+
   if (!restaurant) return null;
 
   const displayImage = restaurant.image || DEFAULT_RESTAURANT_IMAGE;

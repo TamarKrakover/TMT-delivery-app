@@ -1,11 +1,15 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
-import styles from '../../styles/RecommendedProducts.styles';
+import createStyles from '../../styles/RecommendedProducts.styles';
+import { useTheme } from '../../contexts/ThemeContext';
 import { BASE_URL } from '../../services/api';
 
 const DEFAULT_PRODUCT_IMAGE = "/api/uploads/products/default.webp";
 
 export default function RecommendedProducts({ recommendations, lastViewedProduct }) {
+  const { theme } = useTheme();
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
+
   if (!recommendations || recommendations.length === 0) {
     return null;
   }

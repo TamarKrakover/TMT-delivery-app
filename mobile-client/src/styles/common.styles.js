@@ -1,10 +1,10 @@
 import { StyleSheet } from 'react-native';
-import { lightTheme, SIZES, FONTS } from '../theme/theme';
+import { SIZES, FONTS } from '../theme/theme';
 
-export const commonStyles = StyleSheet.create({
+export const commonStyles = (theme) => StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: lightTheme.background,
+    backgroundColor: theme.background,
   },
   content: {
     flex: 1,
@@ -18,11 +18,11 @@ export const commonStyles = StyleSheet.create({
   },
   title: {
     ...FONTS.h2,
-    color: lightTheme.text,
+    color: theme.text,
   },
   subtitle: {
     ...FONTS.body1,
-    color: lightTheme.textSecondary,
+    color: theme.textSecondary,
     marginTop: SIZES.sm,
   }
 });

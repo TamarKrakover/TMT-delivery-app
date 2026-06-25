@@ -1,10 +1,10 @@
 import { StyleSheet } from 'react-native';
-import { COLORS, lightTheme, SIZES, FONTS } from '../theme/theme';
+import { COLORS, SIZES, FONTS } from '../theme/theme';
 
-export default StyleSheet.create({
+export default (theme) => StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: lightTheme.background,
+    backgroundColor: theme.background,
   },
   content: {
     flex: 1,
@@ -13,22 +13,22 @@ export default StyleSheet.create({
   },
   title: {
     ...FONTS.h2,
-    color: lightTheme.text,
+    color: theme.text,
     marginBottom: SIZES.lg,
     marginTop: SIZES.lg,
   },
   infoCard: {
     width: '100%',
     padding: SIZES.md,
-    backgroundColor: lightTheme.surface,
+    backgroundColor: theme.surface,
     borderRadius: SIZES.radius,
     borderWidth: 1,
-    borderColor: lightTheme.border,
+    borderColor: theme.border,
     marginBottom: SIZES.lg,
   },
   label: {
     ...FONTS.body1,
-    color: lightTheme.text,
+    color: theme.text,
     marginBottom: SIZES.sm,
   },
   buttonSecondary: {

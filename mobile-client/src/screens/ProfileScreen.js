@@ -1,9 +1,13 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import styles from '../styles/ProfileScreen.styles';
+import createStyles from '../styles/ProfileScreen.styles';
+import { useTheme } from '../contexts/ThemeContext';
 
 export default function ProfileScreen({ userSession, onLogout }) {
+  const { theme } = useTheme();
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.content}>
@@ -13,11 +17,6 @@ export default function ProfileScreen({ userSession, onLogout }) {
           <Text style={styles.label}>Username: {userSession?.username}</Text>
           <Text style={styles.label}>Role: {userSession?.role}</Text>
         </View>
-
-        {/* Day / Night Toggle placeholder */}
-        <TouchableOpacity style={styles.buttonSecondary}>
-          <Text style={styles.buttonSecondaryText}>Toggle Dark Mode</Text>
-        </TouchableOpacity>
 
         <TouchableOpacity style={styles.logoutButton} onPress={onLogout}>
           <Text style={styles.logoutButtonText}>Log Out</Text>

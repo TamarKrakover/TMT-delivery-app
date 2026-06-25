@@ -1,9 +1,9 @@
 import { StyleSheet } from 'react-native';
-import { lightTheme, SIZES, FONTS, COLORS } from '../theme/theme';
+import { SIZES, FONTS, COLORS } from '../theme/theme';
 
-export default StyleSheet.create({
+export default (theme) => StyleSheet.create({
   cardContainer: {
-    backgroundColor: lightTheme.surface,
+    backgroundColor: theme.surface,
     borderRadius: SIZES.radius,
     marginBottom: SIZES.md,
     shadowColor: '#000',
@@ -13,12 +13,12 @@ export default StyleSheet.create({
     elevation: 3,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: lightTheme.borderLight,
+    borderColor: theme.borderLight,
   },
   imageWrapper: {
     width: '100%',
     height: 150,
-    backgroundColor: lightTheme.border,
+    backgroundColor: theme.border,
     position: 'relative',
   },
   restaurantImage: {
@@ -45,12 +45,12 @@ export default StyleSheet.create({
   },
   nameText: {
     ...FONTS.h3,
-    color: lightTheme.text,
+    color: theme.text,
     marginBottom: 4,
   },
   descriptionText: {
     ...FONTS.body2,
-    color: lightTheme.textSecondary,
+    color: theme.textSecondary,
     marginBottom: SIZES.sm,
   },
   footerRow: {

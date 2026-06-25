@@ -1,10 +1,10 @@
 import { StyleSheet } from 'react-native';
-import { COLORS, SIZES, FONTS, lightTheme } from '../theme/theme';
+import { COLORS, SIZES, FONTS } from '../theme/theme';
 
-export default StyleSheet.create({
+export default (theme) => StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: lightTheme.background,
+    backgroundColor: theme.background,
   },
   header: {
     flexDirection: 'row',
@@ -13,7 +13,7 @@ export default StyleSheet.create({
     paddingHorizontal: SIZES.md,
     paddingVertical: SIZES.sm,
     borderBottomWidth: 1,
-    borderBottomColor: lightTheme.border,
+    borderBottomColor: theme.border,
   },
   headerLeft: {
     flexDirection: 'row',
@@ -51,16 +51,16 @@ export default StyleSheet.create({
   },
   welcomeText: {
     ...FONTS.h2,
-    color: lightTheme.text,
+    color: theme.text,
   },
   subtitle: {
     ...FONTS.body1,
-    color: lightTheme.textSecondary,
+    color: theme.textSecondary,
     marginTop: SIZES.sm,
   },
   sectionTitle: {
     ...FONTS.h3,
-    color: lightTheme.text,
+    color: theme.text,
     paddingHorizontal: SIZES.md,
     marginBottom: SIZES.sm,
   }

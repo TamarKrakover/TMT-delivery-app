@@ -1,9 +1,13 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
-import styles from '../../styles/CategoryList.styles';
+import createStyles from '../../styles/CategoryList.styles';
+import { useTheme } from '../../contexts/ThemeContext';
 import { BASE_URL } from '../../services/api';
 
 export default function CategoryList({ categories, selectedCategory, onSelectCategory }) {
+  const { theme } = useTheme();
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
+
   if (!categories || categories.length === 0) {
     return null;
   }

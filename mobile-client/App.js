@@ -9,6 +9,7 @@ import RegisterScreen from './src/screens/RegisterScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import MainTabs from './src/navigation/MainTabs';
 import { COLORS } from './src/theme/theme';
+import { ThemeProvider } from './src/contexts/ThemeContext';
 
 const Stack = createNativeStackNavigator();
 
@@ -42,8 +43,9 @@ export default function App() {
   }
 
   return (
-    <NavigationContainer>
-      <StatusBar style="auto" />
+    <ThemeProvider>
+      <NavigationContainer>
+        <StatusBar style="auto" />
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {userSession ? (
           // Authorized Stack
@@ -81,6 +83,7 @@ export default function App() {
         )}
       </Stack.Navigator>
     </NavigationContainer>
+    </ThemeProvider>
   );
 }
 

@@ -1,9 +1,12 @@
 import React from 'react';
 import { View, FlatList, Text, StyleSheet } from 'react-native';
 import RestaurantCard from './RestaurantCard';
-import { SIZES, FONTS, lightTheme } from '../../theme/theme';
+import { SIZES, FONTS } from '../../theme/theme';
+import { useTheme } from '../../contexts/ThemeContext';
 
 export default function RestaurantList({ restaurants, onRestaurantPress, listHeaderComponent }) {
+  const { theme } = useTheme();
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
   
   if (!restaurants || restaurants.length === 0) {
     return (
@@ -31,7 +34,7 @@ export default function RestaurantList({ restaurants, onRestaurantPress, listHea
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme) => StyleSheet.create({
   listContent: {
     paddingBottom: SIZES.xl,
   },
@@ -41,7 +44,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     ...FONTS.body1,
-    color: lightTheme.textSecondary,
+    color: theme.textSecondary,
     textAlign: 'center',
     marginTop: SIZES.xl,
   }

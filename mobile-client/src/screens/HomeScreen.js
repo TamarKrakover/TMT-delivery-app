@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import styles from '../styles/HomeScreen.styles';
+import createStyles from '../styles/HomeScreen.styles';
+import { useTheme } from '../contexts/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { categoryService, restaurantService, getLastViewedProduct, userService } from '../services/api';
 import { calculateDistance } from '../utils/distance';
@@ -11,6 +12,9 @@ import RestaurantCard from '../components/restaurant/RestaurantCard';
 import RecommendedProducts from '../components/home/RecommendedProducts';
 
 export default function HomeScreen({ navigation, userSession }) {
+  const { theme, isDark, toggleTheme } = useTheme();
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
+
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [restaurants, setRestaurants] = useState([]);
@@ -117,28 +121,33 @@ export default function HomeScreen({ navigation, userSession }) {
   );
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
       <View style={styles.header}>
         <View style={styles.headerLeft}>
           <Image source={require('../../assets/logo.png')} style={styles.logoImage} />
         </View>
-        <TouchableOpacity 
-          style={styles.profileButton}
-          onPress={() => navigation.navigate('Profile')}
-        >
-          {userSession?.profilePicture ? (
-            <Image 
-              source={{ uri: userSession.profilePicture }} 
-              style={styles.profilePic} 
-            />
-          ) : (
-            <View style={styles.avatarPlaceholder}>
-              <Text style={styles.avatarText}>
-                {userSession?.name?.charAt(0)?.toUpperCase() || 'U'}
-              </Text>
-            </View>
-          )}
-        </TouchableOpacity>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <TouchableOpacity onPress={toggleTheme} style={{ marginRight: 15 }}>
+            <Ionicons name={isDark ? 'sunny' : 'moon'} size={24} color={theme.text} />
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.profileButton}
+            onPress={() => navigation.navigate('Profile')}
+          >
+            {userSession?.profilePicture ? (
+              <Image 
+                source={{ uri: userSession.profilePicture }} 
+                style={styles.profilePic} 
+              />
+            ) : (
+              <View style={styles.avatarPlaceholder}>
+                <Text style={styles.avatarText}>
+                  {userSession?.name?.charAt(0)?.toUpperCase() || 'U'}
+                </Text>
+              </View>
+            )}
+          </TouchableOpacity>
+        </View>
       </View>
 
       <View style={styles.content}>
