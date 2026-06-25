@@ -1,0 +1,9 @@
+{
+  "name": "tmt-delivery-root",
+  "version": "1.0.0",
+  "description": "TMT Delivery Root Project Orchestration",
+  "private": true,
+  "scripts": {
+    "start": "node scripts/generate-env.js && docker compose --profile mobile up --build"
+  }
+}

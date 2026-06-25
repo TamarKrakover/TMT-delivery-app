@@ -87,6 +87,31 @@ services:
     networks:
       - tmt-net
 
+  # Mobile Client Service (Expo Metro Bundler)
+  mobile-client:
+    profiles:
+      - mobile
+    build:
+      context: ./mobile-client
+      dockerfile: Dockerfile.mobile
+    container_name: tmt-mobile-client
+    ports:
+      - "8081:8081"
+    environment:
+      - REACT_NATIVE_PACKAGER_HOSTNAME=${API_IP:-${COMPUTERNAME:-localhost}.local}
+      - EXPO_PUBLIC_API_URL=http://${API_IP:-${COMPUTERNAME:-localhost}.local}:8080
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+    volumes:
+      - ./mobile-client:/app
+      - /app/node_modules
+    stdin_open: true
+    tty: true
+    depends_on:
+      - web-server
+    networks:
+      - tmt-net
+
 volumes:
   mongo-data:
 

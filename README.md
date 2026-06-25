@@ -17,6 +17,10 @@ To build and start all three services (C++ Recommendation Server, Node.js API Se
 ```bash
 docker compose up --build
 ```
+running on expo:
+```bash
+npm start
+```
 
 #### Running Services:
 * **React Client Frontend**: Accessible at [http://localhost:3000](http://localhost:3000)
