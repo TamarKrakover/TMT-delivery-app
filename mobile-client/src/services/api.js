@@ -159,3 +159,15 @@ export const authService = {
     return await response.json(); // returns { url: "/api/uploads/misc/..." }
   },
 };
+
+export const categoryService = {
+  getAll: async () => {
+    return await apiRequest('/api/categories');
+  }
+};
+
+export const restaurantService = {
+  getAll: async () => {
+    return await apiRequest('/api/restaurants');
+  }
+};
