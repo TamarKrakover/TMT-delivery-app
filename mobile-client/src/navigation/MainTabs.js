@@ -51,9 +51,10 @@ export default function MainTabs({ route }) {
       
       <Tab.Screen 
         name="SearchTab" 
-        component={SearchScreen} 
         options={{ title: 'Search' }} 
-      />
+      >
+        {(props) => <SearchScreen {...props} userSession={userSession} />}
+      </Tab.Screen>
       
       <Tab.Screen 
         name="CartTab" 
