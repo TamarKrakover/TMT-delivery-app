@@ -189,6 +189,9 @@ export const restaurantService = {
   },
   getRecommendations: async (productId) => {
     return await apiRequest(`/api/restaurants/recommendations?productId=${productId}`);
+  },
+  search: async (query) => {
+    return await apiRequest(`/api/search/${query}`);
   }
 };
 

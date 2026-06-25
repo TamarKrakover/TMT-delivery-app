@@ -4,7 +4,7 @@ import RestaurantCard from './RestaurantCard';
 import { SIZES, FONTS } from '../../theme/theme';
 import { useTheme } from '../../contexts/ThemeContext';
 
-export default function RestaurantList({ restaurants, onRestaurantPress, listHeaderComponent }) {
+export default function RestaurantList({ restaurants, onRestaurantPress, listHeaderComponent, listFooterComponent }) {
   const { theme } = useTheme();
   const styles = React.useMemo(() => createStyles(theme), [theme]);
   
@@ -12,7 +12,6 @@ export default function RestaurantList({ restaurants, onRestaurantPress, listHea
     return (
       <View style={styles.emptyContainer}>
         {listHeaderComponent && listHeaderComponent()}
-        <Text style={styles.emptyText}>No restaurants found.</Text>
       </View>
     );
   }
@@ -30,6 +29,7 @@ export default function RestaurantList({ restaurants, onRestaurantPress, listHea
       contentContainerStyle={styles.listContent}
       showsVerticalScrollIndicator={false}
       ListHeaderComponent={listHeaderComponent}
+      ListFooterComponent={listFooterComponent}
     />
   );
 }
