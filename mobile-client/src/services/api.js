@@ -1,7 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 
-export const BASE_URL = 'http://10.100.102.2:8080';
+// export const BASE_URL = 'http://10.100.102.2:8080';
+export const BASE_URL = 'http://192.168.0.165:8080';
 
 
 const USER_SESSION_KEY = 'user_session';
@@ -95,12 +96,12 @@ export const apiRequest = async (endpoint, options = {}) => {
 export const authService = {
   // Login: POST /api/tokens
   login: async (username, password) => {
-    const result = await apiRequest('/api/tokens', {
-      method: 'POST',
-      body: JSON.stringify({ username, password }),
-    });
+      const result = await apiRequest('/api/tokens', {
+        method: 'POST',
+        body: JSON.stringify({ username, password }),
+      });
     // result is { id: userId }
-    return result;
+      return result;
   },
 
   // Register: POST /api/users
