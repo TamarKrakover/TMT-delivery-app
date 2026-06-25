@@ -1,8 +1,11 @@
 const express = require('express');
+const cors = require('cors');
 const connectDB = require('./src/config/db');
 
 const app = express();
 const port = 8080;
+
+app.use(cors());
 
 // Connect to MongoDB
 connectDB().then(async () => {
