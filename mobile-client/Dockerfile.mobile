@@ -1,0 +1,18 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy dependency manifests
+COPY package*.json ./
+
+# Install dependencies inside the container
+RUN npm install
+
+# Copy application source
+COPY . .
+
+# Expose Metro bundler port
+EXPOSE 8081
+
+# Command to run Expo start in LAN mode
+CMD ["npx", "expo", "start", "--host", "lan"]

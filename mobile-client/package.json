@@ -19,10 +19,10 @@
     "react-native-web": "^0.21.2"
   },
   "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web"
+    "start": "node scripts/set-ip.js && expo start",
+    "android": "node scripts/set-ip.js && expo start --android",
+    "ios": "node scripts/set-ip.js && expo start --ios",
+    "web": "node scripts/set-ip.js && expo start --web"
   },
   "private": true
 }

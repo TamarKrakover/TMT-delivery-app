@@ -1,8 +1,25 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 
-// export const BASE_URL = 'http://10.100.102.2:8080';
-export const BASE_URL = 'http://192.168.0.165:8080';
+const getDevAPIUrl = () => {
+  if (Platform.OS === 'android') {
+    return 'http://10.0.2.2:8080';
+  }
+  return 'http://localhost:8080';
+};
+
+const getBaseURL = () => {
+  const url = process.env.EXPO_PUBLIC_API_URL;
+  if (!url) {
+    return getDevAPIUrl();
+  }
+  if (Platform.OS === 'android' && url.includes('localhost')) {
+    return url.replace('localhost', '10.0.2.2');
+  }
+  return url;
+};
+
+export const BASE_URL = getBaseURL();
 
 
 const USER_SESSION_KEY = 'user_session';
@@ -98,7 +115,7 @@ export const apiRequest = async (endpoint, options = {}) => {
     if (text) {
       try {
         body = JSON.parse(text);
-      } catch (e) {}
+      } catch (e) { }
     }
     return { location, body };
   }
@@ -113,12 +130,12 @@ export const apiRequest = async (endpoint, options = {}) => {
 export const authService = {
   // Login: POST /api/tokens
   login: async (username, password) => {
-      const result = await apiRequest('/api/tokens', {
-        method: 'POST',
-        body: JSON.stringify({ username, password }),
-      });
+    const result = await apiRequest('/api/tokens', {
+      method: 'POST',
+      body: JSON.stringify({ username, password }),
+    });
     // result is { id: userId }
-      return result;
+    return result;
   },
 
   // Register: POST /api/users
@@ -140,7 +157,7 @@ export const authService = {
   // Upload image to backend
   uploadImage: async (imageAsset) => {
     const formData = new FormData();
-    
+
     // Convert the local image URI to a standard Blob object using XMLHttpRequest (reliable on both Web and Android file:// URIs)
     const blob = await new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
@@ -158,7 +175,7 @@ export const authService = {
 
     const mimeType = blob.type || 'image/jpeg';
     const fileExt = mimeType.split('/')[1] || 'jpeg';
-    
+
     formData.append('image', blob, `photo.${fileExt}`);
 
     const response = await fetch(`${BASE_URL}/api/upload`, {
@@ -197,7 +214,7 @@ export const restaurantService = {
 
 export const userService = {
   getUserByUsername: async (username) => {
-    return await apiRequest('/api/users'); 
+    return await apiRequest('/api/users');
   },
   getUserById: async (userId) => {
     return await apiRequest(`/api/users/${userId}`);
