@@ -3,14 +3,17 @@ import { View, Text, TouchableOpacity, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import styles from '../styles/HomeScreen.styles';
 import { Ionicons } from '@expo/vector-icons';
-import { categoryService, restaurantService } from '../services/api';
+import { categoryService, restaurantService, getLastViewedProduct } from '../services/api';
 import CategoryList from '../components/home/CategoryList';
 import RestaurantList from '../components/restaurant/RestaurantList';
+import RecommendedProducts from '../components/home/RecommendedProducts';
 
 export default function HomeScreen({ navigation, userSession }) {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [restaurants, setRestaurants] = useState([]);
+  const [recommendations, setRecommendations] = useState([]);
+  const [lastViewed, setLastViewed] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -23,6 +26,23 @@ export default function HomeScreen({ navigation, userSession }) {
         ]);
         setCategories(catsData || []);
         setRestaurants(restsData || []);
+
+        if (userSession?.id) {
+          let viewedProduct = await getLastViewedProduct(userSession.id);
+          
+          // --- זמני: כדי להוכיח שה-C++ וקובץ data.txt עובדים ---
+          // אם אין היסטוריה בטלפון החדש, נדמה שצפינו במוצר עם ה-ID הזה מהקובץ שלך
+          if (!viewedProduct) {
+            viewedProduct = { id: "6a3a699199a4047fd20b6832", name: "מוצר לדוגמה מ-data.txt" };
+          }
+          // -----------------------------------------------------------
+
+          if (viewedProduct) {
+            setLastViewed(viewedProduct);
+            const recsData = await restaurantService.getRecommendations(viewedProduct.id || viewedProduct._id).catch(() => []);
+            setRecommendations(recsData || []);
+          }
+        }
       } catch (err) {
         console.error("Failed to load home data", err);
       } finally {
@@ -30,7 +50,7 @@ export default function HomeScreen({ navigation, userSession }) {
       }
     };
     fetchData();
-  }, []);
+  }, [userSession?.id]);
 
   const displayedRestaurants = React.useMemo(() => {
     if (!restaurants) return [];
@@ -42,8 +62,15 @@ export default function HomeScreen({ navigation, userSession }) {
 
   const renderHeader = () => (
     <View style={{ marginBottom: 16 }}>
-      <Text style={styles.welcomeText}>Welcome, {userSession?.name || 'User'}!</Text>
+      <Text style={styles.welcomeText}>Welcome, {userSession?.name || userSession?.username || 'User'}!</Text>
       
+      {recommendations.length > 0 && (
+        <RecommendedProducts 
+          recommendations={recommendations} 
+          lastViewedProduct={lastViewed}
+        />
+      )}
+
       <CategoryList 
         categories={categories}
         selectedCategory={selectedCategory}

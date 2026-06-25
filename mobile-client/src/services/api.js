@@ -20,6 +20,23 @@ export const getUserSession = async () => {
   }
 };
 
+export const getLastViewedProduct = async (userId) => {
+  try {
+    const data = await AsyncStorage.getItem(`lastViewedProduct_${userId}`);
+    return data ? JSON.parse(data) : null;
+  } catch (e) {
+    return null;
+  }
+};
+
+export const setLastViewedProduct = async (userId, product) => {
+  try {
+    await AsyncStorage.setItem(`lastViewedProduct_${userId}`, JSON.stringify(product));
+  } catch (e) {
+    console.error('Failed to save last viewed product', e);
+  }
+};
+
 /**
  * Set the current user's session in AsyncStorage
  */
@@ -169,5 +186,17 @@ export const categoryService = {
 export const restaurantService = {
   getAll: async () => {
     return await apiRequest('/api/restaurants');
+  },
+  getRecommendations: async (productId) => {
+    return await apiRequest(`/api/restaurants/recommendations?productId=${productId}`);
+  }
+};
+
+export const userService = {
+  getUserByUsername: async (username) => {
+    return await apiRequest('/api/users'); 
+  },
+  getUserById: async (userId) => {
+    return await apiRequest(`/api/users/${userId}`);
   }
 };
