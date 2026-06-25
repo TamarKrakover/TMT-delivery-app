@@ -1,38 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { ActivityIndicator, View, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { getUserSession } from './src/services/api';
 import LoginScreen from './src/screens/LoginScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
+import RestaurantScreen from './src/screens/RestaurantScreen';
 import MainTabs from './src/navigation/MainTabs';
 import { COLORS } from './src/theme/theme';
 import { ThemeProvider } from './src/contexts/ThemeContext';
+import { AuthProvider, useAuth } from './src/contexts/AuthContext';
+import { CartProvider } from './src/contexts/CartContext';
 
 const Stack = createNativeStackNavigator();
 
-export default function App() {
-  const [loading, setLoading] = useState(true);
-  const [userSession, setUserSession] = useState(null);
-
-  useEffect(() => {
-    const checkSession = async () => {
-      const session = await getUserSession();
-      setUserSession(session);
-      setLoading(false);
-    };
-    checkSession();
-  }, []);
-
-  const handleLoginSuccess = (session) => {
-    setUserSession(session);
-  };
-
-  const handleLogout = () => {
-    setUserSession(null);
-  };
+function AppContent() {
+  const { currentUser, loading } = useAuth();
 
   if (loading) {
     return (
@@ -43,46 +27,36 @@ export default function App() {
   }
 
   return (
-    <ThemeProvider>
-      <NavigationContainer>
-        <StatusBar style="auto" />
+    <NavigationContainer>
+      <StatusBar style="auto" />
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {userSession ? (
+        {currentUser ? (
           // Authorized Stack
           <>
-            <Stack.Screen name="Main" initialParams={{ userSession }}>
-              {(props) => (
-                <MainTabs
-                  {...props}
-                />
-              )}
-            </Stack.Screen>
-            <Stack.Screen name="Profile">
-              {(props) => (
-                <ProfileScreen
-                  {...props}
-                  userSession={userSession}
-                  onLogout={handleLogout}
-                />
-              )}
-            </Stack.Screen>
+            <Stack.Screen name="Main" component={MainTabs} />
+            <Stack.Screen name="Profile" component={ProfileScreen} />
+            <Stack.Screen name="Restaurant" component={RestaurantScreen} />
           </>
         ) : (
           // Auth Stack
           <>
-            <Stack.Screen name="Login">
-              {(props) => (
-                <LoginScreen
-                  {...props}
-                  onLoginSuccess={handleLoginSuccess}
-                />
-              )}
-            </Stack.Screen>
+            <Stack.Screen name="Login" component={LoginScreen} />
             <Stack.Screen name="Register" component={RegisterScreen} />
           </>
         )}
       </Stack.Navigator>
     </NavigationContainer>
+  );
+}
+
+export default function App() {
+  return (
+    <ThemeProvider>
+      <AuthProvider>
+        <CartProvider>
+          <AppContent />
+        </CartProvider>
+      </AuthProvider>
     </ThemeProvider>
   );
 }
@@ -95,4 +69,3 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
   },
 });
-

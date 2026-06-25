@@ -44,10 +44,9 @@ export default function MainTabs({ route }) {
     >
       <Tab.Screen 
         name="HomeTab" 
+        component={HomeScreen} 
         options={{ title: 'Home' }}
-      >
-        {(props) => <HomeScreen {...props} userSession={userSession} />}
-      </Tab.Screen>
+      />
       
       <Tab.Screen 
         name="SearchTab" 
@@ -63,3 +62,4 @@ export default function MainTabs({ route }) {
     </Tab.Navigator>
   );
 }
+

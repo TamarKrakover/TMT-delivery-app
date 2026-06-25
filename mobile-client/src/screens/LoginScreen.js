@@ -11,13 +11,15 @@ import {
   Image
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { authService, setUserSession } from '../services/api';
+import { authService } from '../services/api';
 import InputField from '../components/InputField';
 import CustomButton from '../components/CustomButton';
 import styles from '../styles/LoginScreen.styles';
+import { useAuth } from '../contexts/AuthContext';
 
 
-export default function LoginScreen({ navigation, onLoginSuccess }) {
+export default function LoginScreen({ navigation }) {
+  const { login } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -44,14 +46,11 @@ export default function LoginScreen({ navigation, onLoginSuccess }) {
       setLoading(true);
       const res = await authService.login(username.trim(), password);
       
-      // Save session
-      const session = { id: res.id, username: username.trim() };
-      await setUserSession(session);
+      // Fetch full user details from backend using x-user-id
+      const fullUserData = await authService.getUserDetails(res.id, res.id);
       
-      // Trigger App.js update
-      if (onLoginSuccess) {
-        onLoginSuccess(session);
-      }
+      // Update global context session
+      await login(fullUserData);
     } catch (error) {
       Alert.alert('Login Failed', error.message || 'Invalid username or password');
     } finally {
