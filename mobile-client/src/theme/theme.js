@@ -33,7 +33,7 @@ export const darkTheme = {
   border: '#334155', // body.dark-mode --gray-200
   borderLight: '#0f172a', // body.dark-mode --gray-100
   card: '#1e293b',
-  navbarBg: 'rgba(30, 41, 59, 0.85)',
+  navbarBg: '#1e293b',
 };
 
 // Global Spacing & Sizes

@@ -6,8 +6,10 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { getUserSession } from './src/services/api';
 import LoginScreen from './src/screens/LoginScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
-import MainScreen from './src/screens/MainScreen';
+import ProfileScreen from './src/screens/ProfileScreen';
+import MainTabs from './src/navigation/MainTabs';
 import { COLORS } from './src/theme/theme';
+import { ThemeProvider } from './src/contexts/ThemeContext';
 
 const Stack = createNativeStackNavigator();
 
@@ -35,26 +37,36 @@ export default function App() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={COLORS.primary} />
+        <ActivityIndicator size="large" color={COLORS.primary || '#00c2e8'} />
       </View>
     );
   }
 
   return (
-    <NavigationContainer>
-      <StatusBar style="auto" />
+    <ThemeProvider>
+      <NavigationContainer>
+        <StatusBar style="auto" />
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {userSession ? (
           // Authorized Stack
-          <Stack.Screen name="Main">
-            {(props) => (
-              <MainScreen
-                {...props}
-                userSession={userSession}
-                onLogout={handleLogout}
-              />
-            )}
-          </Stack.Screen>
+          <>
+            <Stack.Screen name="Main" initialParams={{ userSession }}>
+              {(props) => (
+                <MainTabs
+                  {...props}
+                />
+              )}
+            </Stack.Screen>
+            <Stack.Screen name="Profile">
+              {(props) => (
+                <ProfileScreen
+                  {...props}
+                  userSession={userSession}
+                  onLogout={handleLogout}
+                />
+              )}
+            </Stack.Screen>
+          </>
         ) : (
           // Auth Stack
           <>
@@ -71,6 +83,7 @@ export default function App() {
         )}
       </Stack.Navigator>
     </NavigationContainer>
+    </ThemeProvider>
   );
 }
 
@@ -82,3 +95,4 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
   },
 });
+
