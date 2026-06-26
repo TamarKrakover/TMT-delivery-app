@@ -172,6 +172,7 @@ export default function HomeScreen({ navigation }) {
         categories={categories}
         selectedCategory={selectedCategory}
         onSelectCategory={setSelectedCategory}
+        totalRestaurants={restaurants.length}
       />
       <Text style={styles.subtitle}>Selected Category: {selectedCategory}</Text>
     </View>
@@ -233,8 +234,8 @@ export default function HomeScreen({ navigation }) {
         ) : (
           <RestaurantList
             restaurants={displayedRestaurants}
-            listHeaderComponent={renderHeader}
-            listFooterComponent={renderFooter}
+            listHeaderComponent={renderHeader()}
+            listFooterComponent={renderFooter()}
             onRestaurantPress={handleRestaurantPress}
           />
         )}

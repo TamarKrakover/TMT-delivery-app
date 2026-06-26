@@ -68,7 +68,7 @@ export default (theme) => StyleSheet.create({
     paddingVertical: SIZES.xl,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingBottom: SIZES.lg,
+    paddingBottom: SIZES.xs,
   },
   footerTitle: {
     ...FONTS.h3,
