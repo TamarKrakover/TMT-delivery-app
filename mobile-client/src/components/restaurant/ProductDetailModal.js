@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, Modal, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, Image, TouchableOpacity, Modal, StyleSheet, ScrollView, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useCart } from '../../contexts/CartContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -36,8 +36,8 @@ export default function ProductDetailModal({ visible, product, restaurant, onClo
   const displayImage = product.image || DEFAULT_PRODUCT_IMAGE;
   const imageUrl = displayImage.startsWith('http') ? displayImage : `${BASE_URL}${displayImage}`;
 
-  const handleAddToOrder = () => {
-    addToCart(product, restaurant);
+  const handleAddToOrder = async () => {
+    await addToCart(product, restaurant);
     onClose();
   };
 
@@ -48,13 +48,13 @@ export default function ProductDetailModal({ visible, product, restaurant, onClo
       visible={visible}
       onRequestClose={onClose}
     >
-      <View style={styles.overlay}>
-        <View style={styles.modalContainer}>
-          <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-            <Ionicons name="close" size={24} color={theme.text} />
-          </TouchableOpacity>
+        <View style={styles.overlay}>
+          <View style={styles.modalContainer}>
+            <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+              <Ionicons name="close" size={24} color={theme.text} />
+            </TouchableOpacity>
 
-          <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+            <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
             {product.image ? (
               <Image source={{ uri: imageUrl }} style={styles.productImage} />
             ) : (

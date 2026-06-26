@@ -19,6 +19,8 @@ export default function CartScreen({ navigation }) {
     cartCalculation,
     isCalculating,
     conflictItem,
+    successItem,
+    clearSuccess,
     updateQuantity,
     removeFromCart,
     clearCart,
@@ -193,12 +195,7 @@ export default function CartScreen({ navigation }) {
                 </Text>
               ) : null}
 
-              <View style={styles.summaryRow}>
-                <Text style={styles.summaryLabel}>Subtotal</Text>
-                <Text style={styles.summaryValue}>
-                  ₪{(cartCalculation.totalPrice || 0).toFixed(2)}
-                </Text>
-              </View>
+
 
               <View style={styles.totalRow}>
                 <Text style={styles.totalLabel}>Total Sum</Text>
@@ -250,6 +247,31 @@ export default function CartScreen({ navigation }) {
               </TouchableOpacity>
               <TouchableOpacity style={styles.conflictConfirm} onPress={confirmConflict}>
                 <Text style={styles.conflictConfirmText}>Confirm</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Success Modal Overlay */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={successItem !== null}
+        onRequestClose={clearSuccess}
+      >
+        <View style={styles.conflictOverlay}>
+          <View style={styles.conflictContainer}>
+            <View style={styles.conflictHeader}>
+              <Ionicons name="checkmark-circle" size={28} color={COLORS.success || '#10b981'} />
+              <Text style={styles.conflictTitle}>Added to Cart</Text>
+            </View>
+            <Text style={styles.conflictText}>
+              <Text style={{ fontWeight: 'bold' }}>{successItem?.name}</Text> has been added to your order.
+            </Text>
+            <View style={styles.conflictButtonsRow}>
+              <TouchableOpacity style={[styles.conflictConfirm, { backgroundColor: COLORS.primary }]} onPress={clearSuccess}>
+                <Text style={styles.conflictConfirmText}>Awesome</Text>
               </TouchableOpacity>
             </View>
           </View>

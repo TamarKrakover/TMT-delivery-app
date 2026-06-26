@@ -17,6 +17,8 @@ const CartContext = createContext({
   confirmConflict: async () => {},
   cancelConflict: async () => {},
   fetchCart: async () => {},
+  successItem: null,
+  clearSuccess: () => {},
 });
 
 export const useCart = () => useContext(CartContext);
@@ -28,9 +30,19 @@ export const CartProvider = ({ children }) => {
   const [cartRestaurant, setCartRestaurant] = useState(null);
   const [activeOrderId, setActiveOrderId] = useState(null);
   const [conflictItem, setConflictItem] = useState(null);
+  const [successItem, setSuccessItem] = useState(null);
   const [cartCalculation, setCartCalculation] = useState({ totalPrice: 0, items: [] });
   const [isCalculating, setIsCalculating] = useState(false);
   const [checkoutTrigger, setCheckoutTrigger] = useState(0);
+
+  const triggerSuccess = (product) => {
+    setSuccessItem(product);
+    setTimeout(() => {
+      setSuccessItem(null);
+    }, 1500);
+  };
+
+  const clearSuccess = () => setSuccessItem(null);
 
   const fetchCart = useCallback(async () => {
     if (!currentUser) {
@@ -164,7 +176,7 @@ export const CartProvider = ({ children }) => {
   const addToCart = async (product, restaurant) => {
     if (!currentUser) {
       Alert.alert("Authentication Required", "Please sign in to add items to your cart.");
-      return;
+      return false;
     }
 
     const restId = restaurant.id || restaurant._id;
@@ -175,12 +187,13 @@ export const CartProvider = ({ children }) => {
       setCartRestaurant({ id: restId, name: restaurant.name });
       setCartItems(newItems);
       await syncCartToServer(restId, newItems);
-      return;
+      triggerSuccess(product);
+      return true;
     }
 
     if (restId !== cartRestaurant.id) {
       setConflictItem({ product, restaurant });
-      return;
+      return false;
     }
 
     const newItems = [...cartItems];
@@ -192,6 +205,8 @@ export const CartProvider = ({ children }) => {
     }
     setCartItems(newItems);
     await syncCartToServer(cartRestaurant.id, newItems);
+    triggerSuccess(product);
+    return true;
   };
 
   const removeFromCart = async (productId) => {
@@ -280,6 +295,7 @@ export const CartProvider = ({ children }) => {
         }
         const newOrder = await orderService.create(restId, [prodId]);
         setActiveOrderId(newOrder.id || newOrder._id);
+        triggerSuccess(product);
       } catch (e) {
         console.error("Failed to switch cart", e);
         fetchCart();
@@ -299,6 +315,8 @@ export const CartProvider = ({ children }) => {
         cartCalculation,
         isCalculating,
         conflictItem,
+        successItem,
+        clearSuccess,
         addToCart,
         removeFromCart,
         updateQuantity,
