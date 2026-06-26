@@ -204,11 +204,61 @@ export const restaurantService = {
   getAll: async () => {
     return await apiRequest('/api/restaurants');
   },
+  getById: async (id) => {
+    return await apiRequest(`/api/restaurants/${id}`);
+  },
   getRecommendations: async (productId) => {
     return await apiRequest(`/api/restaurants/recommendations?productId=${productId}`);
   },
   search: async (query) => {
     return await apiRequest(`/api/search/${query}`);
+  }
+};
+
+export const productService = {
+  getByRestaurantId: async (restaurantId) => {
+    return await apiRequest(`/api/restaurants/${restaurantId}/products`);
+  },
+  getById: async (restaurantId, productId) => {
+    return await apiRequest(`/api/restaurants/${restaurantId}/products/${productId}`);
+  },
+  getByGlobalId: async (productId) => {
+    return await apiRequest(`/api/products/${productId}`);
+  },
+  getRecommendations: async (userId, productId) => {
+    return await apiRequest(`/api/recommendations/${userId}/${productId}`);
+  }
+};
+
+export const orderService = {
+  create: async (restaurantId, productIds) => {
+    return await apiRequest('/api/orders', {
+      method: 'POST',
+      body: JSON.stringify({ restaurantId, productIds })
+    });
+  },
+  getAll: async () => {
+    return await apiRequest('/api/orders');
+  },
+  getById: async (id) => {
+    return await apiRequest(`/api/orders/${id}`);
+  },
+  update: async (id, data) => {
+    return await apiRequest(`/api/orders/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data)
+    });
+  },
+  delete: async (id) => {
+    return await apiRequest(`/api/orders/${id}`, {
+      method: 'DELETE'
+    });
+  },
+  calculate: async (restaurantId, productIds) => {
+    return await apiRequest('/api/orders/calculate', {
+      method: 'POST',
+      body: JSON.stringify({ restaurantId, productIds })
+    });
   }
 };
 
@@ -220,3 +270,4 @@ export const userService = {
     return await apiRequest(`/api/users/${userId}`);
   }
 };
+

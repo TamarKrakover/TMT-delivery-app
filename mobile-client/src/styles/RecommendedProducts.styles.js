@@ -58,5 +58,11 @@ export default (theme) => StyleSheet.create({
     color: theme.textSecondary,
     fontSize: 10,
     marginTop: 2,
+  },
+  emptyText: {
+    ...FONTS.body2,
+    color: theme.textSecondary,
+    paddingHorizontal: SIZES.md,
+    fontStyle: 'italic',
   }
 });

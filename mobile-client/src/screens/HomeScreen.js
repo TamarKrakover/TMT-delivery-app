@@ -1,19 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Image, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, Image, ScrollView, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import createStyles from '../styles/HomeScreen.styles';
 import { useTheme } from '../contexts/ThemeContext';
+import { useAuth } from '../contexts/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
-import { categoryService, restaurantService, getLastViewedProduct, userService } from '../services/api';
+import { categoryService, restaurantService, productService, userService, BASE_URL } from '../services/api';
 import { calculateDistance } from '../utils/distance';
 import CategoryList from '../components/home/CategoryList';
 import RestaurantList from '../components/restaurant/RestaurantList';
 import RestaurantCard from '../components/restaurant/RestaurantCard';
 import RecommendedProducts from '../components/home/RecommendedProducts';
+import ProductDetailModal from '../components/restaurant/ProductDetailModal';
 
-export default function HomeScreen({ navigation, userSession }) {
+export default function HomeScreen({ navigation }) {
   const { theme, isDark, toggleTheme } = useTheme();
   const styles = React.useMemo(() => createStyles(theme), [theme]);
+
+  const { currentUser } = useAuth();
 
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -23,87 +27,120 @@ export default function HomeScreen({ navigation, userSession }) {
   const [fullUser, setFullUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const [catsData, restsData] = await Promise.all([
-          categoryService.getAll().catch(() => []),
-          restaurantService.getAll().catch(() => [])
-        ]);
-        setCategories(catsData || []);
-        setRestaurants(restsData || []);
+  // States for tapping recommendations
+  const [selectedRecProduct, setSelectedRecProduct] = useState(null);
+  const [selectedRecRestaurant, setSelectedRecRestaurant] = useState(null);
+  const [recModalVisible, setRecModalVisible] = useState(false);
 
-        if (userSession?.id) {
-          const user = await userService.getUserById(userSession.id).catch(() => null);
-          setFullUser(user);
+  const fetchHomeData = async () => {
+    try {
+      setLoading(true);
+      const [catsData, restsData] = await Promise.all([
+        categoryService.getAll().catch(() => []),
+        restaurantService.getAll().catch(() => [])
+      ]);
+      setCategories(catsData || []);
+      setRestaurants(restsData || []);
 
-          let viewedProduct = await getLastViewedProduct(userSession.id);
+      if (currentUser?.id) {
+        const user = await userService.getUserById(currentUser.id).catch(() => null);
+        setFullUser(user);
 
-
-          if (viewedProduct) {
+        if (user?.lastViewedProduct) {
+          try {
+            // Load details of the last viewed product
+            const viewedProduct = await productService.getByGlobalId(user.lastViewedProduct);
             setLastViewed(viewedProduct);
-            const recsData = await restaurantService.getRecommendations(viewedProduct.id || viewedProduct._id).catch(() => []);
-            setRecommendations(recsData || []);
+            
+            if (viewedProduct) {
+              // Fetch recommendations based on user interaction profile
+              const recsData = await productService.getRecommendations(currentUser.id, user.lastViewedProduct).catch(() => []);
+              setRecommendations(recsData || []);
+            }
+          } catch (e) {
+            console.error("Failed to load recommendation details:", e);
           }
+        } else {
+          setLastViewed(null);
+          setRecommendations([]);
         }
-      } catch (err) {
-        console.error("Failed to load home data", err);
-      } finally {
-        setLoading(false);
+      } else {
+        setFullUser(null);
+        setLastViewed(null);
+        setRecommendations([]);
       }
-    };
-    fetchData();
-  }, [userSession?.id]);
+    } catch (err) {
+      console.error("Failed to load home data:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchHomeData();
+  }, [currentUser?.id, currentUser?.lastViewedProduct]);
 
   const nearbyRestaurants = React.useMemo(() => {
     if (!restaurants || !fullUser?.location) return [];
-    
+
     return restaurants.map(r => {
       const dist = r.location ? calculateDistance(fullUser.location, r.location) : null;
       return { ...r, distance: dist };
     })
-    .filter(r => r.distance !== null && r.distance <= 5)
-    .sort((a, b) => a.distance - b.distance);
+      .filter(r => r.distance !== null && r.distance <= 5)
+      .sort((a, b) => a.distance - b.distance);
   }, [restaurants, fullUser]);
 
   const displayedRestaurants = React.useMemo(() => {
     if (!restaurants) return [];
-    
+
     // Base mapping to attach distance
     const withDistance = restaurants.map(r => {
       const dist = (fullUser?.location && r.location) ? calculateDistance(fullUser.location, r.location) : null;
       return { ...r, distance: dist };
     });
 
-    // Default: Filter by category (no distance sort)
-    const filtered = selectedCategory === 'All' 
-      ? withDistance 
+    // Filter by category
+    const filtered = selectedCategory === 'All'
+      ? withDistance
       : withDistance.filter(r => r.category && r.category.toLowerCase() === selectedCategory.toLowerCase());
-      
+
     return filtered;
   }, [restaurants, selectedCategory, fullUser]);
 
+  const handleRestaurantPress = (restaurant) => {
+    navigation.navigate('Restaurant', { restaurant });
+  };
+
+  const handleRecProductPress = (product, restaurant) => {
+    setSelectedRecProduct(product);
+    setSelectedRecRestaurant(restaurant);
+    setRecModalVisible(true);
+  };
+
   const renderHeader = () => (
     <View style={{ marginBottom: 16 }}>
-      <Text style={styles.welcomeText}>Welcome, {userSession?.name || userSession?.username || 'User'}!</Text>
-      
-      {recommendations.length > 0 && (
-        <RecommendedProducts 
-          recommendations={recommendations} 
+      <Text style={styles.welcomeText}>
+        Welcome, {currentUser?.name || currentUser?.username || 'User'}!
+      </Text>
+
+      {currentUser && (
+        <RecommendedProducts
+          recommendations={recommendations}
           lastViewedProduct={lastViewed}
+          onPress={handleRecProductPress}
         />
       )}
 
       {nearbyRestaurants.length > 0 && (
         <View style={{ marginTop: 24, marginBottom: 20 }}>
           <Text style={styles.sectionTitle}>Nearby Restaurants</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingLeft: 16 }}>
             {nearbyRestaurants.map((restaurant) => (
               <View key={restaurant.id || restaurant._id} style={{ width: 250, marginRight: 15 }}>
-                <RestaurantCard 
-                  restaurant={restaurant} 
-                  onPress={(r) => console.log('Pressed', r.name)} 
+                <RestaurantCard
+                  restaurant={restaurant}
+                  onPress={handleRestaurantPress}
                 />
               </View>
             ))}
@@ -111,7 +148,7 @@ export default function HomeScreen({ navigation, userSession }) {
         </View>
       )}
 
-      <CategoryList 
+      <CategoryList
         categories={categories}
         selectedCategory={selectedCategory}
         onSelectCategory={setSelectedCategory}
@@ -130,19 +167,19 @@ export default function HomeScreen({ navigation, userSession }) {
           <TouchableOpacity onPress={toggleTheme} style={{ marginRight: 15 }}>
             <Ionicons name={isDark ? 'sunny' : 'moon'} size={24} color={theme.text} />
           </TouchableOpacity>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.profileButton}
             onPress={() => navigation.navigate('Profile')}
           >
-            {userSession?.profilePicture ? (
-              <Image 
-                source={{ uri: userSession.profilePicture }} 
-                style={styles.profilePic} 
+            {currentUser?.profilePic || currentUser?.profilePicture ? (
+              <Image
+                source={{ uri: currentUser.profilePic?.startsWith('http') ? currentUser.profilePic : `${BASE_URL}${currentUser.profilePic || currentUser.profilePicture}` }}
+                style={styles.profilePic}
               />
             ) : (
               <View style={styles.avatarPlaceholder}>
                 <Text style={styles.avatarText}>
-                  {userSession?.name?.charAt(0)?.toUpperCase() || 'U'}
+                  {currentUser?.name?.charAt(0)?.toUpperCase() || 'U'}
                 </Text>
               </View>
             )}
@@ -151,16 +188,29 @@ export default function HomeScreen({ navigation, userSession }) {
       </View>
 
       <View style={styles.content}>
-        <RestaurantList 
-
-restaurants={displayedRestaurants}
-          listHeaderComponent={renderHeader}
-          onRestaurantPress={(restaurant) => {
-            // We will navigate to Restaurant detail screen later
-            console.log('Pressed', restaurant.name);
-          }}
-        />
+        {loading && restaurants.length === 0 ? (
+          <ActivityIndicator size="large" color={theme.text} />
+        ) : (
+          <RestaurantList
+            restaurants={displayedRestaurants}
+            listHeaderComponent={renderHeader}
+            onRestaurantPress={handleRestaurantPress}
+          />
+        )}
       </View>
+
+      <ProductDetailModal
+        visible={recModalVisible}
+        product={selectedRecProduct}
+        restaurant={selectedRecRestaurant}
+        onClose={() => {
+          setRecModalVisible(false);
+          setSelectedRecProduct(null);
+          setSelectedRecRestaurant(null);
+          // Refresh home screen to load any updated recommendations if details triggered a change
+          fetchHomeData();
+        }}
+      />
     </SafeAreaView>
   );
 }

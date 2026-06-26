@@ -49,13 +49,18 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/recommendations', recommendationRoutes);
 
 const ProductModel = require('./src/models/ProductModel');
-app.get('/api/products/:productId', (req, res) => {
-    const { productId } = req.params;
-    const product = ProductModel.findByGlobalId(productId);
-    if (!product) {
-        return res.status(404).json({ error: 'Product not found' });
+app.get('/api/products/:productId', async (req, res) => {
+    try {
+        const { productId } = req.params;
+        const product = await ProductModel.findByGlobalId(productId);
+        if (!product) {
+            return res.status(404).json({ error: 'Product not found' });
+        }
+        res.status(200).json(product);
+    } catch (err) {
+        console.error('Error fetching product by global ID:', err);
+        res.status(500).json({ error: 'Internal server error' });
     }
-    res.status(200).json(product);
 });
 
 // Catch-all route for undefined endpoints
