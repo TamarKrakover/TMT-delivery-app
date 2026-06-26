@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Image, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, Image, ScrollView, ActivityIndicator, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import createStyles from '../styles/HomeScreen.styles';
 import { useTheme } from '../contexts/ThemeContext';
@@ -157,6 +157,26 @@ export default function HomeScreen({ navigation }) {
     </View>
   );
 
+  const renderFooter = () => (
+    <View style={styles.footerContainer}>
+      <Ionicons name="restaurant" size={32} color={theme.borderDark || theme.border} />
+      <Text style={styles.footerTitle}>You've reached the end!</Text>
+      <Text style={styles.footerText}> </Text>
+      <Text style={styles.footerText}>© 2026 TMT Delivery</Text>
+      <Text style={styles.footerText}>Made with ❤️ for Advanced Programming</Text>
+      <Text style={[styles.footerText, { marginTop: 8 }]}>Images by Magnific & Unsplash:</Text>
+      <View style={{ flexDirection: 'row', marginTop: 2 }}>
+        <TouchableOpacity onPress={() => Linking.openURL('https://www.magnific.com/')}>
+          <Text style={[styles.footerText, { color: '#00c2e8', textDecorationLine: 'underline' }]}>magnific.com</Text>
+        </TouchableOpacity>
+        <Text style={styles.footerText}> | </Text>
+        <TouchableOpacity onPress={() => Linking.openURL('https://unsplash.com/')}>
+          <Text style={[styles.footerText, { color: '#00c2e8', textDecorationLine: 'underline' }]}>unsplash.com</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
       <View style={styles.header}>
@@ -194,6 +214,7 @@ export default function HomeScreen({ navigation }) {
           <RestaurantList
             restaurants={displayedRestaurants}
             listHeaderComponent={renderHeader}
+            listFooterComponent={renderFooter}
             onRestaurantPress={handleRestaurantPress}
           />
         )}
