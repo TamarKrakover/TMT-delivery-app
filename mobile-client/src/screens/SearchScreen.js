@@ -7,6 +7,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { restaurantService, userService } from '../services/api';
 import { calculateDistance } from '../utils/distance';
 import RestaurantList from '../components/restaurant/RestaurantList';
+import ProductDetailModal from '../components/restaurant/ProductDetailModal';
 import { COLORS } from '../theme/theme';
 
 export default function SearchScreen({ navigation, userSession }) {
@@ -21,6 +22,10 @@ export default function SearchScreen({ navigation, userSession }) {
   const [activeTab, setActiveTab] = useState('restaurants'); // 'restaurants' or 'products'
   const [restaurantDict, setRestaurantDict] = useState({});
   
+  // Product modal state
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+
   // Local pagination
   const [visibleCount, setVisibleCount] = useState(10);
 
@@ -183,8 +188,13 @@ export default function SearchScreen({ navigation, userSession }) {
         ) : (
           <RestaurantList 
             restaurants={displayedItems}
-            onRestaurantPress={(restaurant) => {
-              // Navigate to restaurant details later
+            onRestaurantPress={(item) => {
+              if (activeTab === 'restaurants') {
+                navigation.navigate('Restaurant', { restaurant: item });
+              } else {
+                setSelectedProduct(item);
+                setModalVisible(true);
+              }
             }}
             listHeaderComponent={() => (
               displayedItems.length === 0 && !loading ? (
@@ -204,6 +214,16 @@ export default function SearchScreen({ navigation, userSession }) {
           />
         )}
       </View>
+
+      <ProductDetailModal
+        visible={modalVisible}
+        product={selectedProduct}
+        restaurant={selectedProduct ? { id: selectedProduct.restaurantId, name: selectedProduct.restaurantName } : null}
+        onClose={() => {
+          setModalVisible(false);
+          setSelectedProduct(null);
+        }}
+      />
     </SafeAreaView>
   );
 }

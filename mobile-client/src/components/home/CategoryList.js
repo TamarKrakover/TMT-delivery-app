@@ -4,7 +4,7 @@ import createStyles from '../../styles/CategoryList.styles';
 import { useTheme } from '../../contexts/ThemeContext';
 import { BASE_URL } from '../../services/api';
 
-export default function CategoryList({ categories, selectedCategory, onSelectCategory }) {
+export default function CategoryList({ categories, selectedCategory, onSelectCategory, totalRestaurants }) {
   const { theme } = useTheme();
   const styles = React.useMemo(() => createStyles(theme), [theme]);
 
@@ -14,7 +14,7 @@ export default function CategoryList({ categories, selectedCategory, onSelectCat
 
   // Prepend the "All" category automatically like in the web app
   const displayCategories = [
-    { name: 'All', image: '/api/uploads/categories/all.webp' },
+    { name: 'All', image: '/api/uploads/categories/all.webp', count: totalRestaurants || 0 },
     ...categories
   ];
 
@@ -38,30 +38,39 @@ export default function CategoryList({ categories, selectedCategory, onSelectCat
           return (
             <TouchableOpacity 
               key={index} 
-              style={styles.categoryItem}
+              style={[
+                styles.categoryItem,
+                isSelected && styles.categoryItemSelected
+              ]}
               onPress={() => onSelectCategory(cat.name)}
               activeOpacity={0.7}
             >
-              <View style={[
-                styles.imageContainer, 
-                isSelected && styles.imageContainerSelected
-              ]}>
+              <View style={styles.imageContainer}>
                 {cat.image ? (
                   <Image 
                     source={{ uri: imageUrl }} 
                     style={styles.categoryImage} 
+                    resizeMode="cover"
                     defaultSource={require('../../../assets/icon.png')}
                   />
                 ) : (
-                  <Text style={styles.categoryName}>{cat.name.charAt(0)}</Text>
+                  <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                    <Text style={{ fontSize: 24, color: theme.textSecondary }}>{cat.name.charAt(0)}</Text>
+                  </View>
                 )}
               </View>
-              <Text style={[
-                styles.categoryName,
-                isSelected && styles.categoryNameSelected
-              ]}>
-                {cat.name}
-              </Text>
+              
+              <View style={styles.infoContainer}>
+                <Text style={[
+                  styles.categoryName,
+                  isSelected && styles.categoryNameSelected
+                ]} numberOfLines={1}>
+                  {cat.name}
+                </Text>
+                <Text style={styles.categoryPlaces}>
+                  {cat.count !== undefined ? `${cat.count} places` : 'Various'}
+                </Text>
+              </View>
             </TouchableOpacity>
           );
         })}

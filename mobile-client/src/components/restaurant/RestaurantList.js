@@ -8,13 +8,8 @@ export default function RestaurantList({ restaurants, onRestaurantPress, listHea
   const { theme } = useTheme();
   const styles = React.useMemo(() => createStyles(theme), [theme]);
   
-  if (!restaurants || restaurants.length === 0) {
-    return (
-      <View style={styles.emptyContainer}>
-        {listHeaderComponent && listHeaderComponent()}
-      </View>
-    );
-  }
+  // Let FlatList handle the empty state so headers/footers still render correctly
+  // without crashing if listHeaderComponent is a React Element instead of a function.
 
   return (
     <FlatList
@@ -30,6 +25,13 @@ export default function RestaurantList({ restaurants, onRestaurantPress, listHea
       showsVerticalScrollIndicator={false}
       ListHeaderComponent={listHeaderComponent}
       ListFooterComponent={listFooterComponent}
+      ListEmptyComponent={
+        <View style={styles.emptyListContainer}>
+          <Text style={styles.emptyListText}>
+            No restaurants found
+          </Text>
+        </View>
+      }
     />
   );
 }
@@ -38,14 +40,15 @@ const createStyles = (theme) => StyleSheet.create({
   listContent: {
     paddingBottom: SIZES.xl,
   },
-  emptyContainer: {
-    flex: 1,
-    paddingBottom: SIZES.xl,
+  emptyListContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 60,
+    paddingHorizontal: 20,
   },
-  emptyText: {
+  emptyListText: {
     ...FONTS.body1,
     color: theme.textSecondary,
     textAlign: 'center',
-    marginTop: SIZES.xl,
   }
 });

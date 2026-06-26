@@ -3,6 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../theme/theme';
 import { useTheme } from '../contexts/ThemeContext';
+import { useCart } from '../contexts/CartContext';
 
 // Screens
 import HomeScreen from '../screens/HomeScreen';
@@ -15,6 +16,10 @@ export default function MainTabs({ route }) {
   // Pass down userSession to children if needed
   const { userSession } = route.params || {};
   const { theme } = useTheme();
+  const { cartItems } = useCart();
+
+  // Calculate total items in cart
+  const cartItemCount = cartItems?.reduce((total, item) => total + (item.quantity || 1), 0) || 0;
 
   return (
     <Tab.Navigator
@@ -58,7 +63,11 @@ export default function MainTabs({ route }) {
       <Tab.Screen 
         name="CartTab" 
         component={CartScreen} 
-        options={{ title: 'Cart' }} 
+        options={{ 
+          title: 'Cart',
+          tabBarBadge: cartItemCount > 0 ? cartItemCount : null,
+          tabBarBadgeStyle: { backgroundColor: COLORS.primary }
+        }} 
       />
     </Tab.Navigator>
   );

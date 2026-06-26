@@ -63,5 +63,22 @@ export default (theme) => StyleSheet.create({
     color: theme.text,
     paddingHorizontal: SIZES.md,
     marginBottom: SIZES.sm,
+  },
+  footerContainer: {
+    paddingVertical: SIZES.xl,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingBottom: SIZES.xs,
+  },
+  footerTitle: {
+    ...FONTS.h3,
+    color: theme.textSecondary,
+    fontWeight: 'bold',
+    marginTop: SIZES.sm,
+  },
+  footerText: {
+    ...FONTS.body2,
+    color: theme.textSecondary,
+    marginTop: 2,
   }
 });
