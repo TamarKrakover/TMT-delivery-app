@@ -101,7 +101,7 @@ export default (theme) => StyleSheet.create({
     marginBottom: SIZES.sm,
   },
   listContent: {
-    paddingBottom: 100, // Increased padding to prevent bottom cutoff
+    paddingBottom: SIZES.xl,
   },
   productCard: {
     flexDirection: 'row',

@@ -124,6 +124,26 @@ export default function HomeScreen({ navigation }) {
         Welcome, {currentUser?.name || currentUser?.username || 'User'}!
       </Text>
 
+      {currentUser && (currentUser.role === 'owner' || currentUser.isAdmin) && (
+        <TouchableOpacity 
+          style={{ 
+            backgroundColor: theme.primary || '#3b82f6', 
+            flexDirection: 'row', 
+            alignItems: 'center', 
+            padding: 12, 
+            borderRadius: 8, 
+            marginTop: 16,
+            marginBottom: 8,
+            justifyContent: 'center',
+            marginHorizontal: 4
+          }}
+          onPress={() => navigation.navigate('MyRestaurants')}
+        >
+          <Ionicons name="restaurant-outline" size={20} color="#ffffff" style={{ marginRight: 8 }} />
+          <Text style={{ color: '#ffffff', fontWeight: 'bold', fontSize: 16 }}>Manage My Restaurants</Text>
+        </TouchableOpacity>
+      )}
+
       {currentUser && (
         <RecommendedProducts
           recommendations={recommendations}

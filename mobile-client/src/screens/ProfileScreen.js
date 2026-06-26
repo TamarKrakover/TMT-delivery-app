@@ -6,9 +6,9 @@ import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { orderService, restaurantService, productService, BASE_URL } from '../services/api';
 import createStyles from '../styles/ProfileScreen.styles';
-import { COLORS } from '../theme/theme';
+import { COLORS, SIZES } from '../theme/theme';
 
-export default function ProfileScreen({ onLogout }) {
+export default function ProfileScreen({ navigation, onLogout }) {
   const { theme } = useTheme();
   const styles = React.useMemo(() => createStyles(theme), [theme]);
 
