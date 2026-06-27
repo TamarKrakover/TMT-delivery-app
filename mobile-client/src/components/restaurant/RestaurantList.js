@@ -1,7 +1,7 @@
 import React from 'react';
-import { View, FlatList, Text, StyleSheet } from 'react-native';
+import { View, FlatList, Text } from 'react-native';
 import RestaurantCard from './RestaurantCard';
-import { SIZES, FONTS } from '../../theme/theme';
+import createStyles from '../../styles/RestaurantList.styles';
 import { useTheme } from '../../contexts/ThemeContext';
 
 export default function RestaurantList({ restaurants, onRestaurantPress, listHeaderComponent, listFooterComponent }) {
@@ -35,20 +35,3 @@ export default function RestaurantList({ restaurants, onRestaurantPress, listHea
     />
   );
 }
-
-const createStyles = (theme) => StyleSheet.create({
-  listContent: {
-    paddingBottom: SIZES.xl,
-  },
-  emptyListContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 60,
-    paddingHorizontal: 20,
-  },
-  emptyListText: {
-    ...FONTS.body1,
-    color: theme.textSecondary,
-    textAlign: 'center',
-  }
-});
