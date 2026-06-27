@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import MyRestaurantsScreenView from '../styles/MyRestaurantsScreen.styles';
 import { useAuth } from '../contexts/AuthContext';
 import { restaurantService } from '../services/api';
@@ -13,11 +14,7 @@ export default function MyRestaurantsScreen({ navigation }) {
   // Modal open/close state
   const [modalVisible, setModalVisible] = useState(false);
 
-  useEffect(() => {
-    fetchMyRestaurants();
-  }, [currentUser]);
-
-  const fetchMyRestaurants = async () => {
+  const fetchMyRestaurants = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -33,7 +30,13 @@ export default function MyRestaurantsScreen({ navigation }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentUser]);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchMyRestaurants();
+    }, [fetchMyRestaurants])
+  );
 
   const handleRestaurantPress = (restaurant) => {
     navigation.navigate('Restaurant', { restaurantId: restaurant.id || restaurant._id });

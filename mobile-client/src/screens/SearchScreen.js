@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -42,20 +43,25 @@ export default function SearchScreen({ navigation, userSession }) {
       }
     };
     fetchUser();
-
-    // Fetch all restaurants to build a dictionary for product mappings
-    const fetchRestaurantsForMapping = async () => {
-      try {
-        const allRests = await restaurantService.getAll();
-        const dict = {};
-        allRests.forEach(r => { dict[r.id] = r.name; });
-        setRestaurantDict(dict);
-      } catch (e) {
-        console.error("Failed to fetch restaurants for mapping", e);
-      }
-    };
-    fetchRestaurantsForMapping();
   }, [userSession]);
+
+  // Fetch all restaurants to build a dictionary for product mappings
+  const fetchRestaurantsForMapping = useCallback(async () => {
+    try {
+      const allRests = await restaurantService.getAll();
+      const dict = {};
+      allRests.forEach(r => { dict[r.id] = r.name; });
+      setRestaurantDict(dict);
+    } catch (e) {
+      console.error("Failed to fetch restaurants for mapping", e);
+    }
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchRestaurantsForMapping();
+    }, [fetchRestaurantsForMapping])
+  );
 
   // Main search logic
   useEffect(() => {

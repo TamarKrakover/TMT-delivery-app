@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { View, Text, TouchableOpacity, Image, ScrollView, ActivityIndicator, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import createStyles from '../styles/HomeScreen.styles';
@@ -32,7 +33,7 @@ export default function HomeScreen({ navigation }) {
   const [selectedRecRestaurant, setSelectedRecRestaurant] = useState(null);
   const [recModalVisible, setRecModalVisible] = useState(false);
 
-  const fetchHomeData = async () => {
+  const fetchHomeData = useCallback(async () => {
     try {
       setLoading(true);
       const [catsData, restsData] = await Promise.all([
@@ -74,11 +75,13 @@ export default function HomeScreen({ navigation }) {
     } finally {
       setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    fetchHomeData();
   }, [currentUser?.id, currentUser?.lastViewedProduct]);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchHomeData();
+    }, [fetchHomeData])
+  );
 
   const nearbyRestaurants = React.useMemo(() => {
     if (!restaurants || !fullUser?.location) return [];
