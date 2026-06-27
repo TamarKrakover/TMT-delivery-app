@@ -62,5 +62,16 @@ export default (theme) => StyleSheet.create({
     ...FONTS.caption,
     color: COLORS.primary,
     fontWeight: 'bold',
+  },
+  priceBadge: {
+    backgroundColor: theme.primary,
+  },
+  priceBadgeText: {
+    fontWeight: 'bold',
+  },
+  restaurantNameText: {
+    ...FONTS.body2,
+    color: theme.primary,
+    marginBottom: 2,
   }
 });
