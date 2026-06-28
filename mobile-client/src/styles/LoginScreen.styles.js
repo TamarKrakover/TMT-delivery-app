@@ -10,15 +10,16 @@ export default StyleSheet.create({
     flex: 1,
   },
   inner: {
-    flex: 1,
+    flexGrow: 1,
     padding: SIZES.lg,
-    paddingBottom: 40,
+    paddingBottom: 20,
     justifyContent: 'space-between',
     alignItems: 'stretch',
   },
   headerContainer: {
     alignItems: 'center',
-    marginTop: 60,
+    marginTop: 30,
+    marginBottom: SIZES.sm,
   },
   logoImage: {
     width: 120,
@@ -37,9 +38,7 @@ export default StyleSheet.create({
     textAlign: 'center',
   },
   formContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    marginVertical: SIZES.xl,
+    marginVertical: SIZES.md,
   },
   footerContainer: {
     flexDirection: 'row',

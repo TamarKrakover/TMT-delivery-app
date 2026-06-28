@@ -15,6 +15,9 @@ import { authService } from '../services/api';
 import InputField from '../components/InputField';
 import CustomButton from '../components/CustomButton';
 import styles from '../styles/RegisterScreen.styles';
+import CustomAlertModal from '../components/CustomAlertModal';
+import { Ionicons } from '@expo/vector-icons';
+import { COLORS, SIZES } from '../theme/theme';
 
 export default function RegisterScreen({ navigation }) {
   const [username, setUsername] = useState('');
@@ -24,7 +27,21 @@ export default function RegisterScreen({ navigation }) {
   const [lat, setLat] = useState('');
   const [lng, setLng] = useState('');
   const [imageAsset, setImageAsset] = useState(null);
+  const [role, setRole] = useState('customer');
   const [loading, setLoading] = useState(false);
+
+  // Custom alert states
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertTitle, setAlertTitle] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertButtons, setAlertButtons] = useState([]);
+
+  const showAlert = (title, message, buttons = []) => {
+    setAlertTitle(title);
+    setAlertMessage(message);
+    setAlertButtons(buttons);
+    setAlertVisible(true);
+  };
 
   // Field interaction tracking
   const [usernameTouched, setUsernameTouched] = useState(false);
@@ -54,44 +71,51 @@ export default function RegisterScreen({ navigation }) {
     isNameValid &&
     isPasswordValid &&
     isConfirmPasswordValid &&
-    isImageValid &&
     isLatValid &&
     isLngValid;
 
   const pickImageFromGallery = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Error', 'Gallery permission is required to pick an image');
-      return;
-    }
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        showAlert('Error', 'Gallery permission is required to pick an image');
+        return;
+      }
 
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.7,
-    });
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: false,
+        quality: 0.7,
+      });
 
-    if (!result.canceled) {
-      setImageAsset(result.assets[0]);
+      if (!result.canceled) {
+        setImageAsset(result.assets[0]);
+      }
+    } catch (err) {
+      console.error('Gallery picker error:', err);
+      showAlert('Error', 'Failed to pick image. Please try again.');
     }
   };
 
   const takePhotoWithCamera = async () => {
-    const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Error', 'Camera permission is required to take a photo');
-      return;
-    }
+    try {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== 'granted') {
+        showAlert('Error', 'Camera permission is required to take a photo');
+        return;
+      }
 
-    const result = await ImagePicker.launchCameraAsync({
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.7,
-    });
+      const result = await ImagePicker.launchCameraAsync({
+        allowsEditing: false,
+        quality: 0.7,
+      });
 
-    if (!result.canceled) {
-      setImageAsset(result.assets[0]);
+      if (!result.canceled) {
+        setImageAsset(result.assets[0]);
+      }
+    } catch (err) {
+      console.error('Camera picker error:', err);
+      showAlert('Error', 'Failed to capture photo. Please try again.');
     }
   };
 
@@ -103,38 +127,37 @@ export default function RegisterScreen({ navigation }) {
     setLatTouched(true);
     setLngTouched(true);
 
-    if (!isImageValid) {
-      Alert.alert('Error', 'Please choose a profile picture to register');
-      return;
-    }
-
     if (!isFormValid) {
-      Alert.alert('Error', 'Please fill in all fields correctly');
+      showAlert('Error', 'Please fill in all fields correctly');
       return;
     }
 
     setLoading(true);
     try {
-      // 1. Upload profile image to the backend first
-      const uploadRes = await authService.uploadImage(imageAsset);
-      const profilePicUrl = uploadRes.url; // e.g., /api/uploads/misc/filename.jpg
+      // 1. Upload profile image to the backend first (if provided)
+      let profilePicUrl = '';
+      if (imageAsset) {
+        const uploadRes = await authService.uploadImage(imageAsset);
+        profilePicUrl = uploadRes.url; // e.g., /api/uploads/misc/filename.jpg
+      }
 
       // 2. Register user
       const userData = {
         username: username.trim(),
         password,
         name: name.trim(),
+        role: role,
         location: { lat: parseFloat(lat), lng: parseFloat(lng) },
         profilePic: profilePicUrl,
       };
 
       await authService.register(userData);
       
-      Alert.alert('Success!', 'Your account has been created successfully. You can sign in now.', [
-        { text: 'Sign In', onPress: () => navigation.navigate('Login') }
+      showAlert('Success!', 'Your account has been created successfully. You can sign in now.', [
+        { text: 'Sign In', onPress: () => navigation.navigate('Login'), style: 'primary' }
       ]);
     } catch (error) {
-      Alert.alert('Registration Failed', error.message || 'An error occurred during registration');
+      showAlert('Registration Failed', error.message || 'An error occurred during registration');
     } finally {
       setLoading(false);
     }
@@ -154,13 +177,16 @@ export default function RegisterScreen({ navigation }) {
             <Text style={styles.subtitleText}>Sign up to start ordering your favorite food</Text>
           </View>
 
-          {/* Profile Picture Selector */}
+          {/* Profile Picture Selector (Optional) */}
           <View style={styles.avatarContainer}>
+            <Text style={{ fontSize: 14, color: '#4b5563', fontWeight: 'bold', marginBottom: SIZES.sm }}>Profile Picture (Optional)</Text>
             {imageAsset ? (
               <Image source={{ uri: imageAsset.uri }} style={styles.avatarPreview} />
             ) : (
-              <View style={styles.avatarPlaceholder}>
-                <Text style={styles.avatarPlaceholderText}>No Image</Text>
+              <View style={[styles.avatarPreview, { backgroundColor: COLORS.primary, justifyContent: 'center', alignItems: 'center' }]}>
+                <Text style={{ color: '#ffffff', fontSize: 36, fontWeight: 'bold' }}>
+                  {(name.trim() || 'U').charAt(0).toUpperCase()}
+                </Text>
               </View>
             )}
             <View style={styles.imageButtonsRow}>
@@ -171,9 +197,6 @@ export default function RegisterScreen({ navigation }) {
                 <Text style={styles.imageButtonOutlineText}>Take Photo</Text>
               </TouchableOpacity>
             </View>
-            {!isImageValid && usernameTouched && (
-              <Text style={styles.imageErrorText}>Profile picture is required</Text>
-            )}
           </View>
 
           {/* Input Fields */}
@@ -201,6 +224,48 @@ export default function RegisterScreen({ navigation }) {
               showError={nameTouched && !isNameValid}
               errorText="Full name is required"
             />
+
+            {/* Account Type Selector */}
+            <View style={styles.roleContainer}>
+              <Text style={styles.roleLabel}>Account Type</Text>
+              <View style={styles.roleRow}>
+                <TouchableOpacity
+                  style={[
+                    styles.roleCard,
+                    role === 'customer' && styles.roleCardActive
+                  ]}
+                  onPress={() => setRole('customer')}
+                >
+                  <Ionicons 
+                    name="cart-outline" 
+                    size={20} 
+                    color={role === 'customer' ? COLORS.primary : '#4b5563'} 
+                  />
+                  <Text style={[
+                    styles.roleText,
+                    role === 'customer' && styles.roleTextActive
+                  ]}>Regular User</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[
+                    styles.roleCard,
+                    role === 'owner' && styles.roleCardActive
+                  ]}
+                  onPress={() => setRole('owner')}
+                >
+                  <Ionicons 
+                    name="restaurant-outline" 
+                    size={20} 
+                    color={role === 'owner' ? COLORS.primary : '#4b5563'} 
+                  />
+                  <Text style={[
+                    styles.roleText,
+                    role === 'owner' && styles.roleTextActive
+                  ]}>Restaurant Owner</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
 
             <InputField
               label="Password"
@@ -273,6 +338,13 @@ export default function RegisterScreen({ navigation }) {
 
         </ScrollView>
       </KeyboardAvoidingView>
+      <CustomAlertModal
+        visible={alertVisible}
+        title={alertTitle}
+        message={alertMessage}
+        buttons={alertButtons}
+        onClose={() => setAlertVisible(false)}
+      />
     </SafeAreaView>
   );
 }
