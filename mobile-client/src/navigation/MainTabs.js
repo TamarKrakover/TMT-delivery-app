@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../theme/theme';
 import { useTheme } from '../contexts/ThemeContext';
 import { useCart } from '../contexts/CartContext';
+import createStyles from '../styles/MainTabs.styles';
 
 // Screens
 import HomeScreen from '../screens/HomeScreen';
@@ -17,6 +18,7 @@ export default function MainTabs({ route }) {
   const { userSession } = route.params || {};
   const { theme } = useTheme();
   const { cartItems } = useCart();
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
 
   // Calculate total items in cart
   const cartItemCount = cartItems?.reduce((total, item) => total + (item.quantity || 1), 0) || 0;
@@ -27,11 +29,7 @@ export default function MainTabs({ route }) {
         headerShown: false,
         tabBarActiveTintColor: COLORS.primary || '#00c2e8',
         tabBarInactiveTintColor: theme.textSecondary || '#4b5563',
-        tabBarStyle: {
-          backgroundColor: theme.navbarBg || '#ffffff',
-          borderTopColor: theme.border || '#e5e7eb',
-          paddingBottom: 4,
-        },
+        tabBarStyle: styles.tabBar,
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
 
@@ -66,7 +64,7 @@ export default function MainTabs({ route }) {
         options={{ 
           title: 'Cart',
           tabBarBadge: cartItemCount > 0 ? cartItemCount : null,
-          tabBarBadgeStyle: { backgroundColor: COLORS.primary }
+          tabBarBadgeStyle: styles.tabBarBadge
         }} 
       />
     </Tab.Navigator>

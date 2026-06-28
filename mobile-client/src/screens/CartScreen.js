@@ -170,7 +170,7 @@ export default function CartScreen({ navigation }) {
             </TouchableOpacity>
           </View>
         ) : (
-          <View style={{ flex: 1 }}>
+          <View style={styles.flexContainer}>
             <FlatList
               data={cartItems}
               keyExtractor={(item) => item.id || item._id}
@@ -190,7 +190,7 @@ export default function CartScreen({ navigation }) {
             {/* Sticky Invoice Footer */}
             <View style={styles.footer}>
               {checkoutError ? (
-                <Text style={{ color: COLORS.danger, marginBottom: 8, textAlign: 'center' }}>
+                <Text style={styles.checkoutErrorText}>
                   {checkoutError}
                 </Text>
               ) : null}
@@ -238,8 +238,8 @@ export default function CartScreen({ navigation }) {
               <Text style={styles.conflictTitle}>Clear Cart?</Text>
             </View>
             <Text style={styles.conflictText}>
-              You already have items from <Text style={{ fontWeight: 'bold' }}>{cartRestaurant?.name}</Text> in your cart.
-              Would you like to clear your current cart and start a new order from <Text style={{ fontWeight: 'bold' }}>{conflictItem?.restaurant?.name}</Text>?
+              You already have items from <Text style={styles.boldText}>{cartRestaurant?.name}</Text> in your cart.
+              Would you like to clear your current cart and start a new order from <Text style={styles.boldText}>{conflictItem?.restaurant?.name}</Text>?
             </Text>
             <View style={styles.conflictButtonsRow}>
               <TouchableOpacity style={styles.conflictCancel} onPress={cancelConflict}>
@@ -267,10 +267,10 @@ export default function CartScreen({ navigation }) {
               <Text style={styles.conflictTitle}>Added to Cart</Text>
             </View>
             <Text style={styles.conflictText}>
-              <Text style={{ fontWeight: 'bold' }}>{successItem?.name}</Text> has been added to your order.
+              <Text style={styles.boldText}>{successItem?.name}</Text> has been added to your order.
             </Text>
             <View style={styles.conflictButtonsRow}>
-              <TouchableOpacity style={[styles.conflictConfirm, { backgroundColor: COLORS.primary }]} onPress={clearSuccess}>
+              <TouchableOpacity style={[styles.conflictConfirm, styles.successConfirmButton]} onPress={clearSuccess}>
                 <Text style={styles.conflictConfirmText}>Awesome</Text>
               </TouchableOpacity>
             </View>

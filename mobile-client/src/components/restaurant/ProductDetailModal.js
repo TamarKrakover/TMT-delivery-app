@@ -1,19 +1,23 @@
-import React, { useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, Modal, StyleSheet, ScrollView, Alert } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import React, { useState, useEffect } from 'react';
+import ProductDetailModalView from '../../styles/ProductDetailModal.styles';
 import { useCart } from '../../contexts/CartContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { BASE_URL, productService } from '../../services/api';
-import { COLORS, SIZES, FONTS } from '../../theme/theme';
-import { useTheme } from '../../contexts/ThemeContext';
+import { Alert } from 'react-native';
 
 const DEFAULT_PRODUCT_IMAGE = "/api/uploads/products/default.webp";
 
-export default function ProductDetailModal({ visible, product, restaurant, onClose }) {
+export default function ProductDetailModal({ visible, product, restaurant, onClose, onProductUpdated }) {
   const { addToCart } = useCart();
   const { currentUser, updateLastViewedProduct } = useAuth();
-  const { theme } = useTheme();
-  const styles = React.useMemo(() => createStyles(theme), [theme]);
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [name, setName] = useState('');
+  const [price, setPrice] = useState('');
+  const [description, setDescription] = useState('');
+  const [image, setImage] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (visible && product && restaurant && currentUser) {
@@ -22,17 +26,30 @@ export default function ProductDetailModal({ visible, product, restaurant, onClo
       
       // Trigger backend log view (which saves interaction to C++ TCP recommendation server)
       productService.getById(restId, prodId).catch((err) => {
-        console.error('Failed to log product view on backend:', err);
+        console.log('Failed to log product view on backend:', err.message);
       });
 
       updateLastViewedProduct(product).catch((err) => {
-        console.error('Failed to log last viewed product locally:', err);
+        console.log('Failed to log last viewed product locally:', err.message);
       });
     }
   }, [visible, product, restaurant, currentUser]);
 
+  useEffect(() => {
+    if (!visible) {
+      setIsEditing(false);
+      setError(null);
+    } else if (product) {
+      setName(product.name || '');
+      setPrice(product.price ? String(product.price) : '');
+      setDescription(product.description || '');
+      setImage(product.image || '');
+    }
+  }, [visible, product]);
+
   if (!product) return null;
 
+  const isCreator = currentUser && (restaurant?.creatorId === currentUser.id || currentUser.isAdmin);
   const displayImage = product.image || DEFAULT_PRODUCT_IMAGE;
   const imageUrl = displayImage.startsWith('http') ? displayImage : `${BASE_URL}${displayImage}`;
 
@@ -41,151 +58,100 @@ export default function ProductDetailModal({ visible, product, restaurant, onClo
     onClose();
   };
 
+  const handleSaveProduct = async () => {
+    if (!name.trim()) {
+      setError('Product name is required.');
+      return;
+    }
+    if (!price.trim() || isNaN(parseFloat(price))) {
+      setError('Product price must be a valid number.');
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      setError(null);
+
+      const payload = {
+        name: name.trim(),
+        price: parseFloat(price),
+        description: description.trim(),
+        image: image.trim() || undefined
+      };
+
+      const restId = restaurant.id || restaurant._id;
+      const prodId = product.id || product._id;
+
+      await productService.update(restId, prodId, payload);
+      
+      if (onProductUpdated) {
+        await onProductUpdated();
+      }
+
+      setIsEditing(false);
+      onClose();
+    } catch (err) {
+      console.log("Failed to update product:", err.message);
+      setError(err.message || 'Failed to update product. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDeleteProduct = () => {
+    Alert.alert(
+      "Delete Product",
+      "Are you sure you want to delete this product? This action cannot be undone.",
+      [
+        { text: "Cancel", style: "cancel" },
+        { 
+          text: "Delete", 
+          style: "destructive",
+          onPress: async () => {
+            try {
+              setSubmitting(true);
+              const restId = restaurant.id || restaurant._id;
+              const prodId = product.id || product._id;
+              await productService.delete(restId, prodId);
+              
+              if (onProductUpdated) {
+                await onProductUpdated();
+              }
+              onClose();
+            } catch (err) {
+              console.log("Failed to delete product:", err.message);
+              Alert.alert("Error", err.message || "Failed to delete product.");
+            } finally {
+              setSubmitting(false);
+            }
+          }
+        }
+      ]
+    );
+  };
+
   return (
-    <Modal
-      animationType="slide"
-      transparent={true}
+    <ProductDetailModalView
       visible={visible}
-      onRequestClose={onClose}
-    >
-        <View style={styles.overlay}>
-          <View style={styles.modalContainer}>
-            <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-              <Ionicons name="close" size={24} color={theme.text} />
-            </TouchableOpacity>
-
-            <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-            {product.image ? (
-              <Image source={{ uri: imageUrl }} style={styles.productImage} />
-            ) : (
-              <View style={styles.noImageContainer}>
-                <Ionicons name="fast-food-outline" size={60} color={theme.textSecondary} />
-                <Text style={styles.noImageText}>No image available</Text>
-              </View>
-            )}
-
-            <View style={styles.infoContainer}>
-              <Text style={styles.productName}>{product.name}</Text>
-              <Text style={styles.productPrice}>₪{parseFloat(product.price).toFixed(2)}</Text>
-              
-              <View style={styles.divider} />
-              
-              <Text style={styles.sectionTitle}>Description</Text>
-              <Text style={styles.productDescription}>
-                {product.description || 'No description available for this item.'}
-              </Text>
-            </View>
-          </ScrollView>
-
-          <View style={[styles.footer, { borderTopColor: theme.border }]}>
-            <TouchableOpacity style={styles.addButton} onPress={handleAddToOrder}>
-              <Ionicons name="cart" size={20} color="#ffffff" style={{ marginRight: 8 }} />
-              <Text style={styles.addButtonText}>Add to Order</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
-    </Modal>
+      onClose={onClose}
+      isCreator={isCreator}
+      isEditing={isEditing}
+      setIsEditing={setIsEditing}
+      error={error}
+      name={name}
+      setName={setName}
+      price={price}
+      setPrice={setPrice}
+      description={description}
+      setDescription={setDescription}
+      image={image}
+      setImage={setImage}
+      submitting={submitting}
+      handleDeleteProduct={handleDeleteProduct}
+      product={product}
+      imageUrl={imageUrl}
+      handleSaveProduct={handleSaveProduct}
+      handleAddToOrder={handleAddToOrder}
+    />
   );
 }
-
-const createStyles = (theme) => StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-end',
-  },
-  modalContainer: {
-    backgroundColor: theme.surface,
-    borderTopLeftRadius: SIZES.radius * 2,
-    borderTopRightRadius: SIZES.radius * 2,
-    maxHeight: '85%',
-    minHeight: '50%',
-    paddingBottom: 24,
-  },
-  closeButton: {
-    position: 'absolute',
-    top: 16,
-    right: 16,
-    zIndex: 10,
-    backgroundColor: theme.surface,
-    borderRadius: 20,
-    padding: 6,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  scrollContent: {
-    paddingBottom: 80,
-  },
-  productImage: {
-    width: '100%',
-    height: 250,
-    borderTopLeftRadius: SIZES.radius * 2,
-    borderTopRightRadius: SIZES.radius * 2,
-  },
-  noImageContainer: {
-    width: '100%',
-    height: 200,
-    backgroundColor: theme.borderLight,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderTopLeftRadius: SIZES.radius * 2,
-    borderTopRightRadius: SIZES.radius * 2,
-  },
-  noImageText: {
-    ...FONTS.caption,
-    color: theme.textSecondary,
-    marginTop: 8,
-  },
-  infoContainer: {
-    padding: SIZES.md,
-  },
-  productName: {
-    ...FONTS.h2,
-    color: theme.text,
-    marginBottom: SIZES.xs,
-  },
-  productPrice: {
-    ...FONTS.h3,
-    color: COLORS.primary,
-    fontWeight: 'bold',
-    marginBottom: SIZES.md,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: theme.border,
-    marginVertical: SIZES.md,
-  },
-  sectionTitle: {
-    ...FONTS.h3,
-    color: theme.text,
-    marginBottom: SIZES.xs,
-  },
-  productDescription: {
-    ...FONTS.body1,
-    color: theme.textSecondary,
-    lineHeight: 22,
-  },
-  footer: {
-    paddingHorizontal: SIZES.md,
-    paddingTop: SIZES.md,
-    borderTopWidth: 1,
-    backgroundColor: theme.surface,
-  },
-  addButton: {
-    backgroundColor: COLORS.primary,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 14,
-    borderRadius: SIZES.radius,
-  },
-  addButtonText: {
-    ...FONTS.body1,
-    color: '#ffffff',
-    fontWeight: 'bold',
-  },
-});
