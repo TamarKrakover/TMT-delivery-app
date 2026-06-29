@@ -8,6 +8,7 @@ import { BASE_URL } from '../services/api';
 import ProductDetailModal from '../components/restaurant/ProductDetailModal';
 import EditRestaurantModal from '../components/restaurant/EditRestaurantModal';
 import AddProductModal from '../components/restaurant/AddProductModal';
+import CustomAlertModal from '../components/CustomAlertModal';
 
 const DEFAULT_RESTAURANT_IMAGE = "/api/uploads/restaurants/default.webp";
 const DEFAULT_PRODUCT_IMAGE = "/api/uploads/products/default.webp";
@@ -168,6 +169,11 @@ export const createStyles = (theme) => StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  rightActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: SIZES.xs,
+  },
   detailsHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -209,11 +215,16 @@ export default function RestaurantScreenView({
   setModalVisible,
   editModalVisible,
   setEditModalVisible,
+  deleteModalState,
+  setDeleteModalState,
   addProductModalVisible,
   setAddProductModalVisible,
-  handleProductsRefresh,
+  handleProductPress,
   handleRestaurantUpdated,
-  handleProductPress
+  handleRestaurantDeleted,
+  confirmDeleteRestaurant,
+  handleSuccessClose,
+  handleProductsRefresh
 }) {
   const { theme } = useTheme();
   const styles = React.useMemo(() => createStyles(theme), [theme]);
@@ -257,12 +268,20 @@ export default function RestaurantScreenView({
             </TouchableOpacity>
             
             {isCreator && (
-              <TouchableOpacity 
-                style={styles.backButton} 
-                onPress={() => setEditModalVisible(true)}
-              >
-                <Ionicons name="create-outline" size={24} color="#ffffff" />
-              </TouchableOpacity>
+              <View style={styles.rightActions}>
+                <TouchableOpacity 
+                  style={[styles.backButton, { marginRight: SIZES.xs, backgroundColor: 'rgba(255, 59, 48, 0.7)' }]} 
+                  onPress={handleRestaurantDeleted}
+                >
+                  <Ionicons name="trash-outline" size={24} color="#ffffff" />
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={styles.backButton} 
+                  onPress={() => setEditModalVisible(true)}
+                >
+                  <Ionicons name="create-outline" size={24} color="#ffffff" />
+                </TouchableOpacity>
+              </View>
             )}
           </SafeAreaView>
         </ImageBackground>
@@ -363,6 +382,22 @@ export default function RestaurantScreenView({
         restaurant={restaurant}
         onClose={() => setAddProductModalVisible(false)}
         onProductAdded={handleProductsRefresh}
+      />
+
+      <CustomAlertModal
+        visible={deleteModalState !== 'hidden'}
+        title={deleteModalState === 'success' ? "Success" : "Delete Restaurant"}
+        message={deleteModalState === 'success' 
+          ? "Restaurant deleted successfully." 
+          : "Are you sure you want to delete this restaurant? This action cannot be undone."
+        }
+        onClose={deleteModalState === 'success' ? handleSuccessClose : () => setDeleteModalState('hidden')}
+        buttons={deleteModalState === 'success' ? [
+          { text: "OK", style: "primary", onPress: handleSuccessClose }
+        ] : [
+          { text: "Cancel", style: "secondary" },
+          { text: "Delete", style: "danger", onPress: confirmDeleteRestaurant }
+        ]}
       />
     </SafeAreaView>
   );
