@@ -63,5 +63,19 @@ export default (theme) => StyleSheet.create({
     fontSize: 10,
     color: theme.textSecondary,
     marginTop: 1,
+  },
+  addCategoryItem: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: theme.background,
+    borderStyle: 'dashed',
+    borderWidth: 2,
+    borderColor: theme.borderDark || theme.border,
+  },
+  addCategoryText: {
+    ...FONTS.body3,
+    color: theme.textSecondary,
+    fontWeight: 'bold',
+    marginTop: 8,
   }
 });

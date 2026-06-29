@@ -1,10 +1,11 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import createStyles from '../../styles/CategoryList.styles';
 import { useTheme } from '../../contexts/ThemeContext';
 import { BASE_URL } from '../../services/api';
 
-export default function CategoryList({ categories, selectedCategory, onSelectCategory, totalRestaurants }) {
+export default function CategoryList({ categories, selectedCategory, onSelectCategory, totalRestaurants, isAdmin, onAddCategory }) {
   const { theme } = useTheme();
   const styles = React.useMemo(() => createStyles(theme), [theme]);
 
@@ -74,6 +75,18 @@ export default function CategoryList({ categories, selectedCategory, onSelectCat
             </TouchableOpacity>
           );
         })}
+
+        {/* Add Category Button (Admin Only) */}
+        {isAdmin && (
+          <TouchableOpacity 
+            style={[styles.categoryItem, styles.addCategoryItem]}
+            onPress={onAddCategory}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="add" size={48} color={theme.textSecondary} />
+            <Text style={styles.addCategoryText}>Add Category</Text>
+          </TouchableOpacity>
+        )}
       </ScrollView>
     </View>
   );

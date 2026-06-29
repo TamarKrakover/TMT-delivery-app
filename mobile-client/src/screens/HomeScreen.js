@@ -12,6 +12,7 @@ import RestaurantList from '../components/restaurant/RestaurantList';
 import RestaurantCard from '../components/restaurant/RestaurantCard';
 import RecommendedProducts from '../components/home/RecommendedProducts';
 import ProductDetailModal from '../components/restaurant/ProductDetailModal';
+import AddCategoryModal from '../components/modals/AddCategoryModal';
 
 export default function HomeScreen({ navigation }) {
   const { theme, isDark, toggleTheme } = useTheme();
@@ -31,6 +32,9 @@ export default function HomeScreen({ navigation }) {
   const [selectedRecProduct, setSelectedRecProduct] = useState(null);
   const [selectedRecRestaurant, setSelectedRecRestaurant] = useState(null);
   const [recModalVisible, setRecModalVisible] = useState(false);
+  
+  // State for Add Category
+  const [addCategoryModalVisible, setAddCategoryModalVisible] = useState(false);
 
   const fetchHomeData = async () => {
     try {
@@ -118,6 +122,10 @@ export default function HomeScreen({ navigation }) {
     setRecModalVisible(true);
   };
 
+  const handleAddCategorySuccess = (newCategory) => {
+    setCategories((prev) => [...prev, newCategory]);
+  };
+
   const renderHeader = () => (
     <View style={{ marginBottom: 16 }}>
       <Text style={styles.welcomeText}>
@@ -173,6 +181,8 @@ export default function HomeScreen({ navigation }) {
         selectedCategory={selectedCategory}
         onSelectCategory={setSelectedCategory}
         totalRestaurants={restaurants.length}
+        isAdmin={currentUser?.isAdmin}
+        onAddCategory={() => setAddCategoryModalVisible(true)}
       />
       <Text style={styles.subtitle}>Selected Category: {selectedCategory}</Text>
     </View>
@@ -241,17 +251,25 @@ export default function HomeScreen({ navigation }) {
         )}
       </View>
 
-      <ProductDetailModal
-        visible={recModalVisible}
-        product={selectedRecProduct}
-        restaurant={selectedRecRestaurant}
-        onClose={() => {
-          setRecModalVisible(false);
-          setSelectedRecProduct(null);
-          setSelectedRecRestaurant(null);
-          // Refresh home screen to load any updated recommendations if details triggered a change
-          fetchHomeData();
-        }}
+      {selectedRecProduct && selectedRecRestaurant && (
+        <ProductDetailModal
+          visible={recModalVisible}
+          onClose={() => {
+            setRecModalVisible(false);
+            setSelectedRecProduct(null);
+            setSelectedRecRestaurant(null);
+            // Refresh home screen to load any updated recommendations if details triggered a change
+            fetchHomeData();
+          }}
+          product={selectedRecProduct}
+          restaurant={selectedRecRestaurant}
+        />
+      )}
+
+      <AddCategoryModal
+        visible={addCategoryModalVisible}
+        onClose={() => setAddCategoryModalVisible(false)}
+        onSuccess={handleAddCategorySuccess}
       />
     </SafeAreaView>
   );

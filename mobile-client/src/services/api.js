@@ -91,8 +91,8 @@ export const apiRequest = async (endpoint, options = {}) => {
 
   const url = `${BASE_URL}${endpoint}`;
 
-  // If body is FormData, don't set Content-Type header manually (let fetch determine boundaries)
-  if (options.body instanceof FormData) {
+  // If body is FormData or explicitly flagged as multipart, don't set Content-Type header manually (let fetch determine boundaries)
+  if (options.body instanceof FormData || options.isMultipart || (options.body && options.body.constructor && options.body.constructor.name === 'FormData')) {
     delete headers['Content-Type'];
   }
 
@@ -197,6 +197,29 @@ export const authService = {
 export const categoryService = {
   getAll: async () => {
     return await apiRequest('/api/categories');
+  },
+  create: async (data) => {
+    return await apiRequest('/api/categories', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+};
+
+export const uploadService = {
+  uploadImage: async (uri) => {
+    const formData = new FormData();
+    const filename = uri.split('/').pop();
+    const match = /\.(\w+)$/.exec(filename);
+    const type = match ? `image/${match[1]}` : `image`;
+
+    formData.append('image', { uri, name: filename, type });
+
+    return await apiRequest('/api/upload', {
+      method: 'POST',
+      body: formData,
+      isMultipart: true,
+    });
   }
 };
 
