@@ -2,6 +2,7 @@ import React, { createContext, useState, useEffect, useContext } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Appearance } from 'react-native';
 import { theme } from '../theme/theme';
+import { useAuth } from './AuthContext';
 
 const ThemeContext = createContext({
   isDark: false,
@@ -12,6 +13,7 @@ const ThemeContext = createContext({
 export const useTheme = () => useContext(ThemeContext);
 
 export const ThemeProvider = ({ children }) => {
+  const { currentUser } = useAuth();
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
@@ -43,10 +45,11 @@ export const ThemeProvider = ({ children }) => {
     }
   };
 
-  const currentTheme = isDark ? theme.dark : theme.light;
+  const effectiveIsDark = isDark && currentUser && !currentUser.isGuest;
+  const currentTheme = effectiveIsDark ? theme.dark : theme.light;
 
   return (
-    <ThemeContext.Provider value={{ isDark, theme: currentTheme, toggleTheme }}>
+    <ThemeContext.Provider value={{ isDark: !!effectiveIsDark, theme: currentTheme, toggleTheme }}>
       {children}
     </ThemeContext.Provider>
   );

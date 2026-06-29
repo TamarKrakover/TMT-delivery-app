@@ -70,6 +70,34 @@ export default function LoginScreen({ navigation }) {
     }
   };
 
+  const handleGuestLogin = async () => {
+    try {
+      setLoading(true);
+      const res = await authService.login('user1', 'Password123!');
+      const guestUser = {
+        id: res.id,
+        isGuest: true,
+        username: 'guest',
+        displayName: 'Guest User',
+        role: 'customer',
+        profilePic: '',
+        location: { lat: 32.0853, lng: 34.7818 }
+      };
+      await login(guestUser);
+    } catch (error) {
+      console.log('Failed background guest login:', error.message);
+      await login({
+        isGuest: true,
+        username: 'guest',
+        displayName: 'Guest User',
+        role: 'customer',
+        profilePic: '',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const renderContent = () => (
     <>
       {/* Header / Logo Area */}
@@ -113,6 +141,24 @@ export default function LoginScreen({ navigation }) {
           disabled={!isFormValid}
           loading={loading}
         />
+
+        {/* Continue as Guest Button */}
+        <TouchableOpacity
+          style={{
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingVertical: 14,
+            marginTop: 12,
+            borderColor: '#00c2e8',
+            borderWidth: 1,
+            borderRadius: 8,
+          }}
+          onPress={handleGuestLogin}
+        >
+          <Text style={{ fontSize: 16, color: '#00c2e8', fontWeight: 'bold' }}>
+            Continue as Guest
+          </Text>
+        </TouchableOpacity>
       </View>
 
       {/* Navigation to Register */}

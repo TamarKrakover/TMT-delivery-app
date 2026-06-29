@@ -4,6 +4,7 @@ import { useCart } from '../../contexts/CartContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { BASE_URL, productService } from '../../services/api';
 import { Alert } from 'react-native';
+import CustomAlertModal from '../CustomAlertModal';
 
 const DEFAULT_PRODUCT_IMAGE = "/api/uploads/products/default.webp";
 
@@ -18,6 +19,7 @@ export default function ProductDetailModal({ visible, product, restaurant, onClo
   const [image, setImage] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [showAuthAlert, setShowAuthAlert] = useState(false);
 
   useEffect(() => {
     if (visible && product && restaurant && currentUser) {
@@ -54,6 +56,10 @@ export default function ProductDetailModal({ visible, product, restaurant, onClo
   const imageUrl = displayImage.startsWith('http') ? displayImage : `${BASE_URL}${displayImage}`;
 
   const handleAddToOrder = async () => {
+    if (!currentUser || currentUser.isGuest) {
+      setShowAuthAlert(true);
+      return;
+    }
     await addToCart(product, restaurant);
     onClose();
   };
@@ -131,27 +137,42 @@ export default function ProductDetailModal({ visible, product, restaurant, onClo
   };
 
   return (
-    <ProductDetailModalView
-      visible={visible}
-      onClose={onClose}
-      isCreator={isCreator}
-      isEditing={isEditing}
-      setIsEditing={setIsEditing}
-      error={error}
-      name={name}
-      setName={setName}
-      price={price}
-      setPrice={setPrice}
-      description={description}
-      setDescription={setDescription}
-      image={image}
-      setImage={setImage}
-      submitting={submitting}
-      handleDeleteProduct={handleDeleteProduct}
-      product={product}
-      imageUrl={imageUrl}
-      handleSaveProduct={handleSaveProduct}
-      handleAddToOrder={handleAddToOrder}
-    />
+    <>
+      <ProductDetailModalView
+        visible={visible}
+        onClose={onClose}
+        isCreator={isCreator}
+        isEditing={isEditing}
+        setIsEditing={setIsEditing}
+        error={error}
+        name={name}
+        setName={setName}
+        price={price}
+        setPrice={setPrice}
+        description={description}
+        setDescription={setDescription}
+        image={image}
+        setImage={setImage}
+        submitting={submitting}
+        handleDeleteProduct={handleDeleteProduct}
+        product={product}
+        imageUrl={imageUrl}
+        handleSaveProduct={handleSaveProduct}
+        handleAddToOrder={handleAddToOrder}
+      />
+      <CustomAlertModal
+        visible={showAuthAlert}
+        title="Authentication Required"
+        message="Please sign in to add items to your cart."
+        onClose={() => setShowAuthAlert(false)}
+        buttons={[
+          {
+            text: 'OK',
+            onPress: () => setShowAuthAlert(false),
+            style: 'danger'
+          }
+        ]}
+      />
+    </>
   );
 }
