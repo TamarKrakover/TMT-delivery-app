@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Alert } from 'react-native';
 import RestaurantScreenView from '../styles/RestaurantScreen.styles';
 import { useAuth } from '../contexts/AuthContext';
 import { productService, restaurantService } from '../services/api';
@@ -18,6 +19,8 @@ export default function RestaurantScreen({ route, navigation }) {
 
   // Edit Restaurant modal state
   const [editModalVisible, setEditModalVisible] = useState(false);
+  // 'hidden' | 'confirm' | 'success'
+  const [deleteModalState, setDeleteModalState] = useState('hidden');
 
   // Add Product modal state
   const [addProductModalVisible, setAddProductModalVisible] = useState(false);
@@ -64,6 +67,29 @@ export default function RestaurantScreen({ route, navigation }) {
     }));
   };
 
+  const handleRestaurantDeleted = () => {
+    setDeleteModalState('confirm');
+  };
+
+  const confirmDeleteRestaurant = async () => {
+    try {
+      const targetId = restaurant.id || restaurant._id;
+      await restaurantService.delete(targetId);
+      setDeleteModalState('success');
+    } catch (err) {
+      console.log("Failed to delete restaurant:", err.message);
+      setDeleteModalState('hidden');
+      setTimeout(() => {
+        Alert.alert("Error", err.message || "Failed to delete restaurant.");
+      }, 500);
+    }
+  };
+
+  const handleSuccessClose = () => {
+    setDeleteModalState('hidden');
+    navigation.goBack();
+  };
+
   const handleProductsRefresh = async () => {
     const targetId = restaurant.id || restaurant._id;
     const productsData = await productService.getByRestaurantId(targetId);
@@ -84,10 +110,15 @@ export default function RestaurantScreen({ route, navigation }) {
       setModalVisible={setModalVisible}
       editModalVisible={editModalVisible}
       setEditModalVisible={setEditModalVisible}
+      deleteModalState={deleteModalState}
+      setDeleteModalState={setDeleteModalState}
       addProductModalVisible={addProductModalVisible}
       setAddProductModalVisible={setAddProductModalVisible}
       handleProductsRefresh={handleProductsRefresh}
       handleRestaurantUpdated={handleRestaurantUpdated}
+      handleRestaurantDeleted={handleRestaurantDeleted}
+      confirmDeleteRestaurant={confirmDeleteRestaurant}
+      handleSuccessClose={handleSuccessClose}
       handleProductPress={handleProductPress}
     />
   );

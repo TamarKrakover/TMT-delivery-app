@@ -1,5 +1,6 @@
 import React from 'react';
-import { StyleSheet, View, Text, TextInput, ScrollView, TouchableOpacity, ActivityIndicator, Modal } from 'react-native';
+import { StyleSheet, View, Text, TextInput, ScrollView, TouchableOpacity, ActivityIndicator, Modal, Image } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SIZES, FONTS } from '../theme/theme';
 import { useTheme } from '../contexts/ThemeContext';
 
@@ -133,6 +134,53 @@ export const createStyles = (theme) => StyleSheet.create({
   },
   submitButtonDisabled: {
     opacity: 0.7,
+  },
+  imagePickerContainer: {
+    marginTop: 8,
+    marginBottom: 16,
+  },
+  imagePreviewArea: {
+    width: '100%',
+    height: 150,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: theme.border,
+    borderStyle: 'dashed',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: theme.background,
+    overflow: 'hidden',
+  },
+  imagePreview: {
+    width: '100%',
+    height: '100%',
+  },
+  placeholderText: {
+    fontSize: 14,
+    color: theme.textSecondary,
+    marginTop: 8,
+  },
+  imageActionButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 12,
+  },
+  imageBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 10,
+    borderRadius: 8,
+    backgroundColor: theme.background,
+    borderWidth: 1,
+    borderColor: theme.border,
+    marginHorizontal: 4,
+  },
+  imageBtnText: {
+    fontSize: 14,
+    color: theme.text,
+    marginLeft: 6,
   }
 });
 
@@ -155,7 +203,8 @@ export default function AddRestaurantModalView({
   lng,
   setLng,
   submitting,
-  handleAddRestaurant
+  handleAddRestaurant,
+  pickImage
 }) {
   const { theme } = useTheme();
   const styles = React.useMemo(() => createStyles(theme), [theme]);
@@ -184,16 +233,8 @@ export default function AddRestaurantModalView({
             />
 
             <Text style={styles.label}>Category *</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="e.g. Italian, Sushi, Burgers"
-              placeholderTextColor={theme.textSecondary}
-              value={category}
-              onChangeText={setCategory}
-            />
-
-            {/* Suggestions */}
-            {availableCategories.length > 0 && (
+            
+            {availableCategories.length > 0 ? (
               <View style={styles.suggestionsContainer}>
                 {availableCategories.map((cat, idx) => (
                   <TouchableOpacity
@@ -213,6 +254,10 @@ export default function AddRestaurantModalView({
                   </TouchableOpacity>
                 ))}
               </View>
+            ) : (
+              <Text style={[styles.errorText, { textAlign: 'left', marginBottom: 12 }]}>
+                No categories available. Please add a category first.
+              </Text>
             )}
 
             <Text style={styles.label}>Description</Text>
@@ -226,15 +271,40 @@ export default function AddRestaurantModalView({
               numberOfLines={3}
             />
 
-            <Text style={styles.label}>Image URL / Path</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="e.g. /api/uploads/restaurants/custom.webp"
-              placeholderTextColor={theme.textSecondary}
-              value={image}
-              onChangeText={setImage}
-              autoCapitalize="none"
-            />
+            <View style={styles.imagePickerContainer}>
+              <Text style={styles.label}>Restaurant Image (Optional)</Text>
+              
+              <View style={styles.imagePreviewArea}>
+                {image ? (
+                  <Image source={{ uri: image }} style={styles.imagePreview} resizeMode="cover" />
+                ) : (
+                  <>
+                    <Ionicons name="image-outline" size={48} color={theme.textSecondary} />
+                    <Text style={styles.placeholderText}>No image selected</Text>
+                  </>
+                )}
+              </View>
+
+              <View style={styles.imageActionButtons}>
+                <TouchableOpacity 
+                  style={styles.imageBtn} 
+                  onPress={() => pickImage(false)}
+                  disabled={submitting}
+                >
+                  <Ionicons name="images-outline" size={20} color={theme.text} />
+                  <Text style={styles.imageBtnText}>Gallery</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={styles.imageBtn} 
+                  onPress={() => pickImage(true)}
+                  disabled={submitting}
+                >
+                  <Ionicons name="camera-outline" size={20} color={theme.text} />
+                  <Text style={styles.imageBtnText}>Camera</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
 
             <View style={styles.rowSpaceBetween}>
               <View style={styles.halfInputContainerLeft}>
@@ -277,7 +347,7 @@ export default function AddRestaurantModalView({
             <TouchableOpacity 
               style={[styles.submitButton, submitting && styles.submitButtonDisabled]} 
               onPress={handleAddRestaurant}
-              disabled={submitting}
+              disabled={submitting || availableCategories.length === 0}
             >
               {submitting ? (
                 <ActivityIndicator size="small" color="#ffffff" />
