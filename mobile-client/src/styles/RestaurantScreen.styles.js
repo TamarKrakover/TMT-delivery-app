@@ -113,7 +113,7 @@ export const createStyles = (theme) => StyleSheet.create({
     marginBottom: SIZES.sm,
   },
   listContent: {
-    paddingBottom: SIZES.xl,
+    paddingBottom: SIZES.xxl,
   },
   productCard: {
     flexDirection: 'row',
@@ -324,7 +324,7 @@ export default function RestaurantScreenView({
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <FlatList
         data={products}
         keyExtractor={(item) => item.id || item._id}
@@ -364,6 +364,6 @@ export default function RestaurantScreenView({
         onClose={() => setAddProductModalVisible(false)}
         onProductAdded={handleProductsRefresh}
       />
-    </View>
+    </SafeAreaView>
   );
 }
