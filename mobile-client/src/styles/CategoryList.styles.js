@@ -68,7 +68,6 @@ export default (theme) => StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: theme.background,
-    borderStyle: 'dashed',
     borderWidth: 2,
     borderColor: theme.borderDark || theme.border,
   },
