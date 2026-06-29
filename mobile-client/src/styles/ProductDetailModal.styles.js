@@ -1,0 +1,393 @@
+import React from 'react';
+import { StyleSheet, View, Text, Image, TouchableOpacity, Modal, ScrollView, TextInput, ActivityIndicator } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { COLORS, SIZES, FONTS } from '../theme/theme';
+import { useTheme } from '../contexts/ThemeContext';
+
+export const createStyles = (theme) => StyleSheet.create({
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContainer: {
+    backgroundColor: theme.surface,
+    borderTopLeftRadius: SIZES.radius * 2,
+    borderTopRightRadius: SIZES.radius * 2,
+    maxHeight: '85%',
+    minHeight: '50%',
+    paddingBottom: 24,
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    zIndex: 10,
+    backgroundColor: theme.surface,
+    borderRadius: 20,
+    padding: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  editButton: {
+    position: 'absolute',
+    top: 16,
+    right: 60,
+    zIndex: 10,
+    backgroundColor: theme.surface,
+    borderRadius: 20,
+    padding: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  scrollContent: {
+    paddingBottom: 80,
+  },
+  productImage: {
+    width: '100%',
+    height: 250,
+    borderTopLeftRadius: SIZES.radius * 2,
+    borderTopRightRadius: SIZES.radius * 2,
+  },
+  noImageContainer: {
+    width: '100%',
+    height: 200,
+    backgroundColor: theme.borderLight,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderTopLeftRadius: SIZES.radius * 2,
+    borderTopRightRadius: SIZES.radius * 2,
+  },
+  noImageText: {
+    ...FONTS.caption,
+    color: theme.textSecondary,
+    marginTop: 8,
+  },
+  infoContainer: {
+    padding: SIZES.md,
+  },
+  productName: {
+    ...FONTS.h2,
+    color: theme.text,
+    marginBottom: SIZES.xs,
+  },
+  productPrice: {
+    ...FONTS.h3,
+    color: COLORS.primary,
+    fontWeight: 'bold',
+    marginBottom: SIZES.md,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: theme.border,
+    marginVertical: SIZES.md,
+  },
+  sectionTitle: {
+    ...FONTS.h3,
+    color: theme.text,
+    marginBottom: SIZES.xs,
+  },
+  editModalTitle: {
+    ...FONTS.h3,
+    color: theme.text,
+    fontSize: 20,
+    marginBottom: 16,
+  },
+  errorText: {
+    color: COLORS.danger,
+    fontSize: 14,
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  productDescription: {
+    ...FONTS.body1,
+    color: theme.textSecondary,
+    lineHeight: 22,
+  },
+  footer: {
+    paddingHorizontal: SIZES.md,
+    paddingTop: SIZES.md,
+    borderTopWidth: 1,
+    backgroundColor: theme.surface,
+  },
+  footerCreator: {
+    paddingHorizontal: SIZES.md,
+    paddingTop: SIZES.md,
+    borderTopWidth: 1,
+    backgroundColor: theme.surface,
+    borderTopColor: theme.border,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  footerUser: {
+    paddingHorizontal: SIZES.md,
+    paddingTop: SIZES.md,
+    borderTopWidth: 1,
+    backgroundColor: theme.surface,
+    borderTopColor: theme.border,
+  },
+  addButton: {
+    backgroundColor: COLORS.primary,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 14,
+    borderRadius: SIZES.radius,
+  },
+  addButtonText: {
+    ...FONTS.body1,
+    color: '#ffffff',
+    fontWeight: 'bold',
+  },
+  cancelButton: {
+    backgroundColor: theme.background,
+    borderColor: theme.border,
+    borderWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 14,
+    borderRadius: SIZES.radius,
+    flex: 1,
+    marginRight: 8,
+  },
+  cancelButtonText: {
+    ...FONTS.body1,
+    color: theme.text,
+    fontWeight: 'bold',
+  },
+  saveButton: {
+    backgroundColor: COLORS.primary,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 14,
+    borderRadius: SIZES.radius,
+    flex: 1,
+    marginLeft: 8,
+  },
+  saveButtonText: {
+    ...FONTS.body1,
+    color: '#ffffff',
+    fontWeight: 'bold',
+  },
+  inputLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: theme.textSecondary,
+    marginBottom: 4,
+    marginTop: 8,
+    textAlign: 'left',
+  },
+  textInput: {
+    backgroundColor: theme.background,
+    borderColor: theme.border,
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 10,
+    color: theme.text,
+    fontSize: 16,
+    marginBottom: 12,
+    textAlign: 'left',
+  },
+  textInputArea: {
+    backgroundColor: theme.background,
+    borderColor: theme.border,
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 10,
+    color: theme.text,
+    fontSize: 16,
+    marginBottom: 12,
+    textAlign: 'left',
+    minHeight: 80,
+    textAlignVertical: 'top',
+  },
+  deleteButton: {
+    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    borderColor: COLORS.danger,
+    borderWidth: 1,
+    paddingVertical: 12,
+    borderRadius: SIZES.radius,
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  deleteButtonText: {
+    color: COLORS.danger,
+    fontWeight: 'bold',
+  },
+  cartIcon: {
+    marginRight: 8,
+  },
+});
+
+export default function ProductDetailModalView({
+  visible,
+  onClose,
+  isCreator,
+  isEditing,
+  setIsEditing,
+  error,
+  name,
+  setName,
+  price,
+  setPrice,
+  description,
+  setDescription,
+  image,
+  setImage,
+  submitting,
+  handleDeleteProduct,
+  product,
+  imageUrl,
+  handleSaveProduct,
+  handleAddToOrder
+}) {
+  const { theme } = useTheme();
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
+
+  if (!product) return null;
+
+  return (
+    <Modal
+      animationType="slide"
+      transparent={true}
+      visible={visible}
+      onRequestClose={onClose}
+    >
+      <View style={styles.overlay}>
+        <View style={styles.modalContainer}>
+          <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+            <Ionicons name="close" size={24} color={theme.text} />
+          </TouchableOpacity>
+
+          {isCreator && !isEditing && (
+            <TouchableOpacity 
+              style={styles.editButton} 
+              onPress={() => setIsEditing(true)}
+            >
+              <Ionicons name="create-outline" size={24} color={theme.text} />
+            </TouchableOpacity>
+          )}
+
+          <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+            {isEditing ? (
+              <View style={styles.infoContainer}>
+                <Text style={styles.editModalTitle}>Edit Product Details</Text>
+                {error && <Text style={styles.errorText}>{error}</Text>}
+                
+                <Text style={styles.inputLabel}>Product Name *</Text>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="Enter product name"
+                  placeholderTextColor={theme.textSecondary}
+                  value={name}
+                  onChangeText={setName}
+                />
+
+                <Text style={styles.inputLabel}>Price * (₪)</Text>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="e.g. 35.5"
+                  placeholderTextColor={theme.textSecondary}
+                  value={price}
+                  onChangeText={setPrice}
+                  keyboardType="numeric"
+                />
+
+                <Text style={styles.inputLabel}>Description</Text>
+                <TextInput
+                  style={styles.textInputArea}
+                  placeholder="Enter product description"
+                  placeholderTextColor={theme.textSecondary}
+                  value={description}
+                  onChangeText={setDescription}
+                  multiline={true}
+                  numberOfLines={3}
+                />
+
+                <Text style={styles.inputLabel}>Image URL / Path</Text>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="e.g. /api/uploads/products/custom.webp"
+                  placeholderTextColor={theme.textSecondary}
+                  value={image}
+                  onChangeText={setImage}
+                  autoCapitalize="none"
+                />
+
+                <TouchableOpacity 
+                  style={styles.deleteButton}
+                  onPress={handleDeleteProduct}
+                  disabled={submitting}
+                >
+                  <Text style={styles.deleteButtonText}>Delete Product</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <>
+                {product.image ? (
+                  <Image source={{ uri: imageUrl }} style={styles.productImage} />
+                ) : (
+                  <View style={styles.noImageContainer}>
+                    <Ionicons name="fast-food-outline" size={60} color={theme.textSecondary} />
+                    <Text style={styles.noImageText}>No image available</Text>
+                  </View>
+                )}
+
+                <View style={styles.infoContainer}>
+                  <Text style={styles.productName}>{product.name}</Text>
+                  <Text style={styles.productPrice}>₪{parseFloat(product.price).toFixed(2)}</Text>
+                  
+                  <View style={styles.divider} />
+                  
+                  <Text style={styles.sectionTitle}>Description</Text>
+                  <Text style={styles.productDescription}>
+                    {product.description || 'No description available for this item.'}
+                  </Text>
+                </View>
+              </>
+            )}
+          </ScrollView>
+
+          {isEditing ? (
+            <View style={styles.footerCreator}>
+              <TouchableOpacity 
+                style={styles.cancelButton} 
+                onPress={() => setIsEditing(false)}
+                disabled={submitting}
+              >
+                <Text style={styles.cancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={styles.saveButton} 
+                onPress={handleSaveProduct}
+                disabled={submitting}
+              >
+                {submitting ? (
+                  <ActivityIndicator size="small" color="#ffffff" />
+                ) : (
+                  <Text style={styles.saveButtonText}>Save</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View style={styles.footerUser}>
+              <TouchableOpacity style={styles.addButton} onPress={handleAddToOrder}>
+                <Ionicons name="cart" size={20} color="#ffffff" style={styles.cartIcon} />
+                <Text style={styles.addButtonText}>Add to Order</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+      </View>
+    </Modal>
+  );
+}

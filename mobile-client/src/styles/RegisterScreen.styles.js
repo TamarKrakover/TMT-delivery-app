@@ -104,6 +104,44 @@ export default StyleSheet.create({
   locationCol: {
     flex: 1,
   },
+  roleContainer: {
+    marginBottom: SIZES.md,
+  },
+  roleLabel: {
+    fontSize: 14,
+    color: '#4b5563',
+    fontWeight: 'bold',
+    marginBottom: SIZES.sm,
+  },
+  roleRow: {
+    flexDirection: 'row',
+    gap: SIZES.md,
+  },
+  roleCard: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+    borderRadius: SIZES.radius,
+    paddingVertical: 12,
+    gap: 8,
+  },
+  roleCardActive: {
+    borderColor: COLORS.primary,
+    backgroundColor: 'rgba(0, 194, 232, 0.05)',
+  },
+  roleText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#4b5563',
+  },
+  roleTextActive: {
+    color: COLORS.primary,
+    fontWeight: 'bold',
+  },
   footerContainer: {
     flexDirection: 'row',
     justifyContent: 'center',

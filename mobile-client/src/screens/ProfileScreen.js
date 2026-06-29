@@ -7,6 +7,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { orderService, restaurantService, productService, BASE_URL } from '../services/api';
 import createStyles from '../styles/ProfileScreen.styles';
 import { COLORS, SIZES } from '../theme/theme';
+import CustomAlertModal from '../components/CustomAlertModal';
 
 export default function ProfileScreen({ navigation, onLogout }) {
   const { theme } = useTheme();
@@ -19,6 +20,19 @@ export default function ProfileScreen({ navigation, onLogout }) {
   const [productsCache, setProductsCache] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  // Custom alert states
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertTitle, setAlertTitle] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertButtons, setAlertButtons] = useState([]);
+
+  const showAlert = (title, message, buttons = []) => {
+    setAlertTitle(title);
+    setAlertMessage(message);
+    setAlertButtons(buttons);
+    setAlertVisible(true);
+  };
 
   const fetchOrderHistory = async () => {
     if (!currentUser) return;
@@ -75,6 +89,17 @@ export default function ProfileScreen({ navigation, onLogout }) {
     }
   };
 
+  const triggerLogoutConfirm = () => {
+    showAlert(
+      'Sign Out',
+      'Are you sure you want to sign out of your account?',
+      [
+        { text: 'Cancel', style: 'secondary' },
+        { text: 'Sign Out', style: 'danger', onPress: handleLogoutPress }
+      ]
+    );
+  };
+
   const renderHeader = () => {
     if (!currentUser) return null;
 
@@ -83,6 +108,15 @@ export default function ProfileScreen({ navigation, onLogout }) {
 
     return (
       <View style={styles.headerContainer}>
+        {/* Top Navigation Bar */}
+        <View style={styles.topBar}>
+          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={24} color={theme.text} />
+          </TouchableOpacity>
+          <Text style={styles.topBarTitle}>Profile</Text>
+          <View style={{ width: 24 }} />
+        </View>
+
         {imageUrl ? (
           <Image source={{ uri: imageUrl }} style={styles.avatar} />
         ) : (
@@ -94,6 +128,22 @@ export default function ProfileScreen({ navigation, onLogout }) {
         )}
         <Text style={styles.profileName}>{currentUser.displayName || currentUser.name || currentUser.username}</Text>
         <Text style={styles.profileUsername}>@{currentUser.username}</Text>
+
+        {/* User Credentials (TMT-365) */}
+        <View style={styles.credentialsContainer}>
+          <View style={styles.credentialItem}>
+            <Ionicons name="person-outline" size={16} color={theme.textSecondary} style={{ marginRight: 8 }} />
+            <Text style={styles.credentialText}>Role: {currentUser.role === 'owner' ? 'Owner' : 'Customer'}</Text>
+          </View>
+          {currentUser.location && (
+            <View style={styles.credentialItem}>
+              <Ionicons name="location-outline" size={16} color={theme.textSecondary} style={{ marginRight: 8 }} />
+              <Text style={styles.credentialText}>
+                Coordinates: {currentUser.location.lat?.toFixed(4)}, {currentUser.location.lng?.toFixed(4)}
+              </Text>
+            </View>
+          )}
+        </View>
       </View>
     );
   };
@@ -177,6 +227,7 @@ export default function ProfileScreen({ navigation, onLogout }) {
         ListHeaderComponent={() => (
           <View>
             {renderHeader()}
+            
             <Text style={styles.sectionTitle}>Order History</Text>
             {loading && (
               <View style={styles.loadingContainer}>
@@ -191,7 +242,7 @@ export default function ProfileScreen({ navigation, onLogout }) {
           </View>
         )}
         ListFooterComponent={() => (
-          <TouchableOpacity style={styles.logoutButton} onPress={handleLogoutPress}>
+          <TouchableOpacity style={styles.logoutButton} onPress={triggerLogoutConfirm}>
             <Ionicons name="log-out-outline" size={20} color="#ffffff" />
             <Text style={styles.logoutButtonText}>Log Out</Text>
           </TouchableOpacity>
@@ -203,10 +254,17 @@ export default function ProfileScreen({ navigation, onLogout }) {
           return (
             <View style={styles.emptyContainer}>
               <Ionicons name="receipt-outline" size={48} color={theme.textSecondary} />
-              <Text style={styles.emptyText}>No past orders found.</Text>
+              <Text style={styles.emptyText}>No orders found.</Text>
             </View>
           );
         }}
+      />
+      <CustomAlertModal
+        visible={alertVisible}
+        title={alertTitle}
+        message={alertMessage}
+        buttons={alertButtons}
+        onClose={() => setAlertVisible(false)}
       />
     </SafeAreaView>
   );

@@ -288,4 +288,18 @@ export default (theme) => StyleSheet.create({
     color: '#ffffff',
     fontWeight: 'bold',
   },
+  flexContainer: {
+    flex: 1,
+  },
+  checkoutErrorText: {
+    color: COLORS.danger,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  boldText: {
+    fontWeight: 'bold',
+  },
+  successConfirmButton: {
+    backgroundColor: COLORS.primary,
+  },
 });

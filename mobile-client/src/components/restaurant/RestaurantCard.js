@@ -2,7 +2,6 @@ import React from 'react';
 import { View, Text, Image, TouchableOpacity } from 'react-native';
 import createStyles from '../../styles/RestaurantCard.styles';
 import { useTheme } from '../../contexts/ThemeContext';
-import { FONTS } from '../../theme/theme';
 import { BASE_URL } from '../../services/api';
 
 const DEFAULT_RESTAURANT_IMAGE = "/api/uploads/restaurants/default.webp";
@@ -33,15 +32,15 @@ export default function RestaurantCard({ restaurant, onPress }) {
             <Text style={styles.categoryBadgeText}>{restaurant.category}</Text>
           </View>
         ) : restaurant.price ? (
-          <View style={[styles.categoryBadge, { backgroundColor: theme.primary }]}>
-            <Text style={[styles.categoryBadgeText, { fontWeight: 'bold' }]}>${restaurant.price.toFixed(2)}</Text>
+          <View style={[styles.categoryBadge, styles.priceBadge]}>
+            <Text style={[styles.categoryBadgeText, styles.priceBadgeText]}>${restaurant.price.toFixed(2)}</Text>
           </View>
         ) : null}
       </View>
       <View style={styles.infoContainer}>
         <Text style={styles.nameText} numberOfLines={1}>{restaurant.name}</Text>
         {restaurant.restaurantName ? (
-          <Text style={{ ...FONTS.body2, color: theme.primary, marginBottom: 2 }}>
+          <Text style={styles.restaurantNameText}>
             from {restaurant.restaurantName}
           </Text>
         ) : null}

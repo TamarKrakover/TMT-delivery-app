@@ -1,7 +1,18 @@
-import { StyleSheet } from 'react-native';
+import React from 'react';
+import { View, Text, Image, TouchableOpacity, FlatList, ActivityIndicator, ImageBackground, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SIZES, FONTS } from '../theme/theme';
+import { useTheme } from '../contexts/ThemeContext';
+import { BASE_URL } from '../services/api';
+import ProductDetailModal from '../components/restaurant/ProductDetailModal';
+import EditRestaurantModal from '../components/restaurant/EditRestaurantModal';
+import AddProductModal from '../components/restaurant/AddProductModal';
 
-export default (theme) => StyleSheet.create({
+const DEFAULT_RESTAURANT_IMAGE = "/api/uploads/restaurants/default.webp";
+const DEFAULT_PRODUCT_IMAGE = "/api/uploads/products/default.webp";
+
+export const createStyles = (theme) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.background,
@@ -14,6 +25,7 @@ export default (theme) => StyleSheet.create({
   },
   loadingText: {
     ...FONTS.body1,
+    color: theme.textSecondary,
     marginTop: SIZES.md,
   },
   errorContainer: {
@@ -151,4 +163,207 @@ export default (theme) => StyleSheet.create({
     marginTop: SIZES.sm,
     textAlign: 'center',
   },
+  heroOverlayCreator: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  detailsHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  restaurantNameCreator: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: theme.text,
+    flex: 1,
+    margin: 0,
+  },
+  addProductButton: {
+    backgroundColor: COLORS.primaryLight,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  addProductButtonText: {
+    color: COLORS.primary,
+    fontWeight: 'bold',
+    fontSize: 12,
+  }
 });
+
+export default function RestaurantScreenView({
+  navigation,
+  loading,
+  error,
+  restaurant,
+  products,
+  currentUser,
+  selectedProduct,
+  setSelectedProduct,
+  modalVisible,
+  setModalVisible,
+  editModalVisible,
+  setEditModalVisible,
+  addProductModalVisible,
+  setAddProductModalVisible,
+  handleProductsRefresh,
+  handleRestaurantUpdated,
+  handleProductPress
+}) {
+  const { theme } = useTheme();
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={theme.text} />
+        <Text style={[styles.loadingText, { color: theme.textSecondary }]}>Loading menu details...</Text>
+      </SafeAreaView>
+    );
+  }
+
+  if (error || !restaurant) {
+    return (
+      <SafeAreaView style={styles.errorContainer}>
+        <Ionicons name="alert-circle-outline" size={60} color={theme.textSecondary} />
+        <Text style={styles.errorText}>{error || 'Restaurant not found.'}</Text>
+        <TouchableOpacity style={styles.errorBackButton} onPress={() => navigation.goBack()}>
+          <Text style={styles.errorBackButtonText}>Go Back</Text>
+        </TouchableOpacity>
+      </SafeAreaView>
+    );
+  }
+
+  const isCreator = currentUser && (restaurant.creatorId === currentUser.id || currentUser.isAdmin);
+
+  const renderHeader = () => {
+    const displayImage = restaurant.image || DEFAULT_RESTAURANT_IMAGE;
+    const imageUrl = displayImage.startsWith('http') ? displayImage : `${BASE_URL}${displayImage}`;
+
+    return (
+      <View>
+        <ImageBackground source={{ uri: imageUrl }} style={styles.heroImage}>
+          <SafeAreaView style={[styles.heroOverlay, styles.heroOverlayCreator]} edges={['top']}>
+            <TouchableOpacity 
+              style={styles.backButton} 
+              onPress={() => navigation.goBack()}
+            >
+              <Ionicons name="arrow-back" size={24} color="#ffffff" />
+            </TouchableOpacity>
+            
+            {isCreator && (
+              <TouchableOpacity 
+                style={styles.backButton} 
+                onPress={() => setEditModalVisible(true)}
+              >
+                <Ionicons name="create-outline" size={24} color="#ffffff" />
+              </TouchableOpacity>
+            )}
+          </SafeAreaView>
+        </ImageBackground>
+
+        <View style={styles.detailsCard}>
+          <View style={styles.detailsHeaderRow}>
+            <Text style={styles.restaurantNameCreator}>{restaurant.name}</Text>
+            {isCreator && (
+              <TouchableOpacity 
+                style={styles.addProductButton}
+                onPress={() => setAddProductModalVisible(true)}
+              >
+                <Ionicons name="add" size={16} color={COLORS.primary} style={{ marginRight: 4 }} />
+                <Text style={styles.addProductButtonText}>Add Product</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+          {restaurant.category && (
+            <View style={styles.categoryBadge}>
+              <Text style={styles.categoryBadgeText}>{restaurant.category}</Text>
+            </View>
+          )}
+          <Text style={styles.restaurantDesc}>
+            {restaurant.description || 'No description available for this restaurant.'}
+          </Text>
+        </View>
+
+        <Text style={styles.menuTitle}>Menu Items</Text>
+      </View>
+    );
+  };
+
+  const renderProductItem = ({ item }) => {
+    const displayImage = item.image || DEFAULT_PRODUCT_IMAGE;
+    const imageUrl = displayImage.startsWith('http') ? displayImage : `${BASE_URL}${displayImage}`;
+
+    return (
+      <TouchableOpacity 
+        style={styles.productCard} 
+        activeOpacity={0.8}
+        onPress={() => handleProductPress(item)}
+      >
+        <View style={styles.productInfo}>
+          <Text style={styles.productName}>{item.name}</Text>
+          <Text style={styles.productPrice}>₪{parseFloat(item.price).toFixed(2)}</Text>
+          {item.description ? (
+            <Text style={styles.productDesc} numberOfLines={2}>
+              {item.description}
+            </Text>
+          ) : null}
+        </View>
+        <Image 
+          source={{ uri: imageUrl }} 
+          style={styles.productImage}
+          defaultSource={require('../../assets/icon.png')}
+        />
+      </TouchableOpacity>
+    );
+  };
+
+  return (
+    <View style={styles.container}>
+      <FlatList
+        data={products}
+        keyExtractor={(item) => item.id || item._id}
+        renderItem={renderProductItem}
+        ListHeaderComponent={renderHeader}
+        contentContainerStyle={styles.listContent}
+        showsVerticalScrollIndicator={false}
+        ListEmptyComponent={() => (
+          <View style={styles.emptyMenuContainer}>
+            <Ionicons name="fast-food-outline" size={48} color={theme.textSecondary} />
+            <Text style={styles.emptyMenuText}>No menu items found for this restaurant.</Text>
+          </View>
+        )}
+      />
+
+      <ProductDetailModal
+        visible={modalVisible}
+        product={selectedProduct}
+        restaurant={restaurant}
+        onClose={() => {
+          setModalVisible(false);
+          setSelectedProduct(null);
+        }}
+        onProductUpdated={handleProductsRefresh}
+      />
+
+      <EditRestaurantModal
+        visible={editModalVisible}
+        restaurant={restaurant}
+        onClose={() => setEditModalVisible(false)}
+        onRestaurantUpdated={handleRestaurantUpdated}
+      />
+
+      <AddProductModal
+        visible={addProductModalVisible}
+        restaurant={restaurant}
+        onClose={() => setAddProductModalVisible(false)}
+        onProductAdded={handleProductsRefresh}
+      />
+    </View>
+  );
+}
