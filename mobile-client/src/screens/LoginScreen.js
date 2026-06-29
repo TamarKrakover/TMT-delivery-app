@@ -3,12 +3,10 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Alert,
   KeyboardAvoidingView,
   Platform,
-  TouchableWithoutFeedback,
-  Keyboard,
-  Image
+  Image,
+  ScrollView
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { authService } from '../services/api';
@@ -16,6 +14,7 @@ import InputField from '../components/InputField';
 import CustomButton from '../components/CustomButton';
 import styles from '../styles/LoginScreen.styles';
 import { useAuth } from '../contexts/AuthContext';
+import CustomAlertModal from '../components/CustomAlertModal';
 
 
 export default function LoginScreen({ navigation }) {
@@ -23,6 +22,19 @@ export default function LoginScreen({ navigation }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Custom alert states
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertTitle, setAlertTitle] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertButtons, setAlertButtons] = useState([]);
+
+  const showAlert = (title, message, buttons = []) => {
+    setAlertTitle(title);
+    setAlertMessage(message);
+    setAlertButtons(buttons);
+    setAlertVisible(true);
+  };
   
   // Real-time validations
   const [usernameTouched, setUsernameTouched] = useState(false);
@@ -37,7 +49,7 @@ export default function LoginScreen({ navigation }) {
     setPasswordTouched(true);
 
     if (!isFormValid) {
-      Alert.alert('Error', 'Please fill in all fields correctly');
+      showAlert('Error', 'Please fill in all fields correctly');
       return;
     }
 
@@ -52,14 +64,14 @@ export default function LoginScreen({ navigation }) {
       // Update global context session
       await login(fullUserData);
     } catch (error) {
-      Alert.alert('Login Failed', error.message || 'Invalid username or password');
+      showAlert('Login Failed', error.message || 'Invalid username or password');
     } finally {
       setLoading(false);
     }
   };
 
   const renderContent = () => (
-    <View style={styles.inner}>
+    <>
       {/* Header / Logo Area */}
       <View style={styles.headerContainer}>
         <Image source={require('../../assets/logo.png')} style={styles.logoImage} resizeMode="contain" />
@@ -110,23 +122,37 @@ export default function LoginScreen({ navigation }) {
           <Text style={styles.footerLink}>Sign up</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </>
   );
 
   return (
     <SafeAreaView style={styles.safeArea}>
       {Platform.OS === 'web' ? (
-        renderContent()
+        <View style={styles.inner}>
+          {renderContent()}
+        </View>
       ) : (
         <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
           style={styles.container}
         >
-          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <ScrollView 
+            style={{ flex: 1 }}
+            contentContainerStyle={styles.inner} 
+            showsVerticalScrollIndicator={false} 
+            keyboardShouldPersistTaps="handled"
+          >
             {renderContent()}
-          </TouchableWithoutFeedback>
+          </ScrollView>
         </KeyboardAvoidingView>
       )}
+      <CustomAlertModal
+        visible={alertVisible}
+        title={alertTitle}
+        message={alertMessage}
+        buttons={alertButtons}
+        onClose={() => setAlertVisible(false)}
+      />
     </SafeAreaView>
   );
 }

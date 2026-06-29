@@ -16,6 +16,22 @@ export default (theme) => StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: theme.border,
   },
+  topBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    paddingHorizontal: SIZES.md,
+    paddingBottom: SIZES.sm,
+  },
+  backButton: {
+    padding: SIZES.xs,
+  },
+  topBarTitle: {
+    ...FONTS.h3,
+    color: theme.text,
+    fontWeight: 'bold',
+  },
   avatar: {
     width: 90,
     height: 90,
@@ -161,5 +177,25 @@ export default (theme) => StyleSheet.create({
   loadingContainer: {
     paddingVertical: SIZES.xl,
     alignItems: 'center',
+  },
+  credentialsContainer: {
+    marginTop: SIZES.md,
+    backgroundColor: theme.background,
+    borderRadius: SIZES.radius,
+    padding: SIZES.md,
+    width: '90%',
+    borderWidth: 1,
+    borderColor: theme.border,
+    alignItems: 'stretch',
+    gap: SIZES.sm,
+  },
+  credentialItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  credentialText: {
+    ...FONTS.body2,
+    color: theme.text,
+    flex: 1,
   },
 });
