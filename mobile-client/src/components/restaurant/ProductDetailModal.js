@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import ProductDetailModalView from '../../styles/ProductDetailModal.styles';
+import { StyleSheet, View, Text, Image, TouchableOpacity, Modal, ScrollView, TextInput, ActivityIndicator, Alert } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { COLORS, SIZES, FONTS } from '../../theme/theme';
+import { useTheme } from '../../contexts/ThemeContext';
 import { useCart } from '../../contexts/CartContext';
 import { useAuth } from '../../contexts/AuthContext';
-import { BASE_URL, productService } from '../../services/api';
-import { Alert } from 'react-native';
+import { BASE_URL, productService, uploadService } from '../../services/api';
+import { createStyles } from '../../styles/ProductDetailModal.styles';
+import * as ImagePicker from 'expo-image-picker';
 
 const DEFAULT_PRODUCT_IMAGE = "/api/uploads/products/default.webp";
 
 export default function ProductDetailModal({ visible, product, restaurant, onClose, onProductUpdated }) {
+  const { theme } = useTheme();
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
   const { addToCart } = useCart();
   const { currentUser, updateLastViewedProduct } = useAuth();
 
@@ -47,11 +53,56 @@ export default function ProductDetailModal({ visible, product, restaurant, onClo
     }
   }, [visible, product]);
 
+  const pickImage = async (useCamera = false) => {
+    try {
+      let result;
+      if (useCamera) {
+        const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+        if (permissionResult.granted === false) {
+          Alert.alert('Permission needed', 'You need to grant camera permissions to take a picture.');
+          return;
+        }
+        result = await ImagePicker.launchCameraAsync({
+          mediaTypes: ['images'],
+          allowsEditing: true,
+          aspect: [4, 3],
+          quality: 0.8,
+        });
+      } else {
+        const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (permissionResult.granted === false) {
+          Alert.alert('Permission needed', 'You need to grant gallery permissions to select a picture.');
+          return;
+        }
+        result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ['images'],
+          allowsEditing: true,
+          aspect: [4, 3],
+          quality: 0.8,
+        });
+      }
+
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        setImage(result.assets[0].uri);
+        setError(null);
+      }
+    } catch (err) {
+      console.error('Error picking image:', err);
+      setError('Failed to select image.');
+    }
+  };
+
   if (!product) return null;
 
   const isCreator = currentUser && (restaurant?.creatorId === currentUser.id || currentUser.isAdmin);
   const displayImage = product.image || DEFAULT_PRODUCT_IMAGE;
   const imageUrl = displayImage.startsWith('http') ? displayImage : `${BASE_URL}${displayImage}`;
+
+  const previewUri = image
+    ? (image.startsWith('http') || image.startsWith('file://') || image.startsWith('content://') 
+      ? image 
+      : `${BASE_URL}${image}`)
+    : null;
 
   const handleAddToOrder = async () => {
     await addToCart(product, restaurant);
@@ -72,11 +123,19 @@ export default function ProductDetailModal({ visible, product, restaurant, onClo
       setSubmitting(true);
       setError(null);
 
+      let finalImageUrl = image && image.trim() !== '' ? image.trim() : (product.image || '');
+      if (image && !image.startsWith('/api/') && !image.startsWith('http://') && !image.startsWith('https://')) {
+        const uploadResponse = await uploadService.uploadImage(image);
+        if (uploadResponse && uploadResponse.url) {
+          finalImageUrl = uploadResponse.url;
+        }
+      }
+
       const payload = {
         name: name.trim(),
         price: parseFloat(price),
         description: description.trim(),
-        image: image.trim() || undefined
+        image: finalImageUrl || undefined
       };
 
       const restId = restaurant.id || restaurant._id;
@@ -131,27 +190,165 @@ export default function ProductDetailModal({ visible, product, restaurant, onClo
   };
 
   return (
-    <ProductDetailModalView
+    <Modal
+      animationType="slide"
+      transparent={true}
       visible={visible}
-      onClose={onClose}
-      isCreator={isCreator}
-      isEditing={isEditing}
-      setIsEditing={setIsEditing}
-      error={error}
-      name={name}
-      setName={setName}
-      price={price}
-      setPrice={setPrice}
-      description={description}
-      setDescription={setDescription}
-      image={image}
-      setImage={setImage}
-      submitting={submitting}
-      handleDeleteProduct={handleDeleteProduct}
-      product={product}
-      imageUrl={imageUrl}
-      handleSaveProduct={handleSaveProduct}
-      handleAddToOrder={handleAddToOrder}
-    />
+      onRequestClose={onClose}
+    >
+      <View style={styles.overlay}>
+        <View style={styles.modalContainer}>
+          <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+            <Ionicons name="close" size={24} color={theme.text} />
+          </TouchableOpacity>
+
+          {isCreator && !isEditing && (
+            <TouchableOpacity 
+              style={styles.editButton} 
+              onPress={() => setIsEditing(true)}
+            >
+              <Ionicons name="create-outline" size={24} color={theme.text} />
+            </TouchableOpacity>
+          )}
+
+          <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+            {isEditing ? (
+              <View style={styles.infoContainer}>
+                <Text style={styles.editModalTitle}>Edit Product Details</Text>
+                {error && <Text style={styles.errorText}>{error}</Text>}
+                
+                <Text style={styles.inputLabel}>Product Name *</Text>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="Enter product name"
+                  placeholderTextColor={theme.textSecondary}
+                  value={name}
+                  onChangeText={setName}
+                />
+
+                <Text style={styles.inputLabel}>Price * (₪)</Text>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="e.g. 35.5"
+                  placeholderTextColor={theme.textSecondary}
+                  value={price}
+                  onChangeText={setPrice}
+                  keyboardType="numeric"
+                />
+
+                <Text style={styles.inputLabel}>Description</Text>
+                <TextInput
+                  style={styles.textInputArea}
+                  placeholder="Enter product description"
+                  placeholderTextColor={theme.textSecondary}
+                  value={description}
+                  onChangeText={setDescription}
+                  multiline={true}
+                  numberOfLines={3}
+                />
+
+                <View style={styles.imagePickerContainer}>
+                  <Text style={styles.inputLabel}>Product Image (Optional)</Text>
+                  
+                  <View style={styles.imagePreviewArea}>
+                    {previewUri ? (
+                      <Image source={{ uri: previewUri }} style={styles.imagePreview} resizeMode="cover" />
+                    ) : (
+                      <>
+                        <Ionicons name="image-outline" size={48} color={theme.textSecondary} />
+                        <Text style={styles.placeholderText}>No image selected</Text>
+                      </>
+                    )}
+                  </View>
+
+                  <View style={styles.imageActionButtons}>
+                    <TouchableOpacity 
+                      style={styles.imageBtn} 
+                      onPress={() => pickImage(false)}
+                      disabled={submitting}
+                    >
+                      <Ionicons name="images-outline" size={20} color={theme.text} />
+                      <Text style={styles.imageBtnText}>Gallery</Text>
+                    </TouchableOpacity>
+                    
+                    <TouchableOpacity 
+                      style={styles.imageBtn} 
+                      onPress={() => pickImage(true)}
+                      disabled={submitting}
+                    >
+                      <Ionicons name="camera-outline" size={20} color={theme.text} />
+                      <Text style={styles.imageBtnText}>Camera</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+
+                <TouchableOpacity 
+                  style={styles.deleteButton}
+                  onPress={handleDeleteProduct}
+                  disabled={submitting}
+                >
+                  <Text style={styles.deleteButtonText}>Delete Product</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <>
+                {product.image ? (
+                  <Image source={{ uri: imageUrl }} style={styles.productImage} />
+                ) : (
+                  <View style={styles.noImageContainer}>
+                    <Ionicons name="fast-food-outline" size={60} color={theme.textSecondary} />
+                    <Text style={styles.noImageText}>No image available</Text>
+                  </View>
+                )}
+
+                <View style={styles.infoContainer}>
+                  <Text style={styles.productName}>{product.name}</Text>
+                  <Text style={styles.productPrice}>₪{parseFloat(product.price).toFixed(2)}</Text>
+                  
+                  <View style={styles.divider} />
+                  
+                  <Text style={styles.sectionTitle}>Description</Text>
+                  <Text style={styles.productDescription}>
+                    {product.description || 'No description available for this item.'}
+                  </Text>
+                </View>
+              </>
+            )}
+          </ScrollView>
+
+          {isEditing ? (
+            <View style={styles.footerCreator}>
+              <TouchableOpacity 
+                style={styles.cancelButton} 
+                onPress={() => setIsEditing(false)}
+                disabled={submitting}
+              >
+                <Text style={styles.cancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={styles.saveButton} 
+                onPress={handleSaveProduct}
+                disabled={submitting}
+              >
+                {submitting ? (
+                  <ActivityIndicator size="small" color="#ffffff" />
+                ) : (
+                  <Text style={styles.saveButtonText}>Save</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View style={styles.footerUser}>
+              <TouchableOpacity style={styles.addButton} onPress={handleAddToOrder}>
+                <Ionicons name="cart" size={20} color="#ffffff" style={styles.cartIcon} />
+                <Text style={styles.addButtonText}>Add to Order</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+      </View>
+    </Modal>
   );
 }
+

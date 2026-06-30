@@ -117,7 +117,20 @@ export const apiRequest = async (endpoint, options = {}) => {
         body = JSON.parse(text);
       } catch (e) { }
     }
-    return { location, body };
+    
+    const result = { location, body };
+    if (body && typeof body === 'object') {
+      Object.assign(result, body);
+    }
+    if (location) {
+      const parts = location.split('/');
+      const id = parts[parts.length - 1];
+      if (id) {
+        if (!result.id) result.id = id;
+        if (!result._id) result._id = id;
+      }
+    }
+    return result;
   }
 
   const text = await response.text();
@@ -207,21 +220,45 @@ export const categoryService = {
 };
 
 export const uploadService = {
-  uploadImage: async (uri) => {
+  uploadImage: async (uriOrAsset) => {
     const formData = new FormData();
-    const filename = uri.split('/').pop();
-    const match = /\.(\w+)$/.exec(filename);
-    const type = match ? `image/${match[1]}` : `image`;
+    const uri = uriOrAsset && typeof uriOrAsset === 'object' ? uriOrAsset.uri : uriOrAsset;
 
-    formData.append('image', { uri, name: filename, type });
+    // Convert the local image URI to a standard Blob object using XMLHttpRequest (reliable on both Web and Android file:// URIs)
+    const blob = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        resolve(xhr.response);
+      };
+      xhr.onerror = function (e) {
+        console.error('XHR error converting URI to Blob:', e);
+        reject(new TypeError("Network request failed"));
+      };
+      xhr.responseType = "blob";
+      xhr.open("GET", uri, true);
+      xhr.send(null);
+    });
 
-    return await apiRequest('/api/upload', {
+    const mimeType = blob.type || 'image/jpeg';
+    const fileExt = mimeType.split('/')[1] || 'jpeg';
+
+    formData.append('image', blob, `photo.${fileExt}`);
+
+    const response = await fetch(`${BASE_URL}/api/upload`, {
       method: 'POST',
       body: formData,
-      isMultipart: true,
     });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      console.error('Image upload failed response:', errText);
+      throw new Error('Image upload failed');
+    }
+
+    return await response.json();
   }
 };
+
 
 export const restaurantService = {
   getAll: async () => {
