@@ -8,6 +8,8 @@ import { useAuth } from '../../contexts/AuthContext';
 import { BASE_URL, productService, uploadService } from '../../services/api';
 import { createStyles } from '../../styles/ProductDetailModal.styles';
 import * as ImagePicker from 'expo-image-picker';
+import CustomAlertModal from '../CustomAlertModal';
+
 
 const DEFAULT_PRODUCT_IMAGE = "/api/uploads/products/default.webp";
 
@@ -29,7 +31,7 @@ export default function ProductDetailModal({ visible, product, restaurant, onClo
     if (visible && product && restaurant && currentUser) {
       const restId = restaurant.id || restaurant._id;
       const prodId = product.id || product._id;
-      
+
       // Trigger backend log view (which saves interaction to C++ TCP recommendation server)
       productService.getById(restId, prodId).catch((err) => {
         console.log('Failed to log product view on backend:', err.message);
@@ -99,8 +101,8 @@ export default function ProductDetailModal({ visible, product, restaurant, onClo
   const imageUrl = displayImage.startsWith('http') ? displayImage : `${BASE_URL}${displayImage}`;
 
   const previewUri = image
-    ? (image.startsWith('http') || image.startsWith('file://') || image.startsWith('content://') 
-      ? image 
+    ? (image.startsWith('http') || image.startsWith('file://') || image.startsWith('content://')
+      ? image
       : `${BASE_URL}${image}`)
     : null;
 
@@ -142,7 +144,7 @@ export default function ProductDetailModal({ visible, product, restaurant, onClo
       const prodId = product.id || product._id;
 
       await productService.update(restId, prodId, payload);
-      
+
       if (onProductUpdated) {
         await onProductUpdated();
       }
@@ -163,8 +165,8 @@ export default function ProductDetailModal({ visible, product, restaurant, onClo
       "Are you sure you want to delete this product? This action cannot be undone.",
       [
         { text: "Cancel", style: "cancel" },
-        { 
-          text: "Delete", 
+        {
+          text: "Delete",
           style: "destructive",
           onPress: async () => {
             try {
@@ -172,7 +174,7 @@ export default function ProductDetailModal({ visible, product, restaurant, onClo
               const restId = restaurant.id || restaurant._id;
               const prodId = product.id || product._id;
               await productService.delete(restId, prodId);
-              
+
               if (onProductUpdated) {
                 await onProductUpdated();
               }
@@ -203,8 +205,8 @@ export default function ProductDetailModal({ visible, product, restaurant, onClo
           </TouchableOpacity>
 
           {isCreator && !isEditing && (
-            <TouchableOpacity 
-              style={styles.editButton} 
+            <TouchableOpacity
+              style={styles.editButton}
               onPress={() => setIsEditing(true)}
             >
               <Ionicons name="create-outline" size={24} color={theme.text} />
@@ -216,7 +218,7 @@ export default function ProductDetailModal({ visible, product, restaurant, onClo
               <View style={styles.infoContainer}>
                 <Text style={styles.editModalTitle}>Edit Product Details</Text>
                 {error && <Text style={styles.errorText}>{error}</Text>}
-                
+
                 <Text style={styles.inputLabel}>Product Name *</Text>
                 <TextInput
                   style={styles.textInput}
@@ -249,7 +251,7 @@ export default function ProductDetailModal({ visible, product, restaurant, onClo
 
                 <View style={styles.imagePickerContainer}>
                   <Text style={styles.inputLabel}>Product Image (Optional)</Text>
-                  
+
                   <View style={styles.imagePreviewArea}>
                     {previewUri ? (
                       <Image source={{ uri: previewUri }} style={styles.imagePreview} resizeMode="cover" />
@@ -262,17 +264,17 @@ export default function ProductDetailModal({ visible, product, restaurant, onClo
                   </View>
 
                   <View style={styles.imageActionButtons}>
-                    <TouchableOpacity 
-                      style={styles.imageBtn} 
+                    <TouchableOpacity
+                      style={styles.imageBtn}
                       onPress={() => pickImage(false)}
                       disabled={submitting}
                     >
                       <Ionicons name="images-outline" size={20} color={theme.text} />
                       <Text style={styles.imageBtnText}>Gallery</Text>
                     </TouchableOpacity>
-                    
-                    <TouchableOpacity 
-                      style={styles.imageBtn} 
+
+                    <TouchableOpacity
+                      style={styles.imageBtn}
                       onPress={() => pickImage(true)}
                       disabled={submitting}
                     >
@@ -282,7 +284,7 @@ export default function ProductDetailModal({ visible, product, restaurant, onClo
                   </View>
                 </View>
 
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={styles.deleteButton}
                   onPress={handleDeleteProduct}
                   disabled={submitting}
@@ -304,9 +306,9 @@ export default function ProductDetailModal({ visible, product, restaurant, onClo
                 <View style={styles.infoContainer}>
                   <Text style={styles.productName}>{product.name}</Text>
                   <Text style={styles.productPrice}>₪{parseFloat(product.price).toFixed(2)}</Text>
-                  
+
                   <View style={styles.divider} />
-                  
+
                   <Text style={styles.sectionTitle}>Description</Text>
                   <Text style={styles.productDescription}>
                     {product.description || 'No description available for this item.'}
@@ -318,16 +320,16 @@ export default function ProductDetailModal({ visible, product, restaurant, onClo
 
           {isEditing ? (
             <View style={styles.footerCreator}>
-              <TouchableOpacity 
-                style={styles.cancelButton} 
+              <TouchableOpacity
+                style={styles.cancelButton}
                 onPress={() => setIsEditing(false)}
                 disabled={submitting}
               >
                 <Text style={styles.cancelButtonText}>Cancel</Text>
               </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={styles.saveButton} 
+
+              <TouchableOpacity
+                style={styles.saveButton}
                 onPress={handleSaveProduct}
                 disabled={submitting}
               >
