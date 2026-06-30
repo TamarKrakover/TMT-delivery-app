@@ -6,7 +6,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { orderService, restaurantService, productService, BASE_URL } from '../services/api';
 import createStyles from '../styles/ProfileScreen.styles';
-import { COLORS, SIZES } from '../theme/theme';
+import { COLORS, SIZES, FONTS } from '../theme/theme';
 import CustomAlertModal from '../components/CustomAlertModal';
 
 export default function ProfileScreen({ navigation, onLogout }) {
@@ -35,7 +35,7 @@ export default function ProfileScreen({ navigation, onLogout }) {
   };
 
   const fetchOrderHistory = async () => {
-    if (!currentUser) return;
+    if (!currentUser || currentUser.isGuest) return;
     
     try {
       setLoading(true);
@@ -217,6 +217,39 @@ export default function ProfileScreen({ navigation, onLogout }) {
       </View>
     );
   };
+
+  if (currentUser?.isGuest) {
+    return (
+      <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+        {/* Top Navigation Bar */}
+        <View style={[styles.headerContainer, { borderBottomWidth: 1, borderBottomColor: theme.border, paddingBottom: 16 }]}>
+          <View style={styles.topBar}>
+            <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+              <Ionicons name="arrow-back" size={24} color={theme.text} />
+            </TouchableOpacity>
+            <Text style={styles.topBarTitle}>Profile</Text>
+            <View style={{ width: 24 }} />
+          </View>
+        </View>
+
+        <View style={styles.emptyContainer}>
+          <Ionicons name="person-circle-outline" size={80} color={theme.textSecondary} />
+          <Text style={{ ...FONTS.h2, color: theme.text, marginTop: 16, marginBottom: 8, fontWeight: 'bold' }}>Guest Account</Text>
+          <Text style={{ ...FONTS.body2, color: theme.textSecondary, textAlign: 'center', marginHorizontal: 24, lineHeight: 22, marginBottom: 24 }}>
+            You are currently logged in as a guest. Please sign in to see your profile, manage restaurants, and order delicious food.
+          </Text>
+          
+          <TouchableOpacity 
+            style={[styles.logoutButton, { backgroundColor: COLORS.primary, width: '80%', marginTop: 16 }]} 
+            onPress={logout}
+          >
+            <Ionicons name="log-in-outline" size={20} color="#ffffff" />
+            <Text style={styles.logoutButtonText}>Sign In / Register</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>

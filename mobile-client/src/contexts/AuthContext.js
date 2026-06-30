@@ -19,7 +19,12 @@ export const AuthProvider = ({ children }) => {
   const loadUserSession = async () => {
     try {
       const session = await getUserSession();
-      setCurrentUser(session);
+      if (session && session.isGuest) {
+        await clearUserSession();
+        setCurrentUser(null);
+      } else {
+        setCurrentUser(session);
+      }
     } catch (error) {
       console.error('Failed to load user session:', error);
     } finally {
@@ -32,7 +37,9 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (fullUserData) => {
-    await setUserSession(fullUserData);
+    if (!fullUserData.isGuest) {
+      await setUserSession(fullUserData);
+    }
     setCurrentUser(fullUserData);
   };
 
