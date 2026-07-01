@@ -67,10 +67,10 @@ post user2_id beef_burger_id
 At this stage, `user2`'s history is: `[beef_burger_id]`.
 
 **Web Client**:
-![User 2 View Beef Burger Web](../runScreenShot/viewProductWebPlaceholder.png) *(MISSING: Add screenshot here)*
+![User 2 View Beef Burger Web](assets/web_product_details_modal.png)
 
 **Mobile Client**:
-*(MISSING: Add User 2 View Beef Burger Mobile screenshot here)*
+<img src="assets/mobile_dish_details.jpg" width="300" alt="User 2 View Beef Burger Mobile" />
 
 ### 3. Recommendations Generation
 When `user2` requests recommendations based on the `Beef Burger` page view, the C++ engine runs `recommend("user2_id", "beef_burger_id")`:
@@ -88,7 +88,7 @@ When `user2` requests recommendations based on the `Beef Burger` page view, the 
 On `user2`'s Home screen under **"Recommended for you"**, the items `French Fries` and `Milkshake` are dynamically displayed. Because Moshik ordered them, and `user2` had one shared preference (`Beef Burger`), the system recommended what Moshik liked!
 
 **Web Client**:
-![User 2 Recommendations Web](../runScreenShot/recommendationWebPlaceholder.png) *(MISSING: Add screenshot here)*
+![User 2 Recommendations Web](assets/web_recommendations_pizza.png)
 
 **Mobile Client**:
-<img src="images/1782859670741.jpg" width="300" alt="User Recommendations Mobile" />
+<img src="assets/mobile_user_recommendations.jpg" width="300" alt="User Recommendations Mobile" />
