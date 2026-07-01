@@ -59,14 +59,18 @@ This walkthrough demonstrates the recommendation engine in action as shown in th
   Moshik's history is recorded as: `[beef_burger_id, fries_id, milkshake_id]`.
 
 ### 2. User 2 Views Beef Burger
-<img src="images/1782859671142.jpg" width="300" alt="User 2 View Beef Burger" />
 
-* **Action**: A different user, `user2`, logs in and enters the details page of the `Beef Burger`.
-* **Behind the Scenes**: Node.js logs `user2` viewing `Beef Burger` and saves the interaction to the C++ server:
-  ```
-  post user2_id beef_burger_id
-  ```
-  At this stage, `user2`'s history is: `[beef_burger_id]`.
+A different user, `user2`, logs in and enters the details page of the `Beef Burger`. Node.js logs `user2` viewing `Beef Burger` and saves the interaction to the C++ server:
+```
+post user2_id beef_burger_id
+```
+At this stage, `user2`'s history is: `[beef_burger_id]`.
+
+**Web Client**:
+![User 2 View Beef Burger Web](../runScreenShot/viewProductWebPlaceholder.png) *(MISSING: Add screenshot here)*
+
+**Mobile Client**:
+*(MISSING: Add User 2 View Beef Burger Mobile screenshot here)*
 
 ### 3. Recommendations Generation
 When `user2` requests recommendations based on the `Beef Burger` page view, the C++ engine runs `recommend("user2_id", "beef_burger_id")`:
@@ -80,6 +84,11 @@ When `user2` requests recommendations based on the `Beef Burger` page view, the 
 4. Return recommendations: `[fries_id, milkshake_id]`.
 
 ### 4. Recommendation Rendered to User 2
-<img src="images/1782859671162.jpg" width="300" alt="User 2 Recommendations" />
 
-* **Result**: On `user2`'s Home screen under **"Recommended for you"**, the items `French Fries` and `Milkshake` are dynamically displayed. Because Moshik ordered them, and `user2` had one shared preference (`Beef Burger`), the system recommended what Moshik liked!
+On `user2`'s Home screen under **"Recommended for you"**, the items `French Fries` and `Milkshake` are dynamically displayed. Because Moshik ordered them, and `user2` had one shared preference (`Beef Burger`), the system recommended what Moshik liked!
+
+**Web Client**:
+![User 2 Recommendations Web](../runScreenShot/recommendationWebPlaceholder.png) *(MISSING: Add screenshot here)*
+
+**Mobile Client**:
+<img src="images/1782859670741.jpg" width="300" alt="User Recommendations Mobile" />
