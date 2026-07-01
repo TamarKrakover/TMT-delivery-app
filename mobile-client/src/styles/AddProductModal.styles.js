@@ -1,7 +1,5 @@
-import React from 'react';
-import { StyleSheet, View, Text, TextInput, ScrollView, TouchableOpacity, ActivityIndicator, Modal } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { COLORS, SIZES, FONTS } from '../theme/theme';
-import { useTheme } from '../contexts/ThemeContext';
 
 export const createStyles = (theme) => StyleSheet.create({
   overlay: {
@@ -94,109 +92,53 @@ export const createStyles = (theme) => StyleSheet.create({
   },
   submitButtonDisabled: {
     opacity: 0.7,
+  },
+  imagePickerContainer: {
+    marginTop: 8,
+    marginBottom: 16,
+  },
+  imagePreviewArea: {
+    width: '100%',
+    height: 150,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: theme.border,
+    borderStyle: 'dashed',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: theme.background,
+    overflow: 'hidden',
+  },
+  imagePreview: {
+    width: '100%',
+    height: '100%',
+  },
+  placeholderText: {
+    fontSize: 14,
+    color: theme.textSecondary,
+    marginTop: 8,
+  },
+  imageActionButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 12,
+  },
+  imageBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 10,
+    borderRadius: 8,
+    backgroundColor: theme.background,
+    borderWidth: 1,
+    borderColor: theme.border,
+    marginHorizontal: 4,
+  },
+  imageBtnText: {
+    fontSize: 14,
+    color: theme.text,
+    marginLeft: 6,
   }
 });
 
-export default function AddProductModalView({
-  visible,
-  onClose,
-  pFormError,
-  setPFormError,
-  pName,
-  setPName,
-  pPrice,
-  setPPrice,
-  pDescription,
-  setPDescription,
-  pImage,
-  setPImage,
-  pSubmitting,
-  handleAddProduct
-}) {
-  const { theme } = useTheme();
-  const styles = React.useMemo(() => createStyles(theme), [theme]);
-
-  return (
-    <Modal
-      visible={visible}
-      animationType="slide"
-      transparent={true}
-      onRequestClose={onClose}
-    >
-      <View style={styles.overlay}>
-        <View style={styles.modalContainer}>
-          <Text style={styles.modalTitle}>Add Product to Menu</Text>
-          
-          <ScrollView showsVerticalScrollIndicator={false} style={styles.scrollMargin}>
-            {pFormError && <Text style={styles.errorText}>{pFormError}</Text>}
-            
-            <Text style={styles.label}>Product Name *</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter product name"
-              placeholderTextColor={theme.textSecondary}
-              value={pName}
-              onChangeText={setPName}
-            />
-
-            <Text style={styles.label}>Price * (₪)</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="e.g. 45"
-              placeholderTextColor={theme.textSecondary}
-              value={pPrice}
-              onChangeText={setPPrice}
-              keyboardType="numeric"
-            />
-
-            <Text style={styles.label}>Description</Text>
-            <TextInput
-              style={[styles.input, styles.textArea]}
-              placeholder="Enter description"
-              placeholderTextColor={theme.textSecondary}
-              value={pDescription}
-              onChangeText={setPDescription}
-              multiline={true}
-              numberOfLines={3}
-            />
-
-            <Text style={styles.label}>Image URL / Path</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="e.g. /api/uploads/products/custom.webp"
-              placeholderTextColor={theme.textSecondary}
-              value={pImage}
-              onChangeText={setPImage}
-              autoCapitalize="none"
-            />
-          </ScrollView>
-
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity 
-              style={styles.cancelButton} 
-              onPress={() => {
-                onClose();
-                setPFormError(null);
-              }}
-              disabled={pSubmitting}
-            >
-              <Text style={styles.cancelButtonText}>Cancel</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={[styles.submitButton, pSubmitting && styles.submitButtonDisabled]} 
-              onPress={handleAddProduct}
-              disabled={pSubmitting}
-            >
-              {pSubmitting ? (
-                <ActivityIndicator size="small" color="#ffffff" />
-              ) : (
-                <Text style={styles.submitButtonText}>Add Item</Text>
-              )}
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
-    </Modal>
-  );
-}
