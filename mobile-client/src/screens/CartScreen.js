@@ -12,7 +12,7 @@ export default function CartScreen({ navigation }) {
   const { theme } = useTheme();
   const styles = React.useMemo(() => createStyles(theme), [theme]);
 
-  const { currentUser } = useAuth();
+  const { currentUser, logout } = useAuth();
   const {
     cartItems,
     cartRestaurant,
@@ -103,8 +103,8 @@ export default function CartScreen({ navigation }) {
     );
   };
 
-  // 1. User not logged in state
-  if (!currentUser) {
+  // 1. User not logged in or guest state
+  if (!currentUser || currentUser.isGuest) {
     return (
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.header}>
@@ -118,7 +118,7 @@ export default function CartScreen({ navigation }) {
           </Text>
           <TouchableOpacity 
             style={styles.browseButton}
-            onPress={() => navigation.navigate('Login')}
+            onPress={logout}
           >
             <Text style={styles.browseButtonText}>Sign In</Text>
           </TouchableOpacity>

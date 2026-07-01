@@ -45,7 +45,7 @@ export const CartProvider = ({ children }) => {
   const clearSuccess = () => setSuccessItem(null);
 
   const fetchCart = useCallback(async () => {
-    if (!currentUser) {
+    if (!currentUser || currentUser.isGuest) {
       setCartItems([]);
       setCartRestaurant(null);
       setActiveOrderId(null);
@@ -174,8 +174,7 @@ export const CartProvider = ({ children }) => {
   };
 
   const addToCart = async (product, restaurant) => {
-    if (!currentUser) {
-      Alert.alert("Authentication Required", "Please sign in to add items to your cart.");
+    if (!currentUser || currentUser.isGuest) {
       return false;
     }
 

@@ -89,6 +89,13 @@ export const apiRequest = async (endpoint, options = {}) => {
     ...options.headers,
   };
 
+  // Clean headers to remove any undefined/null values that could crash Expo fetch
+  Object.keys(headers).forEach(key => {
+    if (headers[key] === undefined || headers[key] === null) {
+      delete headers[key];
+    }
+  });
+
   const url = `${BASE_URL}${endpoint}`;
 
   // If body is FormData or explicitly flagged as multipart, don't set Content-Type header manually (let fetch determine boundaries)
@@ -96,8 +103,10 @@ export const apiRequest = async (endpoint, options = {}) => {
     delete headers['Content-Type'];
   }
 
+  const { isMultipart, ...fetchOptions } = options;
+
   const response = await fetch(url, {
-    ...options,
+    ...fetchOptions,
     headers,
   });
 

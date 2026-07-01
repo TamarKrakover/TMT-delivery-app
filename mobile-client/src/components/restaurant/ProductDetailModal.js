@@ -26,6 +26,7 @@ export default function ProductDetailModal({ visible, product, restaurant, onClo
   const [image, setImage] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [showAuthAlert, setShowAuthAlert] = useState(false);
 
   useEffect(() => {
     if (visible && product && restaurant && currentUser) {
@@ -107,6 +108,10 @@ export default function ProductDetailModal({ visible, product, restaurant, onClo
     : null;
 
   const handleAddToOrder = async () => {
+    if (!currentUser || currentUser.isGuest) {
+      setShowAuthAlert(true);
+      return;
+    }
     await addToCart(product, restaurant);
     onClose();
   };

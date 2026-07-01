@@ -218,9 +218,11 @@ export default function HomeScreen({ navigation }) {
           <Image source={require('../../assets/logo.png')} style={styles.logoImage} />
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <TouchableOpacity onPress={toggleTheme} style={{ marginRight: 15 }}>
-            <Ionicons name={isDark ? 'sunny' : 'moon'} size={24} color={theme.text} />
-          </TouchableOpacity>
+          {currentUser && !currentUser.isGuest && (
+            <TouchableOpacity onPress={toggleTheme} style={{ marginRight: 15 }}>
+              <Ionicons name={isDark ? 'sunny' : 'moon'} size={24} color={theme.text} />
+            </TouchableOpacity>
+          )}
           <TouchableOpacity
             style={styles.profileButton}
             onPress={() => navigation.navigate('Profile')}
