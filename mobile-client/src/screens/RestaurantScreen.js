@@ -57,7 +57,6 @@ export default function RestaurantScreen({ route, navigation }) {
       const productsData = await productService.getByRestaurantId(targetId);
       setProducts(productsData || []);
     } catch (err) {
-      console.log("Failed to load restaurant menu:", err.message);
       setError("Could not load menu. Please try again.");
     } finally {
       setLoading(false);
@@ -90,7 +89,6 @@ export default function RestaurantScreen({ route, navigation }) {
       await restaurantService.delete(targetId);
       setDeleteModalState('success');
     } catch (err) {
-      console.log("Failed to delete restaurant:", err.message);
       setDeleteModalState('hidden');
       setTimeout(() => {
         Alert.alert("Error", err.message || "Failed to delete restaurant.");

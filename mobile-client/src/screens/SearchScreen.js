@@ -38,7 +38,6 @@ export default function SearchScreen({ navigation, userSession }) {
           const user = await userService.getUserById(userSession.id);
           setFullUser(user);
         } catch (error) {
-          console.error("Failed to fetch user in search:", error);
         }
       }
     };
@@ -53,7 +52,6 @@ export default function SearchScreen({ navigation, userSession }) {
       allRests.forEach(r => { dict[r.id] = r.name; });
       setRestaurantDict(dict);
     } catch (e) {
-      console.error("Failed to fetch restaurants for mapping", e);
     }
   }, []);
 
@@ -79,7 +77,6 @@ export default function SearchScreen({ navigation, userSession }) {
         setRestaurants(results);
         setVisibleCount(10); // Reset pagination on new search
       } catch (error) {
-        console.error("Search failed:", error);
         setRestaurants([]);
       } finally {
         setLoading(false);
