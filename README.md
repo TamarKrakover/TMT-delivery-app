@@ -1,31 +1,53 @@
-# TMT Delivery - Food Ordering & Recommendation System
+<p align="center">
+  <img src="./react-client/src/logoTMT.svg" alt="TMT Delivery Logo" height="150" />
+</p>
 
-TMT Delivery is a complete, containerized food delivery application (similar to Wolt). It integrates a C++ Recommendation Engine, a Node.js Express REST API, and a dynamic React Single Page Application (SPA).
+# TMT Delivery
+**A Cross-Platform Food Ordering & Recommendation System (Inspired by Wolt)**
+
+TMT Delivery is a complete, containerized ecosystem integrating a high-performance **C++ Recommendation Engine**, a robust **Node.js Express REST API**, a dynamic **React Web Application**, and a **React Native (Expo) Mobile Application**.
 
 ---
 
 ## 🚀 How to Run and Build the Project
 
-The entire stack is containerized using Docker and orchestrated with [docker-compose.yml](file:///docker-compose.yml). 
+The entire stack is containerized using Docker and orchestrated with [`docker-compose.yml`](./docker-compose.yml). 
 
 ### Prerequisites
 Make sure you have [Docker](https://www.docker.com/) and **Docker Compose** installed on your system.
 
-### Running the Application
-To build and start all three services (C++ Recommendation Server, Node.js API Server, and React Frontend), run the following command in the project root directory:
+### 1. Build and Run Backend & Web Clients
+To raise the MongoDB database, the C++ recommendation engine, the Node.js Express server, and the React Web Client, open a terminal in the root project directory and run:
 
 ```bash
 docker compose up --build
 ```
-running on expo:
-```bash
-npm start
-```
+*(Note: Keep this terminal open and running!)*
 
 #### Running Services:
-* **React Client Frontend**: Accessible at [http://localhost:3000](http://localhost:3000)
-* **Node.js Express API Gateway**: Accessible at `http://localhost:8080`
-* **C++ Recommendation Server**: Runs internally on port `5555`
+* **React Web Frontend**: Accessible locally at `http://localhost:3000`
+* **Node.js Express REST API**: Accessible locally at `http://localhost:8080`
+* **MongoDB Instance**: Accessible at `mongodb://localhost:27017`
+* **C++ Recommendation Engine**: Runs on port `5555` inside the container network.
+
+### 2. Run the React Native Mobile Client (Expo)
+Open a **new, separate terminal** so the backend remains running. You have two options to launch the mobile app:
+
+**Option A: Via Docker Profile**
+```bash
+docker compose --profile mobile up --build
+```
+
+**Option B: Locally (Recommended for Emulators)**
+If you want to run the app on an Android Emulator or iOS Simulator, or via the Expo Go app on your physical phone, run it locally:
+```bash
+cd mobile-client
+npm install
+npm start
+```
+*Once the Metro Bundler starts:*
+- **Emulators**: Press `a` in the terminal to open the Android Emulator, or `i` for the iOS Simulator.
+- **Physical Device**: Download the **Expo Go** app (Note: requires **version 56**) on your smartphone and scan the QR code displayed in the terminal to run the app on your own device.
 
 ---
 
@@ -38,131 +60,64 @@ docker compose --profile test run tests
 
 ---
 
+## 📸 Interface and Walkthrough 
+For detailed walkthroughs and screenshots of both the Web Application and the Mobile Application, please refer to the [Wiki Documentation](./wiki/Home.md).
+
+---
+
 ## 🏗️ How the Project is Built (Architecture)
 
 The application follows a highly modular, decoupled architecture distributed across three layers:
 
 ```mermaid
 graph TD
-    Client[React Frontend - Port 3000] <-->|HTTP REST / JSON| API[Express API Gateway - Port 8080]
+    WebClient[React Web - Port 3000] <-->|HTTP REST / JSON| API[Express API Gateway - Port 8080]
+    MobileClient[React Native - Port 8081] <-->|HTTP REST / JSON| API
     API <-->|TCP Socket / Port 5555| Recommendation[C++ Recommendation Engine]
+    API <-->|Mongoose| DB[(MongoDB - Port 27017)]
 ```
 
 ### Component Breakdown
-1. **Frontend Client ([react-client/](file:///react-client))**:
+1. **Web Frontend Client ([react-client/](./react-client))**:
    - Built using **React 19** and **React Router DOM 7**.
-   - Leverages React Context for global state management (such as Theme and Authentication).
    - Custom styling with vanilla CSS supporting a fully responsive layout and seamless Dark/Light Mode.
-2. **REST API Server ([api/](file:///api))**:
+2. **Mobile Client ([mobile-client/](./mobile-client))**:
+   - Built with **React Native** and **Expo**.
+   - Cross-platform support (iOS/Android) using NativeWind and Expo Router.
+3. **REST API Server ([api/](./api))**:
    - Built with **Node.js** and **Express**.
-   - Serves as the central API gateway handling CRUD requests for users, restaurants, products, and orders.
-   - Implements an MVC pattern, persisting resources in-memory using [InMemoryDB.js](file:///api/src/models/InMemoryDB.js).
-   - Functions as a client to the recommendation engine, sending tracking events (e.g., when a user views a product) over a standard TCP Socket on port `5555`.
-3. **Recommendation Engine ([cpp/](file:///cpp))**:
+   - Serves as the central API gateway handling CRUD requests.
+   - Implements an MVC pattern, persisting resources in **MongoDB** using Mongoose.
+   - Communicates with the recommendation engine over TCP.
+4. **Recommendation Engine ([cpp/](./cpp))**:
    - High-performance server written in **C++** and compiled with **CMake**.
-   - Tracks user viewing behavior and utilizes collaborative filtering and item-to-item recommendations to recommend alternative restaurants.
-   - Listens for TCP connections inside the container network.
+   - Tracks user viewing behavior and utilizes collaborative filtering to recommend products.
+5. **Database Layer**:
+   - **MongoDB** container running on port `27017` to securely store all persistent data.
 
 ### Key Implementation Details
-* **In-Memory Data Store**: The API server persists data in volatile structures. Data is reset upon server restart.
+* **Database Persistence**: The API server persists data using MongoDB, replacing the previous volatile in-memory structure. Data persists reliably across container restarts via Docker volumes.
 * **Authentication**: Secured using custom header verification. The React application sends commands using JWT-based headers to authenticate requests.
 * **Distance Calculation**: The application uses user and restaurant coordinates (Latitude/Longitude) to dynamically compute and render distances in kilometers.
-* **Theme Switching**: A unified [ThemeContext.jsx](file:///react-client/src/contexts/ThemeContext.js) listens for toggle triggers, modifying the CSS variables on the document body (`body.dark-mode`). The user's preferred theme is saved in `localStorage` per user ID, ensuring it persists across sessions.
+* **Theme Switching**: A unified [`ThemeContext.jsx`](./react-client/src/contexts/ThemeContext.jsx) listens for toggle triggers, modifying the CSS variables on the document body (`body.dark-mode`). The user's preferred theme is saved in `localStorage` per user ID, ensuring it persists across sessions.
+
+
+## 🛠️ Agile Development & Version Control
+
+The project was managed using strict Agile methodologies to simulate a real-world development environment:
+* **Jira & Sprints**: We utilized Jira to plan our development cycles, working in defined Sprints. Features were meticulously broken down into Epics, User Stories, and Tasks.
+* **Git & GitHub**: Version control was handled through Git. We adhered to a strict **Feature Branch** workflow to ensure the `main` branch remained stable at all times.
+* **Code Reviews**: All features were merged into the main branch exclusively via Pull Requests (PRs), requiring code reviews and approvals from teammates before integration.
 
 ---
 
-## 📸 Interface and Walkthrough 
+## 👥 Work Stages (Course Assignments)
 
-Below is an overview of the screenshots from the `runScreenShot/` directory, illustrating key application views and workflows:
+This project was developed incrementally over the course of the semester, divided into 5 major assignments:
 
-### Registration Screen 
-![Registration Screen](runScreenShot/run1.png)
-* **Page Route**: `/register`
-* Allows new users to sign up. Features field validations (e.g., minimum 8 character password with letters and special characters), username check, display name, account type selection, optional profile picture selection (previewing local images), and location coordinate inputs (Latitude and Longitude) used for nearby restaurant distance calculations.
-
----
-
-### Add Restaurant Modal 
-![Add Restaurant](runScreenShot/run2.png)
-*  **Usage**: A modal interface visible to authorized owners. It prompts for the Restaurant Name, Description, Category (dropdown selection), Latitude/Longitude coordinates, and custom image file upload. The background page is blurred out for user focus.
-
----
-
-### Homepage Overview 
-![Homepage](runScreenShot/run3.png)
-* **Page Route**: `/`
-* Shows the primary dashboard after login (before login only categories are shown).
-  - **Dynamic Distance**: Highlights "pizza makpizza" (recently added) at `0.0 km` distance since it aligns with the user's coordinate location. Other restaurants are listed with dynamically calculated distances (e.g., `0.4 km`, `0.7 km`).
-  - **Sections**: Groups restaurants into "My Restaurants", "What's there to eat nearby?", "Categories"- and display by the selected category.
-  - **Theme Toggle**: The moon icon in the upper right header toggles between Light and Dark mode.
-
----
-
-### Search Results Page 
-![Search Results](runScreenShot/searchPage.png)
-* **Page Route**: `/search?q=query`
-* Displays dynamic search results based on user queries (e.g., searching for "burger").
-  - **Restaurants and Stores**: Lists all restaurants whose name or description match the search term.
-  - **Related Items**: Displays specific menu items from various restaurants that match the query, allowing users to discover individual dishes across the platform and add them directly to their cart.
-
----
-
-### Restaurant Details & Menu 
-![Restaurant Details](runScreenShot/run4.png)
-* **Page Route**: `/restaurant/:id` (e.g., `/restaurant/r1` for Burger Palace)
-* Displays a hero banner, category badge, and description of the restaurant. Displays menu cards featuring product names, pricing, detailed descriptions, and quick "Add to Cart" actions.
-
----
-
-### Restaurant View for Owners 
-![Restaurant Owner View](runScreenShot/run5.png)
-* Shows the newly created restaurant details page before any dishes are added. Since the logged-in user is the owner, special management controls appear below the description banner: **Edit Details**, **+ Add Dish**, and **Delete Restaurant**.
-
----
-
-### Adding Menu Items 
-![Add Menu Item](runScreenShot/run6.png)
-* The custom modal allowing owners to add a new dish to their menu by defining the name, price in USD ($), description, and uploading a product image (defult messege-image instead of image if not uploaded).
-
----
-
-### Managed Menu View 
-![Managed Menu](runScreenShot/run7.png)
-* Renders the updated menu containing the added dish. In addition to "Add to Cart", the owner has quick edit and delete options for the item directly on the card.
-
----
-
-### Product Details Dialog 
-![Product Details Modal](runScreenShot/run8.png)
-* Clicking a menu card opens a modal presenting a large view of the dish, its pricing, detailed ingredients, and a direct checkout action button ("Add to Order").
-
----
-
-### Interactive Shopping Cart Drawer 
-![Shopping Cart](runScreenShot/run9.png)
-* A slide-out right drawer showing current cart contents. Users can edit item quantities (increment/decrement), delete items, see the running subtotal dynamically calculated, and complete checkout.
-
----
-
-### Order Confirmation 
-![Order Confirmed](runScreenShot/run10.png)
-* Upon clicking "Place Order", the cart updates in real-time to show a success state with a checkmark confirming the order has been submitted.
-
----
-
-### User Profile & History 
-![User Profile](runScreenShot/run11.png)
-* **Page Route**: `/profile`
-* **Profile Details**: Shows user account details. Includes:
-  - **Order History**: Lists previously placed orders with order date, detailed item listing with quantities, total price, and real-time status (e.g., "Processing").
-  - **My Restaurants**: A section displaying all restaurants registered by this user.
-
----
-
-### 🌓 Dark Mode Toggle
-The application includes a system-wide Dark Mode.
-* **How it works**: In the navigation bar, a theme toggle button switches between Light and Dark mode.
-* **Persistent Preference**: Toggling the theme writes the preference (`theme_<userID>: "dark" | "light"`) into the browser's `localStorage` linked to the specific authenticated user.
-* **Styling**: Swapping is handled globally in [index.css](./react-client/src/index.css) by overriding background and text color CSS variables under the `body.dark-mode` selector. This guarantees smooth, low-latency theme transitions without requiring full page re-renders.
-  ![Dark Mode](runScreenShot/darkMode.png)
+* **Phase 1 (C++ Recommendation Engine)**: Built the core algorithmic logic in C++. Implemented a Collaborative Filtering system as a CLI application that stores user viewing histories and calculates product recommendations based on user similarity.
+* **Phase 2 (TCP Client-Server Architecture)**: Upgraded the C++ application to run as a dedicated TCP Server. Implemented a Python client to interact with the server over sockets, handling requests asynchronously.
+* **Phase 3 (Node.js REST API & MongoDB)**: Developed the central backend using Node.js and Express. Transitioned to persistent data storage with MongoDB (Mongoose). This API handles all CRUD operations and communicates via TCP with the C++ Recommendation Server.
+* **Phase 4 (React Web Application)**: Built the dynamic Single Page Application (SPA) using React 19 and vanilla CSS. Implemented a full user journey (Registration, Browsing, Cart, Checkout) inspired by Wolt's UI, integrating seamlessly with the Node.js API.
+* **Phase 5 (React Native Mobile App)**: Expanded the ecosystem to mobile using React Native and Expo. Replicated the core web functionalities into a native cross-platform environment (iOS/Android) relying on the exact same backend infrastructure.
 

@@ -7,11 +7,12 @@ To build, compile, and run the complete TMT Delivery stack, we utilize Docker Co
 ## 🚀 Step-by-Step Execution
 
 ### 1. Build and Run Backend & Web Clients
-To raise the MongoDB database, the C++ recommendation engine, the Node.js Express server, and the React Web Client in the background, run the following command in the root project directory:
+To raise the MongoDB database, the C++ recommendation engine, the Node.js Express server, and the React Web Client, open a terminal in the root project directory and run:
 
 ```bash
 docker compose up --build
 ```
+*(Note: Keep this terminal open and running!)*
 
 #### Running Services:
 * **React Web Frontend**: Accessible locally at `http://localhost:3000`
@@ -22,18 +23,23 @@ docker compose up --build
 ---
 
 ### 2. Run the React Native Mobile Client (Expo)
-To launch the mobile application (utilizing the Expo Metro Bundler) on port `8081`, run the container with the `mobile` profile:
+Open a **new, separate terminal** so the backend remains running. You have two options to launch the mobile app:
 
+**Option A: Via Docker Profile**
 ```bash
 docker compose --profile mobile up --build
 ```
 
-Alternatively, you can run the mobile app locally using Expo CLI (if Node.js and dependencies are installed locally):
+**Option B: Locally (Recommended for Emulators)**
+If you want to run the app on an Android Emulator or iOS Simulator, or via the Expo Go app on your physical phone, run it locally:
 ```bash
 cd mobile-client
 npm install
 npm start
 ```
+*Once the Metro Bundler starts:*
+- **Emulators**: Press `a` in the terminal to open the Android Emulator, or `i` for the iOS Simulator.
+- **Physical Device**: Download the **Expo Go** app (Note: requires **version 56**) on your smartphone and scan the QR code displayed in the terminal to run the app on your own device.
 
 ---
 
