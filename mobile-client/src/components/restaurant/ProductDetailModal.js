@@ -35,11 +35,9 @@ export default function ProductDetailModal({ visible, product, restaurant, onClo
 
       // Trigger backend log view (which saves interaction to C++ TCP recommendation server)
       productService.getById(restId, prodId).catch((err) => {
-        console.log('Failed to log product view on backend:', err.message);
       });
 
       updateLastViewedProduct(product).catch((err) => {
-        console.log('Failed to log last viewed product locally:', err.message);
       });
     }
   }, [visible, product, restaurant, currentUser]);
@@ -90,7 +88,6 @@ export default function ProductDetailModal({ visible, product, restaurant, onClo
         setError(null);
       }
     } catch (err) {
-      console.error('Error picking image:', err);
       setError('Failed to select image.');
     }
   };
@@ -157,7 +154,6 @@ export default function ProductDetailModal({ visible, product, restaurant, onClo
       setIsEditing(false);
       onClose();
     } catch (err) {
-      console.log("Failed to update product:", err.message);
       setError(err.message || 'Failed to update product. Please try again.');
     } finally {
       setSubmitting(false);
@@ -185,7 +181,6 @@ export default function ProductDetailModal({ visible, product, restaurant, onClo
               }
               onClose();
             } catch (err) {
-              console.log("Failed to delete product:", err.message);
               Alert.alert("Error", err.message || "Failed to delete product.");
             } finally {
               setSubmitting(false);

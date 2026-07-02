@@ -26,7 +26,6 @@ export const AuthProvider = ({ children }) => {
         setCurrentUser(session);
       }
     } catch (error) {
-      console.error('Failed to load user session:', error);
     } finally {
       setLoading(false);
     }
@@ -68,7 +67,6 @@ export const AuthProvider = ({ children }) => {
           setCurrentUser(freshData);
         }
       } catch (error) {
-        console.error('Failed to refresh user details:', error);
       }
     }
   };

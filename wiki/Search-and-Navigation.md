@@ -12,10 +12,10 @@ The primary dashboard after login displays dynamic sections tailored to the user
 - **Sections**: Groups restaurants into "My Restaurants" (for owners), "Recommended for you", "What's there to eat nearby?", and "Categories".
 
 **Web Client**:
-![Homepage Web](../runScreenShot/run3.png) *(MISSING: Add updated Web screenshot that includes the new Recommendations section)*
+![Homepage Web](assets/web_home_recommendations.png)
 
 **Mobile Client**:
-<img src="images/1782859671048.jpg" width="300" alt="Homepage Dark Mode Mobile" /> <img src="images/1782859670796.jpg" width="300" alt="Homepage Light Mode Mobile" />
+<img src="assets/mobile_homepage_dark.jpg" width="300" alt="Homepage Dark Mode Mobile" /> <img src="assets/mobile_homepage_light.jpg" width="300" alt="Homepage Light Mode Mobile" />
 
 ---
 
@@ -28,27 +28,27 @@ The search input is located prominently in the navigation structure of the homep
 Clicking the search bar or search tab in the navigation bar takes the user to the search input screen.
 
 **Web Client**:
-![Search Icon Web](../runScreenShot/searchIconWebPlaceholder.png) *(MISSING: Add screenshot here)*
+![Search Input Web](assets/web_search_input.png)
 
 **Mobile Client**:
-*(MISSING: Add Search Icon screenshot here)*
+<img src="assets/mobile_search_empty.jpg" width="300" alt="Search Icon Mobile" />
 
 ### 2. Typing a Query
 
 The user types a query (e.g., "burger") into the search banner. The input triggers search handlers in the frontend.
 
 **Web Client**:
-![Search Input Web](../runScreenShot/searchInputWebPlaceholder.png) *(MISSING: Add screenshot here)*
+![Search Icon Web](assets/web_search_typing.png)
 
 **Mobile Client**:
-<img src="images/1782859670722.jpg" width="300" alt="Typing Search Query Mobile" />
+<img src="assets/mobile_search_typing.jpg" width="300" alt="Typing Search Query Mobile" />
 
 ### 3. Search Results (Matching Restaurants & Products)
 
 The API queries MongoDB, searching both the Restaurants collection and Products collection for name or description matches containing the search term. The Search Screen displays matching restaurants as well as individual dishes matching the query, allowing users to tap and open restaurants and products directly from the search results.
 
 **Web Client**:
-![Search Results Web](../runScreenShot/searchPage.png)
+![Search Results Web](assets/web_search_results_page.png)
 
 **Mobile Client**:
-<img src="images/1782859670701.jpg" width="300" alt="Search Results Mobile" />
+<img src="assets/mobile_search_results.jpg" width="300" alt="Search Results Mobile" />

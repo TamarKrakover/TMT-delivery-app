@@ -74,7 +74,6 @@ export const CartProvider = ({ children }) => {
         try {
           products = await productService.getByRestaurantId(pendingOrder.restaurantId);
         } catch (e) {
-          console.error("Could not fetch products", e);
         }
 
         // Count frequencies of productIds in pendingOrder
@@ -101,7 +100,6 @@ export const CartProvider = ({ children }) => {
         setCartCalculation({ totalPrice: 0, items: [] });
       }
     } catch (err) {
-      console.error("Failed to fetch cart", err);
       setCartItems([]);
       setCartRestaurant(null);
       setActiveOrderId(null);
@@ -136,7 +134,6 @@ export const CartProvider = ({ children }) => {
         setIsCalculating(false);
       })
       .catch(err => {
-        console.error('Calculation error:', err);
         setIsCalculating(false);
       });
   }, [cartItems, cartRestaurant]);
@@ -168,7 +165,6 @@ export const CartProvider = ({ children }) => {
         }
       }
     } catch (err) {
-      console.error("Failed to sync cart", err);
       fetchCart(); // rollback on error
     }
   };
@@ -257,7 +253,6 @@ export const CartProvider = ({ children }) => {
         await orderService.delete(activeOrderId);
         setActiveOrderId(null);
       } catch (e) {
-        console.error("Failed to clear cart", e);
       }
     }
   };
@@ -272,7 +267,6 @@ export const CartProvider = ({ children }) => {
       setCartCalculation({ totalPrice: 0, items: [] });
       setCheckoutTrigger(prev => prev + 1);
     } catch (e) {
-      console.error("Failed to checkout", e);
       throw e;
     }
   };
@@ -296,7 +290,6 @@ export const CartProvider = ({ children }) => {
         setActiveOrderId(newOrder.id || newOrder._id);
         triggerSuccess(product);
       } catch (e) {
-        console.error("Failed to switch cart", e);
         fetchCart();
       }
     }
