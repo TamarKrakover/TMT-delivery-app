@@ -63,6 +63,7 @@ export default function AddProductModal({ visible, onClose, restaurant, onProduc
         setPFormError(null);
       }
     } catch (err) {
+      console.error('Error picking image:', err);
       setPFormError('Failed to select image.');
     }
   };
@@ -108,6 +109,7 @@ export default function AddProductModal({ visible, onClose, restaurant, onProduc
       }
       onClose();
     } catch (err) {
+      console.log("Failed to add product:", err.message);
       setPFormError(err.message || 'Failed to add product. Please try again.');
     } finally {
       setPSubmitting(false);

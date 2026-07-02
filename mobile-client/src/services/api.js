@@ -32,6 +32,7 @@ export const getUserSession = async () => {
     const session = await AsyncStorage.getItem(USER_SESSION_KEY);
     return session ? JSON.parse(session) : null;
   } catch (error) {
+    console.error('Error reading user session:', error);
     return null;
   }
 };
@@ -49,6 +50,7 @@ export const setLastViewedProduct = async (userId, product) => {
   try {
     await AsyncStorage.setItem(`lastViewedProduct_${userId}`, JSON.stringify(product));
   } catch (e) {
+    console.error('Failed to save last viewed product', e);
   }
 };
 
@@ -59,6 +61,7 @@ export const setUserSession = async (userSession) => {
   try {
     await AsyncStorage.setItem(USER_SESSION_KEY, JSON.stringify(userSession));
   } catch (error) {
+    console.error('Error saving user session:', error);
   }
 };
 
@@ -69,6 +72,7 @@ export const clearUserSession = async () => {
   try {
     await AsyncStorage.removeItem(USER_SESSION_KEY);
   } catch (error) {
+    console.error('Error clearing user session:', error);
   }
 };
 
@@ -183,6 +187,7 @@ export const authService = {
         resolve(xhr.response);
       };
       xhr.onerror = function (e) {
+        console.error('XHR error converting URI to Blob:', e);
         reject(new TypeError("Network request failed"));
       };
       xhr.responseType = "blob";
@@ -203,6 +208,7 @@ export const authService = {
 
     if (!response.ok) {
       const errText = await response.text();
+      console.error('Image upload failed response:', errText);
       throw new Error('Image upload failed');
     }
 
@@ -234,6 +240,7 @@ export const uploadService = {
         resolve(xhr.response);
       };
       xhr.onerror = function (e) {
+        console.error('XHR error converting URI to Blob:', e);
         reject(new TypeError("Network request failed"));
       };
       xhr.responseType = "blob";
@@ -253,6 +260,7 @@ export const uploadService = {
 
     if (!response.ok) {
       const errText = await response.text();
+      console.error('Image upload failed response:', errText);
       throw new Error('Image upload failed');
     }
 

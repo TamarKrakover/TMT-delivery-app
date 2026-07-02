@@ -47,6 +47,7 @@ export default function CartScreen({ navigation }) {
       await checkout();
       setSuccess(true);
     } catch (err) {
+      console.error('Checkout failed:', err);
       setCheckoutError(err.message || 'Failed to place order. Please try again.');
     } finally {
       setLoading(false);

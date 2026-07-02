@@ -1,6 +1,8 @@
 const db = {
     users: [
-        { id: "admin", name: "admin",username: "admin", password: "admin123!", isAdmin: true, location: { lat: 32.0853, lng: 34.7818 }}
+        { id: "admin", name: "admin",username: "admin", password: "admin123!", isAdmin: true, location: { lat: 32.0853, lng: 34.7818 }},
+        { id: "u_1781793101189_569", name: "User 1", username: "user1", password: "Password123!", role: "customer", location: { lat: 32.0853, lng: 34.7818 }},
+        { id: "u_1781798384998_855", name: "User 2", username: "user2", password: "Password123!", role: "customer", location: { lat: 32.0853, lng: 34.7818 }}
     ],
     restaurants: [
         { id: "r1", name: "Burger Palace", description: "The ultimate destination for mouth-watering, flame-grilled burgers made with 100% premium beef and fresh ingredients.", category: "Burgers", creatorId: "admin", imageKey: "burger", image: "/api/uploads/restaurants/hamburger.webp", location: { lat: 32.0833, lng: 34.7850 } },

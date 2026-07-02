@@ -92,6 +92,7 @@ export default function RegisterScreen({ navigation }) {
         setImageAsset(result.assets[0]);
       }
     } catch (err) {
+      console.error('Gallery picker error:', err);
       showAlert('Error', 'Failed to pick image. Please try again.');
     }
   };
@@ -113,6 +114,7 @@ export default function RegisterScreen({ navigation }) {
         setImageAsset(result.assets[0]);
       }
     } catch (err) {
+      console.error('Camera picker error:', err);
       showAlert('Error', 'Failed to capture photo. Please try again.');
     }
   };

@@ -66,6 +66,7 @@ export default function ProfileScreen({ navigation, onLogout }) {
       setOrders(completedOrders);
       setRestaurants(restaurantsData);
     } catch (err) {
+      console.error('Failed to load profile order history:', err);
       setError('Failed to load order history.');
     } finally {
       setLoading(false);

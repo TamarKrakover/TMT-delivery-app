@@ -63,6 +63,7 @@ export default function HomeScreen({ navigation }) {
               setRecommendations(recsData || []);
             }
           } catch (e) {
+            console.error("Failed to load recommendation details:", e);
           }
         } else {
           setLastViewed(null);
@@ -74,6 +75,7 @@ export default function HomeScreen({ navigation }) {
         setRecommendations([]);
       }
     } catch (err) {
+      console.error("Failed to load home data:", err);
     } finally {
       setLoading(false);
     }

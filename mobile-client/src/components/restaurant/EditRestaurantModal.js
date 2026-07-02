@@ -40,6 +40,7 @@ export default function EditRestaurantModal({ visible, onClose, restaurant, onRe
       const cats = await categoryService.getAll();
       setAvailableCategories(cats || []);
     } catch (e) {
+      console.log("Failed to fetch categories:", e.message);
     }
   };
 
@@ -77,6 +78,7 @@ export default function EditRestaurantModal({ visible, onClose, restaurant, onRe
         setFormError(null);
       }
     } catch (err) {
+      console.error('Error picking image:', err);
       setFormError('Failed to select image.');
     }
   };
@@ -131,6 +133,7 @@ export default function EditRestaurantModal({ visible, onClose, restaurant, onRe
       }
       onClose();
     } catch (err) {
+      console.log("Failed to update restaurant:", err.message);
       setFormError(err.message || 'Failed to update restaurant. Please try again.');
     } finally {
       setSubmitting(false);

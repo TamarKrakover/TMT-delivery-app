@@ -41,6 +41,7 @@ export default function AddRestaurantModal({ visible, onClose, onRestaurantAdded
       const cats = await categoryService.getAll();
       setAvailableCategories(cats || []);
     } catch (e) {
+      console.log("Failed to load categories in modal:", e.message);
     }
   };
 
@@ -78,6 +79,7 @@ export default function AddRestaurantModal({ visible, onClose, onRestaurantAdded
         setFormError(null);
       }
     } catch (err) {
+      console.error('Error picking image:', err);
       setFormError('Failed to select image.');
     }
   };
@@ -135,6 +137,7 @@ export default function AddRestaurantModal({ visible, onClose, onRestaurantAdded
       }
       onClose();
     } catch (err) {
+      console.log("Failed to create restaurant:", err.message);
       setFormError(err.message || 'Failed to create restaurant. Please try again.');
     } finally {
       setSubmitting(false);

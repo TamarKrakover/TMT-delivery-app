@@ -85,6 +85,7 @@ export default function LoginScreen({ navigation }) {
       };
       await login(guestUser);
     } catch (error) {
+      console.log('Failed background guest login:', error.message);
       await login({
         isGuest: true,
         username: 'guest',

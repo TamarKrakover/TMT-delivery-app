@@ -33,6 +33,7 @@ export default function MyRestaurantsScreen({ navigation }) {
         setRestaurants(myRests);
       }
     } catch (err) {
+      console.log("Failed to fetch my restaurants:", err.message);
       setError("Failed to load your restaurants. Please try again.");
     } finally {
       setLoading(false);

@@ -70,6 +70,7 @@ export default function AddCategoryModal({ visible, onClose, onSuccess }) {
         setError('');
       }
     } catch (err) {
+      console.error('Error picking image:', err);
       setError('Failed to select image.');
     }
   };
@@ -108,6 +109,7 @@ export default function AddCategoryModal({ visible, onClose, onSuccess }) {
       handleClose();
       Alert.alert('Success', 'Category added successfully!');
     } catch (err) {
+      console.error('Error creating category:', err);
       setError(err.message || 'Failed to create category.');
     } finally {
       setLoading(false);
