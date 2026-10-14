@@ -7,6 +7,8 @@
 
 TMT Delivery is a complete, containerized ecosystem integrating a high-performance **C++ Recommendation Engine**, a robust **Node.js Express REST API**, a dynamic **React Web Application**, and a **React Native (Expo) Mobile Application**.
 
+_This project was developed as part of the Advanced Systems Programming course at Bar-Ilan University._
+
 ---
 
 ## 🚀 How to Run and Build the Project
